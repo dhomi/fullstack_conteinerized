@@ -1,4 +1,8 @@
 # Howto
+
+Er wordt er vanuit gegaan dat je:
+Docker desktop en NodeJS geinstalleerd zijn
+
 ## Installeer de modules
 ```
 cd backend
