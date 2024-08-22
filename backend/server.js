@@ -9,17 +9,17 @@ app.get("/", (req, res) => {
 	res.json([
 		{
 			id: 1,
-			joke: "Why don't scientists trust atoms? Because they make up everything!",
+			joke: "What’s a QA engineer’s favorite ice cream flavor? Cookie and Debug.",
 		},
-		{ id: 2, joke: "I'm on a seafood diet. I see food and I eat it" },
-		{ id: 3, joke: "I used to be a baker because I kneaded dough" },
+		{ id: 2, joke: "Why did the QA tester break up with their keyboard? It didn’t give enough feedback" },
+		{ id: 3, joke: "What’s a QA engineer’s favorite place in town? The Error 404 Café" },
 		{
 			id: 4,
-			joke: "Why don’t some couples go to the gym? Because some relationships don’t work out!",
+			joke: " QA engineer walks into a bar. Orders a beer. Orders 0 beers. Orders 99999999999 beers. Orders a lizard. Orders -1 beers. Orders a ueicbksjdhd",
 		},
 		{
 			id: 5,
-			joke: "I'm reading a book on anti-gravity. It's impossible to put down!",
+			joke: "That’s a Variant on my favourite saying - I don’t create the problems, I just find them",
 		},
 		{
 			id: 6,
