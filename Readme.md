@@ -1,4 +1,16 @@
 # Howto
+## Installeer de modules
+```
+cd backend
+npm i
+```
+
+nu in de frontend
+```
+cd frontend
+npm i
+```
+
 ## Start de container
 ```docker-compose up --build```
 
