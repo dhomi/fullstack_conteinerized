@@ -40,6 +40,11 @@
   line-height: 1.1;
 }
 
+@layer p.item {
+  margin: auto;
+  padding: 0px;
+}
+
 @layer button {
   border-radius: 8px;
   border: 1px solid transparent;

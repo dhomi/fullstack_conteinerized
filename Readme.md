@@ -4,14 +4,13 @@ Er wordt er vanuit gegaan dat je:
 Docker desktop en NodeJS geinstalleerd zijn
 
 ## Installeer de modules
+ga in de backend map en voer npm install door:
 ```
-cd backend
 npm i
 ```
 
-nu in de frontend
+dan in de frontend map:
 ```
-cd frontend
 npm i
 ```
 
@@ -21,8 +20,30 @@ npm i
 aan het einde van de build zie je ook de Local IP en de Network IP
 
 ## View de front- en backend 
-Open http://localhost:3000/ om de QA jokesville frontend te zien die de jokes krijgt van de backend die op http://localhost:8000/ de output heeft
+Frontend zit op http://localhost:3000/ . De frontend krijgt de 'items' van de backend die op http://localhost:8000/items draait
 
-Hierna kan je de ```docker-compose up``` (zonder ```--build```) gebruiken
 ## Stop de container
 ```docker-compose down```
+
+## CRUD operaties testen
+
+### Read (GET) all items:
+GET http://localhost:8000
+
+Read (GET) a specific item by ID:
+GET http://localhost:8000/1
+
+### Create (POST) a new item:
+POST http://localhost:8000
+Body: { "id":"12", "item": "New Item" }
+
+### Update (PUT) an item by ID:
+PUT http://localhost:8000/1
+Body: { "id":"12", "item": "New Item" }
+
+### Delete (DELETE) an item by ID:
+DELETE http://localhost:8000/1
+
+
+POST http://localhost:8000
+Body: { "id":"12", "item": "New Item" }
