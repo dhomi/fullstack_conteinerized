@@ -27,20 +27,22 @@ function App() {
 
   return (
     <>
-      <div className='text-4xl text-purple-400  px-20 bg-blue-100'>
-      Quality Accelerators Test App
-      </div>
-      <p />
-      <div className="card">
-        <button className='text-4xl text-blue-400  px-20 bg-purple-100' onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-      </div>
+      <header class="bg-white">
+        <nav class="mx-auto flex max-w-5xl items-center justify-between p-6 lg:px-8" aria-label="Global">
+          <div class="flex lg:flex-1">
+              <button type="button" className="button flex items-center gap-x-1 text-sm font-semibold leading-6 text-gray-900" aria-expanded="false" onClick={() => setCount((count) => count + 1)}>
+                Aantal kliks is {count}
+              </button>
+          </div>
+          <div class="relative">
+            <a href="#" class="-m-1.5 p-1.5">
+              <span class="sr-only">Quality Accelerators</span>
+              <img class="h-20 w-auto" src="src/assets/qa-logo.png" alt="Quality Accelerators Logo" />
+            </a>
+          </div>
+        </nav>
+      </header>
 
-
-      < nav className='bg-red-50 py-4' >
-        <p className='font-light text-4xl text-red-400  px-20 '>The backend app: QA Jokes</p>
-      </nav >
       <main className="px-10 py-20">
         {!error ? (
           
