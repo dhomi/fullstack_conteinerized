@@ -3,27 +3,17 @@
 Er wordt er vanuit gegaan dat je:
 Docker desktop en NodeJS geinstalleerd zijn
 
-## Installeer de modules
-ga in de backend map en voer npm install door:
-```
-npm i
-```
-
-dan in de frontend map:
-```
-npm i
-```
-
 ## Start de container
 ```docker-compose up --build```
 
 aan het einde van de build zie je ook de Local IP en de Network IP
 
+### Stop de container
+```docker-compose down```
+
 ## View de front- en backend 
 Frontend zit op http://localhost:3000/ . De frontend krijgt de 'items' van de backend die op http://localhost:8000/items draait
 
-## Stop de container
-```docker-compose down```
 
 ## CRUD operaties testen
 
