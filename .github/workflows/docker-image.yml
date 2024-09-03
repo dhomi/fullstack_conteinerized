@@ -20,7 +20,7 @@ jobs:
     - name: Execute tests in the running services
       run: |
         # run on github
-        # docker compose up --build
+        docker compose up --build
 
         # to run on self-hosted
-         docker-compose up --build
+         # docker-compose up --build
