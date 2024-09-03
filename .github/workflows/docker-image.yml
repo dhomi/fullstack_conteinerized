@@ -20,4 +20,4 @@ jobs:
           compose-file: "docker-compose.yaml"
     - name: Execute tests in the running services
       run: |
-        docker-compose up --build
+        docker compose up --build
