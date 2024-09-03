@@ -11,6 +11,7 @@ jobs:
     timeout-minutes: 60
     # runs-on: ubuntu-latest
     runs-on: self-hosted
+
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
@@ -18,13 +19,16 @@ jobs:
         node-version: 18
 
     - name: Install dependencies
-      run: cd tests && npm ci
+      working-directory: ./tests
+      run: npm ci
 
     - name: Install Playwright Browsers
-      run: cd tests && npx playwright install --with-deps
+      working-directory: ./tests
+      run: npx playwright install --with-deps
 
     - name: Run Playwright tests
-      run: cd tests && npx playwright test
+      working-directory: ./tests
+      run: npx playwright test
 
     # - uses: actions/upload-artifact@v4
     #   if: ${{ !cancelled() }}
