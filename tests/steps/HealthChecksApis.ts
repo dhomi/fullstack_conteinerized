@@ -12,8 +12,7 @@ let accestoken: string
 const API_KEY = 'dummy'
 
 const headers = {
-	'x-api-key': API_KEY,
-};
+}
 
 Given('dat ik het endpoint {string} heb', async ({ }, url: string) => {
 	endpoint = url;

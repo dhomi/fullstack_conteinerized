@@ -1,5 +1,4 @@
 # language: nl
-@wip
 
 Functionaliteit: Controle van de API-status
   als tester 
@@ -13,5 +12,5 @@ Functionaliteit: Controle van de API-status
 
 Voorbeelden:
     | url |
-    | https://localhost:8000/ |
-    | https://localhost:8000/1 |
+    | http://localhost:8000 |
+    | http://localhost:8000/1 |
