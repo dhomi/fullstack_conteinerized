@@ -49,7 +49,8 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* run headless when running in GitLab */
-    headless: !!process.env.CI,
+    // headless: !!process.env.CI,
+    headless: true,
     /* Timeout for each Playwright action in milliseconds. Defaults to 0 (no timeout). Learn more about timeouts and how to set them for a single test. */
     actionTimeout: 0,
     /* Timeout for each navigation action in milliseconds. Defaults to 0 (no timeout). */
