@@ -2,11 +2,11 @@ version: "3.8"
 services:
   frontend:
     build: ./frontend
-    container_name: jokesVille_client
+    container_name: techLab_client
     ports:
       - "3000:3000"
   backend:
     build: ./backend
-    container_name: jokesVille_server
+    container_name: techLab_server
     ports:
       - "8000:8000"

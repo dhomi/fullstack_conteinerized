@@ -18,9 +18,14 @@ Docker container stoppen met ```docker-compose down```
 in een shell ga naar de map tests en run ze met act
 
 ```cd tests
-act```
+act
+```
+## JMeter
+cd naar jmeter en start act op
 
-
+```cd jmeter
+act
+```
 
 ## CRUD operaties testen
 
