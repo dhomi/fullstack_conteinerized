@@ -32,7 +32,7 @@ act
 ### Read (GET) all items:
 GET http://localhost:8000
 
-Read (GET) a specific item by ID:
+### Read (GET) a specific item by ID:
 GET http://localhost:8000/1
 
 ### Create (POST) a new item:
@@ -45,7 +45,3 @@ Body: { "id":"12", "item": "New Item" }
 
 ### Delete (DELETE) an item by ID:
 DELETE http://localhost:8000/1
-
-
-POST http://localhost:8000
-Body: { "id":"12", "item": "New Item" }

@@ -1,5 +1,6 @@
 # language: nl
 
+@ui
 Functionaliteit: UI check
   als tester 
   wil ik verifieren dat de ui correct werkt

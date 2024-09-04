@@ -38,7 +38,8 @@ Then('zou de geklikte id {string} moeten zijn', async ({ page }, id: string) => 
 })
 
 Then('zouden de opvolgende kliks met +1 verhoogd worden', async ({ }) => {
-    expect(eersteKlik).toBe(eersteKlik)
-    expect(tweedeKlik).toBe(tweedeKlik)
-    expect(derdeKlik).toBe(derdeKlik)
+    // console.log('type 3eklik is:', typeof(derdeKlik), 'content ervan is: ', derdeKlik)
+    expect(eersteKlik).toBe('Aantal kliks is 1')
+    expect(tweedeKlik).toBe('Aantal kliks is 2')
+    expect(derdeKlik).toBe('Aantal kliks is 3')
 })
