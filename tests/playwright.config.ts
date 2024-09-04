@@ -1,19 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
+import { junit } from "node:test/reporters";
 import { defineBddConfig } from "playwright-bdd";
 
-const gitlabArtifactsUrl = !!process.env.CI
-  ? `${process.env.CI_PROJECT_URL}/-/jobs/${process.env.CI_JOB_ID}/artifacts/raw/playwright-report/data/`
-  : "";
-const gitlabReporter = [
-  ["junit", { outputFile: "junit-results.xml" }],
-  [
-    "html",
-    {
-      open: "never",
-      attachmentsBaseURL: gitlabArtifactsUrl,
-    },
-  ],
-];
 const desktopReporter = [["html", { open: "always" }]];
 
 const testDir = defineBddConfig({
@@ -30,9 +18,8 @@ const testDir = defineBddConfig({
 export default defineConfig({
   testDir,
   snapshotDir: process.env.CI ? "./snapshots" : "./snapshots/localhost",
-  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  // reporter: process.env.CI ? [...gitlabReporter] : [...desktopReporter],
-  reporter: "html",
+  reporter: process.env.CI ? 'list' : [...desktopReporter],
+  
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   // forbidOnly: !!process.env.CI,
   /* Run tests within files in parallel */

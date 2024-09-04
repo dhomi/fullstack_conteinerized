@@ -3,7 +3,7 @@
 ## Installatie
 Er wordt er vanuit gegaan dat je:
 Docker desktop en NodeJS geinstalleerd zijn
-Voor lokaal runnen is tooltje act wel erg handig
+Voor lokaal runnen is tooltje act wel erg handig <https://nektosact.com>
 
 ## Start de container
 ```docker-compose up --build```
@@ -15,6 +15,8 @@ Frontend zit op http://localhost:3000/ . De frontend krijgt de 'items' van de ba
 Docker container stoppen met ```docker-compose down```
 
 ## E2E tests
+in een shell ga naar de map tests en run ze met act
+
 ```cd tests
 act```
 
