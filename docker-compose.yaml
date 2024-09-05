@@ -1,4 +1,9 @@
 version: "3.8"
+
+networks:
+  monitoring:
+    driver: bridge
+
 services:
   frontend:
     build: ./frontend
@@ -11,14 +16,6 @@ services:
     ports:
       - "8000:8000"
 
-  elk:
-    image: sebp/elk
-    container_name: techLab_elk
-    ports:
-      - "5601:5601"
-      - "9200:9200"
-      - "5044:5044"
-
   grafana:
     build: ./grafana
     container_name: techLab_grafana
@@ -28,6 +25,7 @@ services:
       - grafana-data:/var/lib/grafana
     depends_on:
       - pg-db
+
   pg-db:
     build:
       context: postgres
@@ -37,6 +35,21 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
 
+  prometheus:
+    build: ./prometheus
+    image: prom/prometheus:v2.37.9
+    container_name: techLab_prometheus
+    ports:
+      - 9090:9090
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yaml'
+    volumes:
+      - ./config/prometheus.yaml:/etc/prometheus/prometheus.yaml:ro
+      - ./data:/prometheus
+    restart: unless-stopped
+
 volumes:
   grafana-data:
   postgres-data:
+  prometheus-data:
+    # driver: local
