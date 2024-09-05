@@ -1,5 +1,9 @@
 # Howto
 
+## TODO
+chaos testing: https://github.com/chaos-mesh/chaos-mesh
+Grafana met dashboard op backend elke 1 sec. GET
+
 ## Installatie
 Er wordt er vanuit gegaan dat je:
 Docker desktop en NodeJS geinstalleerd zijn
@@ -14,18 +18,21 @@ Frontend zit op http://localhost:3000/ . De frontend krijgt de 'items' van de ba
 
 Docker container stoppen met ```docker-compose down```
 
-## E2E tests
-in een shell ga naar de map tests en run ze met act
+### E2E tests
+in een shell ga naar de map e2e en run ze met act
 
-```cd tests
+```cd e2e
 act
 ```
-## JMeter
+### JMeter
 cd naar jmeter en start act op
 
 ```cd jmeter
 act
 ```
+
+### ELK stack
+Elasticsearch, Loadash, Kibana op:  http://localhost:5601
 
 ## CRUD operaties testen
 

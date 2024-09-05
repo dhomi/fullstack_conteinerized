@@ -1,0 +1,12 @@
+{
+    "name": "add-latency-to-endpoint",
+    "type": "action",
+    "provider": {
+      "type": "python",
+      "module": "chaosgcp.lb.actions",
+      "func": "add_latency_to_endpoint",
+      "arguments": {
+        "url": ""
+      }
+    }
+  }

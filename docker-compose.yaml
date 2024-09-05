@@ -2,11 +2,41 @@ version: "3.8"
 services:
   frontend:
     build: ./frontend
-    container_name: techLab_client
+    container_name: techLab_frontend
     ports:
       - "3000:3000"
   backend:
     build: ./backend
-    container_name: techLab_server
+    container_name: techLab_backend
     ports:
       - "8000:8000"
+
+  elk:
+    image: sebp/elk
+    container_name: techLab_elk
+    ports:
+      - "5601:5601"
+      - "9200:9200"
+      - "5044:5044"
+
+  grafana:
+    build: ./grafana
+    container_name: techLab_grafana
+    ports:
+      - "4000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - pg-db
+  pg-db:
+    build:
+      context: postgres
+    container_name: techLab_postgresDB
+    ports:
+      - "1599:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  grafana-data:
+  postgres-data:
