@@ -21,7 +21,9 @@ datasources:
       timescaledb: false
     isDefault: true
 
-  - name: InfluxDB_qa
+  - name: InfluxDB
+    uid: influxDB
+    orgId: 1
     type: influxdb
     access: proxy
     url: http://influxdb:8086
