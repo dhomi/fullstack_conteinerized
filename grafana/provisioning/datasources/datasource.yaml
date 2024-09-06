@@ -20,3 +20,18 @@ datasources:
       postgresVersion: 903
       timescaledb: false
     isDefault: true
+
+  - name: InfluxDB_qa
+    type: influxdb
+    access: proxy
+    url: http://influxdb:8086
+    user: myusername
+    password: passwordpasswordpassword
+    jsonData:
+      version: Flux
+      organization: myorg
+      defaultBucket: mybucket
+      tlsSkipVerify: true
+    secureJsonData:
+      token: mytoken
+

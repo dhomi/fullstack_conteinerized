@@ -29,6 +29,14 @@ SET default_tablespace = '';
 SET schema 'public';
 SET default_table_access_method = heap;
 
+CREATE TABLE monitor (
+    id SERIAL PRIMARY KEY,
+    endpoint VARCHAR(50) NOT NULL,
+    response VARCHAR(50) NOT NULL,
+    year INT NOT NULL,
+    date TIMESTAMP
+);
+
 CREATE TABLE cars (
     car_id SERIAL PRIMARY KEY,
     make VARCHAR(50) NOT NULL,

@@ -31,9 +31,6 @@ cd naar jmeter en start act op
 act
 ```
 
-### ELK stack
-Elasticsearch, Loadash, Kibana op:  http://localhost:5601
-
 ## CRUD operaties testen
 
 ### Read (GET) all items:

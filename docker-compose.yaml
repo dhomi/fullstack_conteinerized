@@ -1,4 +1,4 @@
-version: "3.8"
+version: "3"
 
 networks:
   monitoring:
@@ -10,6 +10,7 @@ services:
     container_name: techLab_frontend
     ports:
       - "3000:3000"
+
   backend:
     build: ./backend
     container_name: techLab_backend
@@ -35,21 +36,29 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
 
-  prometheus:
-    build: ./prometheus
-    image: prom/prometheus:v2.37.9
-    container_name: techLab_prometheus
-    ports:
-      - 9090:9090
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yaml'
+  influxdb:
+    image: influxdb:2.6-alpine
+    container_name: techLab_influx
+    env_file:
+      - influxv2.env
     volumes:
-      - ./config/prometheus.yaml:/etc/prometheus/prometheus.yaml:ro
-      - ./data:/prometheus
-    restart: unless-stopped
+      - influxdbv2:/var/lib/influxdb2:rw
+      - influxdbv2:/var/data/influxdb2:rw
+    ports:
+      - "8086:8086"
+
+  telegraf:
+    image: telegraf:1.25-alpine
+    container_name: techLab_telegraf
+    depends_on:
+      - influxdb
+    volumes:
+      - ./telegraf/mytelegraf.conf:/etc/telegraf/telegraf.conf:ro
+    env_file:
+      - influxv2.env
 
 volumes:
   grafana-data:
   postgres-data:
-  prometheus-data:
-    # driver: local
+  influxdbv2:
+  telegraf:
