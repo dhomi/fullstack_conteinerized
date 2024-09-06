@@ -13,15 +13,16 @@ Voor lokaal runnen is tooltje act wel erg handig <https://nektosact.com>
 ```docker-compose up --build```
 aan het einde van de build zie je ook de Local IP en de Network IP
 
+### Monitor
+Grafana is op: http://localhost:4000
+
+Monitoring dashboard is het 'TechLab backend monitor'
+grafana haalt gegevens op uit InfluxDB:8086, en influx krijgt data elke paar seconden uit telegram scraper (op backend getall)
+
 ### View de front- en backend 
 Frontend zit op http://localhost:3000/ . De frontend krijgt de 'items' van de backend die op http://localhost:8000/items draait
 
 Docker container stoppen met ```docker-compose down```
-
-### Monitor
-Grafana is op: http://localhost:4000
-Monitoring dashboard is het 'TechLab backend monitor'
-grafana haalt gegevens op uit InfluxDB:8086, en influx krijgt data elke paar seconden uit telegram scraper (op backend getall)
 
 ### E2E tests
 in een shell ga naar de map e2e en run ze met act
