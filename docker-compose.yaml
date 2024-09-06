@@ -1,12 +1,64 @@
-version: "3.8"
+version: "3"
+
+networks:
+  monitoring:
+    driver: bridge
+
 services:
   frontend:
     build: ./frontend
-    container_name: techLab_client
+    container_name: techLab_frontend
     ports:
       - "3000:3000"
+
   backend:
     build: ./backend
-    container_name: techLab_server
+    container_name: techLab_backend
     ports:
       - "8000:8000"
+
+  grafana:
+    build: ./grafana
+    container_name: techLab_grafana
+    ports:
+      - "4000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - pg-db
+
+  pg-db:
+    build:
+      context: postgres
+    container_name: techLab_postgresDB
+    ports:
+      - "1599:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  influxdb:
+    image: influxdb:2.6-alpine
+    container_name: techLab_influx
+    env_file:
+      - influxv2.env
+    volumes:
+      - influxdbv2:/var/lib/influxdb2:rw
+      - influxdbv2:/var/data/influxdb2:rw
+    ports:
+      - "8086:8086"
+
+  telegraf:
+    image: telegraf:1.25-alpine
+    container_name: techLab_telegraf
+    depends_on:
+      - influxdb
+    volumes:
+      - ./telegraf/mytelegraf.conf:/etc/telegraf/telegraf.conf:ro
+    env_file:
+      - influxv2.env
+
+volumes:
+  grafana-data:
+  postgres-data:
+  influxdbv2:
+  telegraf:
