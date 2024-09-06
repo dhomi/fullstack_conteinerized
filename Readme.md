@@ -18,6 +18,11 @@ Frontend zit op http://localhost:3000/ . De frontend krijgt de 'items' van de ba
 
 Docker container stoppen met ```docker-compose down```
 
+### Monitor
+Grafana is op: http://localhost:4000
+Monitoring dashboard is het 'TechLab backend monitor'
+grafana haalt gegevens op uit InfluxDB:8086, en influx krijgt data elke paar seconden uit telegram scraper (op backend getall)
+
 ### E2E tests
 in een shell ga naar de map e2e en run ze met act
 
