@@ -1,8 +1,9 @@
 # Howto
+Start hier: http://localhost:4000/
+
 
 ## TODO
 chaos testing: https://github.com/chaos-mesh/chaos-mesh
-Grafana met dashboard op backend elke 1 sec. GET
 
 ## Installatie
 Er wordt er vanuit gegaan dat je:
