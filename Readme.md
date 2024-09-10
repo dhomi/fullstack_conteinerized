@@ -1,6 +1,8 @@
 # Howto
-Start hier: http://localhost:4000/
+Na het docker-compose ga naar het dashboard: http://localhost:4000/
 
+## Local IP adress ophalen
+ipconfig | grep IPv4 | awk 'END{print}'  
 
 ## TODO
 chaos testing: https://github.com/chaos-mesh/chaos-mesh
