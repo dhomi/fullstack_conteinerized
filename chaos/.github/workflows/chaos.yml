@@ -14,6 +14,6 @@ jobs:
     - uses: chaostoolkit/run-action@v0
       with:
         experiment-file: "./slow-down-traffic-from-cloudrun-service.json"
-        working-dir: "experiments"
+        working-dir: "chaos"
         install-dependencies: gcp;slack;otel
-        dependencies-file: requirements.txt
+        # dependencies-file: requirements.txt

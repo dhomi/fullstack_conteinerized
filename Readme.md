@@ -21,7 +21,7 @@ Monitoring dashboard is het 'TechLab backend monitor'
 grafana haalt gegevens op uit InfluxDB:8086, en influx krijgt data elke paar seconden uit telegram scraper (op backend getall)
 
 ### View de front- en backend 
-Frontend zit op http://localhost:3000/ . De frontend krijgt de 'items' van de backend die op http://localhost:8000/items draait
+Frontend zit op http://localhost:3000/ . De frontend krijgt de 'jokes' van de backend die op http://localhost:8000/ draait
 
 Docker container stoppen met ```docker-compose down```
 
@@ -40,19 +40,20 @@ act
 
 ## CRUD operaties testen
 
-### Read (GET) all items:
+### Read (GET) all jokes:
 GET http://localhost:8000
 
-### Read (GET) a specific item by ID:
-GET http://localhost:8000/1
+### Read (GET) a specific joke by ID:
+GET http://localhost:8000/6
 
-### Create (POST) a new item:
+### Create (POST) a new joke:
 POST http://localhost:8000
-Body: { "id":"12", "item": "New Item" }
+Body: {"item": "POST nieuwe mop" }
+header: {"Content-type": "application/json; charset=UTF-8" }
 
-### Update (PUT) an item by ID:
-PUT http://localhost:8000/1
-Body: { "id":"12", "item": "New Item" }
+### Update (PUT) an joke by ID:
+PUT http://localhost:8000/8
+Body: { "id":"8", "joke": "PUT joke update" }
 
-### Delete (DELETE) an item by ID:
+### Delete (DELETE) an joke by ID:
 DELETE http://localhost:8000/1
