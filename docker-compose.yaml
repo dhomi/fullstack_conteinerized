@@ -5,12 +5,6 @@ networks:
     driver: bridge
 
 services:
-  frontend:
-    build: ./frontend
-    container_name: techLab_frontend
-    ports:
-      - "3000:3000"
-
   backend:
     build: ./backend
     container_name: techLab_backend
@@ -56,6 +50,12 @@ services:
       - ./telegraf/mytelegraf.conf:/etc/telegraf/telegraf.conf:ro
     env_file:
       - influxv2.env
+
+  frontend:
+    build: ./frontend
+    container_name: techLab_frontend
+    ports:
+      - "3000:3000"
 
 volumes:
   grafana-data:
