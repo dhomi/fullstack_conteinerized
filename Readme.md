@@ -1,11 +1,10 @@
 # Howto
 Na het docker-compose ga naar het dashboard: http://localhost:4000/
 
-## Local IP adress ophalen
-ipconfig | grep IPv4 | awk 'END{print}'  
-
 ## TODO
 chaos testing: https://github.com/chaos-mesh/chaos-mesh
+architectuur plaatje maken voor uitleggen wat/hoe dit werkt
+jmeter test zwaarder maken zodat de dashboard duidelijke lijn laat zien
 
 ## Installatie
 Er wordt er vanuit gegaan dat je:
@@ -21,6 +20,10 @@ Grafana is op: http://localhost:4000
 
 Monitoring dashboard is het 'TechLab backend monitor'
 grafana haalt gegevens op uit InfluxDB:8086, en influx krijgt data elke paar seconden uit telegram scraper (op backend getall)
+
+## Local IP adress ophalen
+ipconfig | grep IPv4 | awk 'END{print}'  
+
 
 ### View de front- en backend 
 Frontend zit op http://localhost:3000/ . De frontend krijgt de 'jokes' van de backend die op http://localhost:8000/ draait
