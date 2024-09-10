@@ -49,7 +49,6 @@ GET http://localhost:8000/6
 ### Create (POST) a new joke:
 POST http://localhost:8000
 Body: {"item": "POST nieuwe mop" }
-header: {"Content-type": "application/json; charset=UTF-8" }
 
 ### Update (PUT) an joke by ID:
 PUT http://localhost:8000/8

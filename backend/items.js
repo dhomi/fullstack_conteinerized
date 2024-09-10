@@ -44,7 +44,6 @@ router.post('/', (req, res) => {
 	const newQaJoke = { id: qaJokes.length + 1, joke };
 	qaJokes.push(newQaJoke);
 	console.log('Got body:', joke);
-	res.sendStatus(200);
 
 	res.status(201).json(newQaJoke);
 });
