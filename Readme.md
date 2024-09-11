@@ -2,9 +2,8 @@
 Na het docker-compose ga naar het dashboard: http://localhost:4000/
 
 ## TODO
-chaos testing: https://github.com/chaos-mesh/chaos-mesh
-architectuur plaatje maken voor uitleggen wat/hoe dit werkt
-jmeter test zwaarder maken zodat de dashboard duidelijke lijn laat zien
+- chaos testing: https://github.com/chaos-mesh/chaos-mesh
+- architectuur plaatje maken voor uitleggen wat/hoe dit werkt
 
 ## Installatie
 Er wordt er vanuit gegaan dat je:
