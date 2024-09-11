@@ -45,19 +45,19 @@ act
 
 ## CRUD operaties testen
 
-### Read (GET) all jokes:
+### Read (GET) all items, returns status: 200:
 GET http://localhost:8000
 
-### Read (GET) a specific joke by ID:
+### Read (GET) a specific item by ID, returns status: 200:
 GET http://localhost:8000/6
 
-### Create (POST) a new joke:
+### Create (POST) a new joke, returns status: 201:
 POST http://localhost:8000
 Body: {"item": "POST nieuwe mop" }
 
-### Update (PUT) an joke by ID:
-PUT http://localhost:8000/8
-Body: { "id":"8", "joke": "PUT joke update" }
+### Update (PUT) an item by ID, returns status: 200:
+PUT http://localhost:8000/6
+Body: { "item": "PUT update" }
 
-### Delete (DELETE) an joke by ID:
-DELETE http://localhost:8000/1
+### Delete (DELETE) an item by ID, returns status: 204:
+DELETE http://localhost:8000/6

@@ -51,22 +51,21 @@ router.post('/', (req, res) => {
 // Update an existing qaJoke by ID
 router.put('/:id', (req, res) => {
 	const { id } = req.params;
-	const { joke } = req.body;
+	const joke = JSON.parse(req.rawHeaders[3]).item
 
 	// Simple validation
 	if (!joke) {
-		return res.status(400).json({ message: 'joke is verplicht toch?...pfff, WEL meegeven hoor?! lol ;)' });
+		return res.status(400).json({ message: 'item met value: joke is verplicht toch?...pfff, WEL meegeven hoor?! lol ;)' })
 	}
 
 	const qaJoke = qaJokes.find((qaJoke) => qaJoke.id === parseInt(id));
 
 	if (!qaJoke) {
-		return res.status(404).json({ message: 'Niet gevonden... misschien was ie te grappig?' });
+		return res.status(404).json({ message: 'Item by ID is niet gevonden... misschien was ie te grappig?' });
 	}
+	console.log('Got body:', joke);
 
 	qaJoke.joke = joke;
-	qaJoke.age = age;
-
 	res.json(qaJoke);
 });
 
@@ -74,7 +73,8 @@ router.put('/:id', (req, res) => {
 router.delete('/:id', (req, res) => {
 	const { id } = req.params;
 	qaJokes = qaJokes.filter((qaJoke) => qaJoke.id !== parseInt(id));
-	res.sendStatus(204);
+	
+	res.sendStatus(204)
 });
 
 module.exports = router;
