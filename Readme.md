@@ -7,10 +7,6 @@ This repository is an ongoing CI/CD project with fullstack technology examples.
 ## How-To
 Na het docker-compose ga naar het dashboard: http://localhost:4000/
 
-## TODO
-- chaos testing: https://github.com/chaos-mesh/chaos-mesh
-- architectuur plaatje maken voor uitleggen wat/hoe dit werkt
-
 ## Installatie
 Er wordt er vanuit gegaan dat je:
 Docker desktop en NodeJS geinstalleerd zijn
@@ -66,3 +62,7 @@ Body: { "item": "PUT update" }
 
 ### Delete (DELETE) an item by ID, returns status: 204:
 DELETE http://localhost:8000/6
+
+## TODO
+- chaos testing: https://github.com/chaos-mesh/chaos-mesh
+- architectuur plaatje maken voor uitleggen wat/hoe dit werkt
