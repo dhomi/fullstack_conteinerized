@@ -1,4 +1,6 @@
-# Howto
+![logo](src/qa.png)
+
+# How-To
 Na het docker-compose ga naar het dashboard: http://localhost:4000/
 
 ## TODO
