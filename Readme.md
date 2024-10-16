@@ -64,5 +64,6 @@ Body: { "item": "PUT update" }
 DELETE http://localhost:8000/6
 
 ## TODO
-- chaos testing: https://github.com/chaos-mesh/chaos-mesh
-- architectuur plaatje maken voor uitleggen wat/hoe dit werkt
+- Chaos testing: https://github.com/chaos-mesh/chaos-mesh
+- Architectuur plaatje maken voor uitleggen wat/hoe dit werkt
+- Extra README instructions
