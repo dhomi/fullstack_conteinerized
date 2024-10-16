@@ -1,6 +1,10 @@
 ![logo](src/qa.png)
 
-# How-To
+# Fullstack Containerized Project
+
+This repository is an ongoing CI/CD project with fullstack technology examples. 
+
+## How-To
 Na het docker-compose ga naar het dashboard: http://localhost:4000/
 
 ## TODO
