@@ -5,7 +5,7 @@
 This repository is an ongoing CI/CD project with fullstack technology examples in an containerized environment. 
 
 ## How-To
-Follow the instructions below. After "docker-compose" go to dashboard at http://localhost:4000/
+Follow the instructions below. 
 
 ### Installation
 Preconditions:
@@ -15,7 +15,8 @@ Preconditions:
 
 ### Start the container
 ```docker-compose up --build```
-- at the end of the build you will also see the Local IP and the Network IP
+- After "docker-compose" go to dashboard at http://localhost:4000/
+- At the end of the build you will also see the Local IP and the Network IP
 
 ### Monitor
 Grafana is a monitoring tool at http://localhost:4000
