@@ -15,7 +15,7 @@ Preconditions:
 
 ### Start the container
 ```docker-compose up --build```
-at the end of the build you will also see the Local IP and the Network IP
+- at the end of the build you will also see the Local IP and the Network IP
 
 ### Monitor
 Grafana is a monitoring tool at http://localhost:4000
