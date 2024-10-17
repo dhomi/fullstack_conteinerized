@@ -2,49 +2,51 @@
 
 # Fullstack Containerized Project
 
-This repository is an ongoing CI/CD project with fullstack technology examples. 
+This repository is an ongoing CI/CD project with fullstack technology examples in an containerized environment. 
 
 ## How-To
-Na het docker-compose ga naar het dashboard: http://localhost:4000/
+Follow the instructions below. After "docker-compose" go to dashboard at http://localhost:4000/
 
-## Installatie
-Er wordt er vanuit gegaan dat je:
-Docker desktop en NodeJS geinstalleerd zijn
-Voor lokaal runnen is tooltje act wel erg handig <https://nektosact.com>
+### Installation
+Preconditions:
+- Docker Desktop installed
+- NodeJS installed
+- Act is a very handy tool for local running, see <https://nektosact.com>
 
-## Start de container
+### Start the container
 ```docker-compose up --build```
-aan het einde van de build zie je ook de Local IP en de Network IP
+at the end of the build you will also see the Local IP and the Network IP
 
 ### Monitor
-Grafana is op: http://localhost:4000
+Grafana is a monitoring tool at http://localhost:4000
 
-Monitoring dashboard is het 'TechLab backend monitor'
-grafana haalt gegevens op uit InfluxDB:8086, en influx krijgt data elke paar seconden uit telegram scraper (op backend getall)
+- Monitoring dashboard is the 'TechLab backend monitor'
+- Grafana gets data from InfluxDB:8086, and Influx gets data every few seconds from Telegram scraper (on backend number)
 
-## Local IP adress ophalen
-ipconfig | grep IPv4 | awk 'END{print}'  
+### Fetch Local IP address
+```ipconfig | grep IPv4 | awk 'END{print}'```  
 
 
-### View de front- en backend 
-Frontend zit op http://localhost:3000/ . De frontend krijgt de 'jokes' van de backend die op http://localhost:8000/ draait
-
-Docker container stoppen met ```docker-compose down```
+### View the Front- and Backend 
+- Frontend is located at http://localhost:3000/
+- The frontend gets the 'jokes' from the backend that runs on http://localhost:8000/
+- To stop the Docker container:
+ ```docker-compose down```
 
 ### E2E tests
-in een shell ga naar de map e2e en run ze met act
+From the shell (or other cmd tool) to folder "e2e" and run the teste with "act"
 
 ```cd e2e
 act
 ```
 ### JMeter
-cd naar jmeter en start act op
+Navigate to folder "jmeter" and start "act"
 
 ```cd jmeter
 act
 ```
 
-## CRUD operaties testen
+## Testing CRUD operations
 
 ### Read (GET) all items, returns status: 200:
 GET http://localhost:8000
@@ -65,5 +67,5 @@ DELETE http://localhost:8000/6
 
 ## TODO
 - Chaos testing: https://github.com/chaos-mesh/chaos-mesh
-- Architectuur plaatje maken voor uitleggen wat/hoe dit werkt
+- Create an architectural picture to explain what and how this project works
 - Extra README instructions
