@@ -48,21 +48,21 @@ act
 
 ## Testing CRUD operations
 
-### Read (GET) all items, returns status: 200:
+### Read (GET) all items / returns status: 200
 GET http://localhost:8000
 
-### Read (GET) a specific item by ID, returns status: 200:
+### Read (GET) a specific item by ID / returns status: 200
 GET http://localhost:8000/6
 
-### Create (POST) a new joke, returns status: 201:
+### Create (POST) a new joke / returns status: 201
 POST http://localhost:8000
-Body: {"item": "POST nieuwe mop" }
+- Body: {"item": "POST nieuwe mop" }
 
-### Update (PUT) an item by ID, returns status: 200:
+### Update (PUT) an item by ID / returns status: 200
 PUT http://localhost:8000/6
-Body: { "item": "PUT update" }
+- Body: { "item": "PUT update" }
 
-### Delete (DELETE) an item by ID, returns status: 204:
+### Delete (DELETE) an item by ID / returns status: 204
 DELETE http://localhost:8000/6
 
 ## TODO
