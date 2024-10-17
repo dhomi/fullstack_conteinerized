@@ -34,7 +34,7 @@ Grafana is a monitoring tool at http://localhost:4000
  ```docker-compose down```
 
 ### E2E tests
-From the shell (or other cmd tool) navigate to folder "e2e" and run the test with "act"
+From the shell (or other CLI tool) navigate to folder "e2e" and run the test with "act"
 
 ```cd e2e
 act
