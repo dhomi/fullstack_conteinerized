@@ -9,8 +9,8 @@ Follow the instructions below. After "docker-compose" go to dashboard at http://
 
 ### Installation
 Preconditions:
-- Docker Desktop installed
-- NodeJS installed
+- [Docker Desktop](https://docs.docker.com/desktop/install/windows-install/) installed
+- [NodeJS](https://nodejs.org/en/download/package-manager) installed
 - Act is a very handy tool for local running, see <https://nektosact.com>
 
 ### Start the container
