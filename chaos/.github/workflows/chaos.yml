@@ -1,19 +1,10 @@
-name: TechLab Chaos Testing
+name: Chaos
 
 on:
-  repository_dispatch:
-  workflow_dispatch:
-  schedule:
-    - cron: "00 18 * * *"
-
-jobs:
-  run-chaostoolkit-experiment:
-    runs-on: ubuntu-22.04
-    steps:
-    - uses: actions/checkout@v4
-    - uses: chaostoolkit/run-action@v0
-      with:
-        experiment-file: "./slow-down-traffic-from-cloudrun-service.json"
-        working-dir: "chaos"
-        install-dependencies: gcp;slack;otel
-        # dependencies-file: requirements.txt
+  push:
+    branches:
+      - steven/testFeature
+      - main
+  pull_request:
+    branches:
+      - main
