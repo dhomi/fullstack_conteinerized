@@ -17,6 +17,14 @@ aan het einde van de build zie je ook de Local IP en de Network IP
 ### K8s (Kubernetes) opzet
 doe een 'kubectl apply -f deployment.yaml -n techlab' om het Techlab binnen K8s te installeren
 
+### Chaos testing
+...vanuit gaande dat de docker runt, kubernetes ook en kubectl apply is uitgevoerd...
+start de chaos dashboard:  kubectl port-forward -n chaos-mesh svc/chaos-dashboard 2333:2333
+ga naar http://127.0.0.1:2333/
+
+Selecteer de techlab namespace, en de grafana app. 
+Maak een experiment door POD KIlL en Submit deze allemaal 
+
 ### Monitor
 Grafana is op: http://localhost:4000
 
