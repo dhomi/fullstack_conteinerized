@@ -1,0 +1,14 @@
+kind: PodChaos
+apiVersion: chaos-mesh.org/v1alpha1
+metadata:
+  namespace: techlab
+  name: t-v01
+spec:
+  selector:
+    namespaces:
+      - techlab
+    labelSelectors:
+      app: grafana
+  mode: all
+  action: pod-kill
+  duration: 35s
