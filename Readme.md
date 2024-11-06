@@ -14,6 +14,9 @@ Voor lokaal runnen is tooltje act wel erg handig <https://nektosact.com>
 ```docker-compose up --build```
 aan het einde van de build zie je ook de Local IP en de Network IP
 
+### K8s (Kubernetes) opzet
+doe een 'kubectl apply -f Deployment.yaml -n techlab' om het Techlab binnen K8s te installeren
+
 ### Monitor
 Grafana is op: http://localhost:4000
 
@@ -41,9 +44,6 @@ cd naar jmeter en start act op
 ```cd jmeter
 act
 ```
-
-### K8s (Kubernetes) opzet
-doe een 'kubectl apply -f Deployment.yaml -n techlab' om het Techlab binnen K8s te installeren
 
 ## CRUD operaties testen
 
