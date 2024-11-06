@@ -15,7 +15,7 @@ Voor lokaal runnen is tooltje act wel erg handig <https://nektosact.com>
 aan het einde van de build zie je ook de Local IP en de Network IP
 
 ### K8s (Kubernetes) opzet
-doe een 'kubectl apply -f Deployment.yaml -n techlab' om het Techlab binnen K8s te installeren
+doe een 'kubectl apply -f deployment.yaml -n techlab' om het Techlab binnen K8s te installeren
 
 ### Monitor
 Grafana is op: http://localhost:4000
