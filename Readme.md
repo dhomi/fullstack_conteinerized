@@ -42,6 +42,9 @@ cd naar jmeter en start act op
 act
 ```
 
+### K8s (Kubernetes) opzet
+doe een 'kubectl apply -f Deployment.yaml -n techlab' om het Techlab binnen K8s te installeren
+
 ## CRUD operaties testen
 
 ### Read (GET) all items, returns status: 200:
