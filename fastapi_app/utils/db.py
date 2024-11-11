@@ -9,6 +9,7 @@ class DatabaseConnection:
     def connect(self):
         """Establish a new connection to the database."""
         try:
+            # Todo variable in .ini file verplaatsen
             self.connection = mysql.connector.connect(
                 host="db",
                 port=3306,

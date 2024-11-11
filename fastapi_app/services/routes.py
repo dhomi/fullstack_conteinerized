@@ -6,7 +6,7 @@ from models.supplierdetails import LeverancierBase, LeverancierDetail, Leveranci
 from models.orderdetails import BestellingBase, BestellingDetail, BestellingDetailBase, BestellingDetailCreate, BestellingDetailUpdate, BestellingDetails, BestellingDetailsArt
 from models.deliverydetails import SuccessfulDelivery, SuccessfulDeliveryBase
 from models.sportartikelDetails import SportartikelDetails
-from services.db import DatabaseConnection
+from utils.db import DatabaseConnection
 from services.leveranciers import Leveranciers
 from services.bestellingen import Bestellingen
 from services.sportArtikelen import Sportartikelen
@@ -15,11 +15,10 @@ from pydantic import BaseModel
 import uvicorn
 from loguru import logger
 
-
-# Define standardized error response model
 class ErrorResponse(BaseModel):
     detail: str
 
+## in de toekomst kunnen we meer scenarios toevoegen.
 app = FastAPI(
     title="Welcome to the Quality Accelerators API playground",
     responses={
@@ -41,16 +40,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Dummy OAuth2PasswordBearer setup for example purposes
+## Todo token logica toevoegen dit is een dummy
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-# Mock function to verify token (for demonstration)
+# Mock function voor token
 def verify_token(token: str = Depends(oauth2_scheme)):
     if token != "expected_token":
         logger.warning("Unauthorized access attempt")
         raise HTTPException(status_code=401, detail="Invalid or expired token")
 
-# Helper function for logging and raising HTTP exceptions
+# Generieke exception 
 def raise_http_exception(status_code: int, detail: str):
     logger.error(f"Error {status_code}: {detail}")
     raise HTTPException(status_code=status_code, detail=detail)

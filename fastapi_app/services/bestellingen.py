@@ -18,7 +18,6 @@ class Bestellingen:
         result = cursor.fetchall()
         return result
     
-    # change query
     def create_best(self, levcode: int, besteldat: str, leverdat: str, bedrag: float, status: str):
         cursor = self.db.get_cursor()
         add_best = "INSERT INTO QAsportartikelen.bestellingen (levcode, besteldat, leverdat, bedrag, status) VALUES (%s, %s, %s, %s, %s)"
