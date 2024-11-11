@@ -1,0 +1,44 @@
+<!-- suppliers.html -->
+{% extends 'homepage.html' %}
+
+{% block title %}Orders{% endblock %}
+
+{% block content %}
+<meta name="description" content="Bootstrap.">  
+<link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">   
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<link rel="stylesheet" href="http://cdn.datatables.net/1.10.2/css/jquery.dataTables.min.css"></style>
+<script type="text/javascript" src="http://cdn.datatables.net/1.10.2/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <h2>Orders</h2>
+    <table id="myTable" class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Ordernumber</th>
+                <th scope="col">Supplier code</th>
+                <th scope="col">orderdate</th>
+                <th scope="col">Delivery date</th>
+                <th scope="col">price</th>
+                <th scope="col">status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+                <tr>
+                    <td><a href="{{ order.ordernr }}">{{ order.ordernr }}</a></td>
+                    <td><a href="/suppliers/{{ order.suppliercode }}">{{ order.suppliercode }}</a></td>
+                    <td>{{ order.orderdate }}</td>
+                    <td>{{ order.deliverydate }}</td>
+                    <td>{{ order.price }}</td>
+                    <td>{{ order.status }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <script>
+        $(document).ready(function(){
+            $('#myTable').dataTable();
+        });
+    </script>
+    <button><a href="/suppliers">Back to all suppliers</a></button>
+{% endblock %}
