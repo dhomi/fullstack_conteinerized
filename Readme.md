@@ -3,6 +3,13 @@ Na het docker-compose ga naar het dashboard: http://localhost:4000/
 
 ## TODO
 - chaos testing: https://github.com/chaos-mesh/chaos-mesh
+   - niet op lege pods, maar op een echte container in een pod instoppen en runnen
+- jmeter draaien:
+   - op een running pod/container draaien, 
+   - dan pod killen, 
+   - jmeter laat errors zien, 
+   - dan pod weer starten 
+   - en jmeter laat running zien
 - architectuur plaatje maken voor uitleggen wat/hoe dit werkt
 
 ## Installatie
@@ -20,10 +27,16 @@ doe een 'kubectl apply -f deployment.yaml -n techlab' om het Techlab binnen K8s 
 ### Chaos testing
 ...vanuit gaande dat de docker runt, kubernetes ook en kubectl apply is uitgevoerd...
 start de chaos dashboard:  kubectl port-forward -n chaos-mesh svc/chaos-dashboard 2333:2333
-ga naar http://127.0.0.1:2333/
-
-Selecteer de techlab namespace, en de grafana app. 
+ga naar het dashboard:  http://127.0.0.1:2333/
+via UI/dashboard: Selecteer de techlab namespace, en de grafana app. 
 Maak een experiment door POD KIlL en Submit deze allemaal 
+
+CLI:
+...zorg dat de betreffende name van een chaos experiment eerst ge-archived is in de experiments dashboard van de chaos mesh...
+cd chaos/
+kubectl apply -f ./kill_grafana_pod.yaml
+
+check de grafana pod in de docker ui. hij moet exited zijn, en binnen enkele seconden een nieuwe pod is running.
 
 ### Monitor
 Grafana is op: http://localhost:4000
