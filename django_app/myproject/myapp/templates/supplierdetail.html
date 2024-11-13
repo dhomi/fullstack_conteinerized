@@ -1,0 +1,43 @@
+<!-- suppliers.html -->
+{% extends 'homepage.html' %}
+
+{% block title %}supplierdetails{% endblock %}
+
+{% block content %}
+<meta name="description" content="Bootstrap.">  
+<link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">   
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<link rel="stylesheet" href="http://cdn.datatables.net/1.10.2/css/jquery.dataTables.min.css"></style>
+<script type="text/javascript" src="http://cdn.datatables.net/1.10.2/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <h2>Supplierdetails - {{ data_merge.suppliername }}</h2>
+    <table id="myTable" class="table table-striped">
+        <thead>
+            <tr>
+                <th>Supplier Code</th>
+                <th>Order number</th>
+                <th>Supplier Name</th>
+                <th>Address</th>
+                <th>Residence</th>
+            </tr>
+        </thead>
+        <tbody>
+           
+            
+                <tr>
+                    <td>{{ data_merge.suppliercode }}</td>
+                    <td><a href="/orders/{{data_merge.ordernr}}">{{data_merge.ordernr}}</a></td>
+                    <td>{{ data_merge.suppliername }}</td>
+                    <td>{{ data_merge.address }}</td>
+                    <td>{{ data_merge.residence }}</td>
+                </tr>
+                
+        </tbody>
+    </table>
+    <script>
+        $(document).ready(function(){
+            $('#myTable').dataTable();
+        });
+    </script>
+    <button><a href="/suppliers">Back to all suppliers</a></button>
+{% endblock %}

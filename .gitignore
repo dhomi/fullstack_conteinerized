@@ -28,3 +28,58 @@ dist-ssr
 
 # github actions runner
 *actions-runner
+
+# Python bytecode files
+__pycache__/
+app/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment directories
+venv/
+env/
+ENV/
+.venv/
+*.env/
+
+# Django stuff:
+*.log
+*.pot
+*.py[cod]
+*.sqlite3
+db.sqlite3
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Distribution / packaging
+*.egg
+*.egg-info/
+dist/
+build/
+*.bak
+*.swp
+
+# PyCharm / VSCode / JetBrains IDE files
+.idea/
+.vscode/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# mypy
+.mypy_cache/
+
+# pytest cache
+__pycache__/
+.pytest_cache/
+./django_app/myproject/myapp/__pycache__/
+
+# VSCode settings
+.vscode/
+
+# IDE specific folders
+.vscode/
+.idea/
