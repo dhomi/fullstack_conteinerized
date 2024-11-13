@@ -4,15 +4,19 @@ services:
   db:
     image: mariadb 
     restart: always
+    build:
+      context: ./mysql
+      dockerfile: Dockerfile    
     environment:
-      MYSQL_USER: 'root'
-      MYSQL_PASSWORD: 'password'
-      MYSQL_ROOT_PASSWORD: 'password'
-      MYSQL_DATABASE: 'QAsportartikelen'
+      - MYSQL_ROOT_PASSWORD=rootpassword
+      - MYSQL_DATABASE=QAsportartikelen
+      # - MYSQL_DATABASE=sampledb
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=userpassword
     ports:
       - "3306:3306"
-    volumes:
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    # volumes:
+    #   - ./mysql/db/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - backend
       - monitoring
@@ -31,96 +35,64 @@ services:
     networks:
       - backend
 
-  fastapi_app:
-    build: .
-    command: python3 ./fastapi_app/main.py
-    ports:
-      - "8000:8000"
-    depends_on:
-      - db
-    environment:
-      - MYSQL_HOST=db
-      - MYSQL_USER=root
-      - MYSQL_PASSWORD=password
-      - MYSQL_DATABASE=QAsportartikelen
-    networks:
-      - backend
-
-  django:
-    build: .
-    command: python ./django_app/myproject/manage.py runserver 0.0.0.0:8001
-    ports:
-      - "8001:8001"
-    depends_on:
-      - db
-    environment:
-      - MYSQL_HOST=db
-      - MYSQL_USER=root
-      - MYSQL_PASSWORD=password
-      - MYSQL_DATABASE=QAsportartikelen
-    volumes:
-      - .:/django_app
-    networks:
-      - backend
-
-  # Monitoring Stack
-  grafana:
-    build: ./grafana
-    # container_name: techLab_grafana
-    ports:
-      - "4000:3000"
-    volumes:
-      - grafana-data:/var/lib/grafana
-      - ./grafana/provisioning/datasources/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
-    depends_on:
-      - db
-    networks:
-      - monitoring
-
-  # influxdb:
-  #   image: influxdb:2.6-alpine
-  #   platform: linux/amd64 # nodig voor macbook met M processor
-  #   # container_name: techLab_influx
-  #   env_file:
-  #     - influxv2.env
-  #   volumes:
-  #     - influxdbv2:/var/lib/influxdb2:rw
+  # fastapi_app:
+  #   build: ./fastapi_app
+  #   command: python3 ./fastapi_app/main.py
   #   ports:
-  #     - "8086:8086"  # InfluxDB accessible on port 8086 on the host
-  #   networks:
-  #     - monitoring
-
-  # telegraf:
-  #   image: telegraf:1.25-alpine
-  #   platform: linux/amd64 # nodig voor macbook met M processor
-  #   container_name: techLab_telegraf
+  #     - "8000:8000"
   #   depends_on:
-  #     - influxdb
+  #     - db
+  #   environment:
+  #     - MYSQL_HOST=db
+  #     - MYSQL_USER=root
+  #     - MYSQL_PASSWORD=password
+  #     - MYSQL_DATABASE=QAsportartikelen
+  #   networks:
+  #     - backend
+
+  # django:
+  #   build: ./django_app
+  #   command: python ./django_app/myproject/manage.py runserver 0.0.0.0:8001
+  #   ports:
+  #     - "8001:8001"
+  #   depends_on:
+  #     - db
+  #   environment:
+  #     - MYSQL_HOST=db
+  #     - MYSQL_USER=root
+  #     - MYSQL_PASSWORD=password
+  #     - MYSQL_DATABASE=QAsportartikelen
   #   volumes:
-  #     - ./telegraf/mytelegraf.conf:/etc/telegraf/telegraf.conf:ro
-  #   env_file:
-  #     - influxv2.env
+  #     - .:/django_app
+  #   networks:
+  #     - backend
+
+  # grafana:
+  #   build: ./grafana
+  #   ports:
+  #     - "4000:3000"
+  #   volumes:
+  #     - grafana-data:/var/lib/grafana
+  #     - ./grafana/provisioning/datasources/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
+  #   depends_on:
+  #     - db
   #   networks:
   #     - monitoring
 
-# Networks
 networks:
   backend:
     driver: bridge
   monitoring:
     driver: bridge
 
-# Volumes
 volumes:
-  my-db:
-    driver: "local"
-  mysql-scripts:
-    driver: "local"
-    driver_opts:
-      type: none
-      o: bind
-      device: .
+  # my-db:
+  #   driver: "local"
+  # mysql-scripts:
+  #   driver: "local"
+  #   driver_opts:
+  #     type: none
+  #     o: bind
+  #     device: .
   grafana-data:
     driver: "local"
-  # influxdbv2:
-  #   driver: "local"

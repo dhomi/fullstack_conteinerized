@@ -1,7 +1,7 @@
 --
 -- Database: `QAsportartikelen`
 --
-CREATE DATABASE `QAsportartikelen` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+CREATE DATABASE IF NOT EXISTS `QAsportartikelen` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
 USE `QAsportartikelen`;
 
 -- --------------------------------------------------------
