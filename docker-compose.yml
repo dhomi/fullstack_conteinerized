@@ -77,31 +77,31 @@ services:
     networks:
       - monitoring
 
-  influxdb:
-    image: influxdb:2.6-alpine
-    platform: linux/amd64 # nodig voor macbook met M processor
-    # container_name: techLab_influx
-    env_file:
-      - influxv2.env
-    volumes:
-      - influxdbv2:/var/lib/influxdb2:rw
-    ports:
-      - "8086:8086"  # InfluxDB accessible on port 8086 on the host
-    networks:
-      - monitoring
+  # influxdb:
+  #   image: influxdb:2.6-alpine
+  #   platform: linux/amd64 # nodig voor macbook met M processor
+  #   # container_name: techLab_influx
+  #   env_file:
+  #     - influxv2.env
+  #   volumes:
+  #     - influxdbv2:/var/lib/influxdb2:rw
+  #   ports:
+  #     - "8086:8086"  # InfluxDB accessible on port 8086 on the host
+  #   networks:
+  #     - monitoring
 
-  telegraf:
-    image: telegraf:1.25-alpine
-    platform: linux/amd64 # nodig voor macbook met M processor
-    container_name: techLab_telegraf
-    depends_on:
-      - influxdb
-    volumes:
-      - ./telegraf/mytelegraf.conf:/etc/telegraf/telegraf.conf:ro
-    env_file:
-      - influxv2.env
-    networks:
-      - monitoring
+  # telegraf:
+  #   image: telegraf:1.25-alpine
+  #   platform: linux/amd64 # nodig voor macbook met M processor
+  #   container_name: techLab_telegraf
+  #   depends_on:
+  #     - influxdb
+  #   volumes:
+  #     - ./telegraf/mytelegraf.conf:/etc/telegraf/telegraf.conf:ro
+  #   env_file:
+  #     - influxv2.env
+  #   networks:
+  #     - monitoring
 
 # Networks
 networks:
@@ -119,8 +119,8 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: C:\fullstack_conteinerized
+      device: .
   grafana-data:
     driver: "local"
-  influxdbv2:
-    driver: "local"
+  # influxdbv2:
+  #   driver: "local"
