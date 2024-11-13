@@ -24,12 +24,11 @@ class Leveranciers:
         return result
     
     def add_lev(self, levnaam: str, adres: str, woonplaats: str):
-        cursor = self.db.get_cursor()
+        cursor = self.db.get_cursor() 
         try:
             # Corrected the column names in the INSERT statement
-            add_lev = "INSERT INTO QAsportartikelen.leveranciers (levnaam, adres, woonplaats) VALUES (%s, %s, %s)"
-            lev_data = (levnaam, adres, woonplaats)
-            cursor.execute(add_lev, lev_data)
+            add_lev = "INSERT INTO QAsportartikelen.leveranciers (levnaam, adres, woonplaats) VALUES (%s, %s, %s)" %(levnaam, adres, woonplaats)
+            cursor.execute(add_lev)
             self.db.connection.commit()
         except Exception as e:
             print(f"Error adding supplier: {e}")  # You can replace this with actual logging if needed
@@ -41,9 +40,9 @@ class Leveranciers:
         cursor = self.db.get_cursor()
         try:
             # SQL syntax for UPDATE query is correct here
-            update_lev = "UPDATE QAsportartikelen.leveranciers SET levnaam=%s, adres=%s, woonplaats=%s WHERE levcode=%s"
-            lev_data = (levnaam, adres, woonplaats, levcode)
-            cursor.execute(update_lev, lev_data)
+            update_lev = "UPDATE QAsportartikelen.leveranciers SET levnaam=%s, adres=%s, woonplaats=%s WHERE levcode=%s" %(levnaam, adres, woonplaats, levcode)
+            
+            cursor.execute(update_lev)
             self.db.connection.commit()
         except Exception as e:
             print(f"Error updating supplier: {e}")
