@@ -24,7 +24,7 @@ class Bestellingen:
         best_data = (levcode, besteldat, leverdat, bedrag, status)
         cursor.execute(add_best, best_data)
         self.db.connection.commit()
-        return {"message": "Order created successfully."}
+        return {"message": "Order created successfully."} 
 
     def update_best(self, best_nr: int, levcode: int, besteldat: str, leverdat: str, bedrag: float, status: str):
         cursor = self.db.get_cursor()
