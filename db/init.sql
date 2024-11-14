@@ -1,8 +1,9 @@
 --
 -- Database: `QAsportartikelen`
 --
-CREATE DATABASE `QAsportartikelen` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
-USE `QAsportartikelen`;
+
+DROP USER IF EXISTS 'root'@'%';
+
 
 -- --------------------------------------------------------
 
@@ -534,18 +535,17 @@ INSERT INTO `goed_ontvangst` (`bestelnr`, `artcode`, `ontv_datum`, `ontv_aantal`
 -- Tabelstructuur voor tabel `klanten`
 --
 
-CREATE TABLE IF NOT EXISTS `klanten` (
-  `klcode` int(4) NOT NULL AUTO_INCREMENT,
-  `klnaam` varchar(20) NOT NULL,
-  `kladres` varchar(25) DEFAULT NULL,
-  `klpcode` char(7) DEFAULT NULL,
-  `kltele` char(11) DEFAULT NULL,
-  `klplaats` varchar(15) DEFAULT NULL,
-  `klstatus` char(1) DEFAULT NULL,
-  `klcredlim` decimal(8,2) NOT NULL DEFAULT 1000.00,
-  `saldo` decimal(8,2) NOT NULL DEFAULT 0.00,
-  PRIMARY KEY (`klcode`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=104 ;
+CREATE TABLE klanten (
+    klcode INT PRIMARY KEY,
+    klnaam VARCHAR(50),      
+    kladres VARCHAR(50),
+    klpcode VARCHAR(10),
+    kltele VARCHAR(15),
+    klplaats VARCHAR(30),
+    klstatus CHAR(1),
+    klcredlim DECIMAL(10, 2),
+    saldo DECIMAL(10, 2)
+);
 
 --
 -- Gegevens worden uitgevoerd voor tabel `klanten`
@@ -563,13 +563,12 @@ INSERT INTO `klanten` (`klcode`, `klnaam`, `kladres`, `klpcode`, `kltele`, `klpl
 -- Tabelstructuur voor tabel `leveranciers`
 --
 
-CREATE TABLE IF NOT EXISTS `leveranciers` (
-  `levcode` int(4) NOT NULL AUTO_INCREMENT,
-  `levnaam` varchar(20) NOT NULL,
-  `adres` varchar(25) DEFAULT NULL,
-  `woonplaats` varchar(15) DEFAULT NULL,
-  PRIMARY KEY (`levcode`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=36 ;
+CREATE TABLE leveranciers (
+    levcode INT PRIMARY KEY,
+    levnaam VARCHAR(50),        
+    adres VARCHAR(50),
+    woonplaats VARCHAR(30)
+);
 
 --
 -- Gegevens worden uitgevoerd voor tabel `leveranciers`
@@ -1157,7 +1156,6 @@ add	Constraint 	fk_lever_fact	foreign key (factnr) references factuur(factnr);
 DROP TRIGGER IF EXISTS `QAsportartikelen`.`pre_insert_boekregel`;
 
 DELIMITER $$
-USE `QAsportartikelen`$$
 CREATE TRIGGER `QAsportartikelen`.`pre_insert_boekregel` 
 BEFORE INSERT ON `boekregel` FOR EACH ROW
 BEGIN

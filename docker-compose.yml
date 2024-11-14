@@ -5,14 +5,14 @@ services:
     image: mariadb 
     restart: always
     environment:
-      MYSQL_USER: 'root'
-      MYSQL_PASSWORD: 'password'
+      MYSQL_USER: QAuser                  # non-root user (optional)
+      MYSQL_PASSWORD: QApassword 
       MYSQL_ROOT_PASSWORD: 'password'
       MYSQL_DATABASE: 'QAsportartikelen'
     ports:
       - "3306:3306"
     volumes:
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./db:/docker-entrypoint-initdb.d
     networks:
       - backend
       - monitoring
@@ -21,9 +21,9 @@ services:
     image: phpmyadmin/phpmyadmin
     environment:
       PMA_HOST: db
-      MYSQL_USER: root
-      MYSQL_PASSWORD: password
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: QAuser                 
+      MYSQL_PASSWORD: QApassword 
+      MYSQL_ROOT_PASSWORD: password
     ports:
       - "8090:80"
     depends_on:
@@ -40,8 +40,8 @@ services:
       - db
     environment:
       - MYSQL_HOST=db
-      - MYSQL_USER=root
-      - MYSQL_PASSWORD=password
+      - MYSQL_USER=QAuser
+      - MYSQL_PASSWORD=QApassword
       - MYSQL_DATABASE=QAsportartikelen
     networks:
       - backend
@@ -55,8 +55,8 @@ services:
       - db
     environment:
       - MYSQL_HOST=db
-      - MYSQL_USER=root
-      - MYSQL_PASSWORD=password
+      - MYSQL_USER=QAuser
+      - MYSQL_PASSWORD=QApassword
       - MYSQL_DATABASE=QAsportartikelen
     volumes:
       - .:/django_app
