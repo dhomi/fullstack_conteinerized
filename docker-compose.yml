@@ -35,8 +35,10 @@ services:
       - backend
 
   fastapi_app:
-    build: .
-    command: python3 ./fastapi_app/main.py
+    build:
+      context: ./fastapi_app
+      dockerfile: Dockerfile
+    command: python3 main.py
     ports:
       - "8000:8000"
     depends_on:
@@ -50,7 +52,9 @@ services:
       - backend
 
   django:
-    build: .
+    build:
+      context: ./django_app
+      dockerfile: Dockerfile
     command: python ./django_app/myproject/manage.py runserver 0.0.0.0:8001
     ports:
       - "8001:8001"
@@ -67,18 +71,18 @@ services:
       - backend
 
   # Monitoring Stack
-  grafana:
-    build: ./grafana
-    # container_name: techLab_grafana
-    ports:
-      - "4000:3000"
-    volumes:
-      - grafana-data:/var/lib/grafana
-      - ./grafana/provisioning/datasources/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
-    depends_on:
-      - db
-    networks:
-      - monitoring
+  # grafana:
+  #   build: ./grafana
+  #   # container_name: techLab_grafana
+  #   ports:
+  #     - "4000:3000"
+  #   volumes:
+  #     - grafana-data:/var/lib/grafana
+  #     - ./grafana/provisioning/datasources/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
+  #   depends_on:
+  #     - db
+  #   networks:
+  #     - monitoring
 
   # influxdb:
   #   image: influxdb:2.6-alpine

@@ -8,7 +8,7 @@ WORKDIR /fastapi_app
 COPY . .
 
 # Install the required packages
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r /fastapi_app/requirements.txt
 
 # Set environment variable
 ENV FLASK_APP=fastApi
