@@ -1,17 +1,17 @@
-version: '3'
+version: "3"
 
 services:
   db:
-    image: mariadb 
+    image: mariadb
     restart: always
     build:
       context: ./mysql
-      dockerfile: Dockerfile    
+      dockerfile: Dockerfile
     environment:
-      MYSQL_USER: QAuser                  # non-root user (optional)
-      MYSQL_PASSWORD: QApassword 
-      MYSQL_ROOT_PASSWORD: 'password'
-      MYSQL_DATABASE: 'QAsportartikelen'
+      MYSQL_USER: QAuser
+      MYSQL_PASSWORD: QApassword
+      MYSQL_ROOT_PASSWORD: "password"
+      MYSQL_DATABASE: "QAsportartikelen"
     ports:
       - "3306:3306"
     volumes:
@@ -24,8 +24,8 @@ services:
     image: phpmyadmin/phpmyadmin
     environment:
       PMA_HOST: db
-      MYSQL_USER: QAuser                 
-      MYSQL_PASSWORD: QApassword 
+      MYSQL_USER: QAuser
+      MYSQL_PASSWORD: QApassword
       MYSQL_ROOT_PASSWORD: password
     ports:
       - "8090:80"
@@ -70,68 +70,17 @@ services:
     networks:
       - backend
 
-  # Monitoring Stack
-  # grafana:
-  #   build: ./grafana
-  #   # container_name: techLab_grafana
-  #   ports:
-  #     - "4000:3000"
-  #   volumes:
-  #     - grafana-data:/var/lib/grafana
-  #     - ./grafana/provisioning/datasources/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
-  #   depends_on:
-  #     - db
-  #   networks:
-  #     - monitoring
-
-  # influxdb:
-  #   image: influxdb:2.6-alpine
-  #   platform: linux/amd64 # nodig voor macbook met M processor
-  #   # container_name: techLab_influx
-  #   env_file:
-  #     - influxv2.env
-  #   volumes:
-  #     - influxdbv2:/var/lib/influxdb2:rw
-  #   ports:
-  #     - "8000:8000"
-  #   depends_on:
-  #     - db
-  #   environment:
-  #     - MYSQL_HOST=db
-  #     - MYSQL_USER=root
-  #     - MYSQL_PASSWORD=password
-  #     - MYSQL_DATABASE=QAsportartikelen
-  #   networks:
-  #     - backend
-
-  # django:
-  #   build: ./django_app
-  #   command: python ./django_app/myproject/manage.py runserver 0.0.0.0:8001
-  #   ports:
-  #     - "8001:8001"
-  #   depends_on:
-  #     - db
-  #   environment:
-  #     - MYSQL_HOST=db
-  #     - MYSQL_USER=root
-  #     - MYSQL_PASSWORD=password
-  #     - MYSQL_DATABASE=QAsportartikelen
-  #   volumes:
-  #     - .:/django_app
-  #   networks:
-  #     - backend
-
-  # grafana:
-  #   build: ./grafana
-  #   ports:
-  #     - "4000:3000"
-  #   volumes:
-  #     - grafana-data:/var/lib/grafana
-  #     - ./grafana/provisioning/datasources/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
-  #   depends_on:
-  #     - db
-  #   networks:
-  #     - monitoring
+  grafana:
+    build: ./grafana
+    ports:
+      - "4000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning/datasources/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
+    depends_on:
+      - db
+    networks:
+      - monitoring
 
 networks:
   backend:
@@ -140,13 +89,5 @@ networks:
     driver: bridge
 
 volumes:
-  # my-db:
-  #   driver: "local"
-  # mysql-scripts:
-  #   driver: "local"
-  #   driver_opts:
-  #     type: none
-  #     o: bind
-  #     device: .
   grafana-data:
     driver: "local"
