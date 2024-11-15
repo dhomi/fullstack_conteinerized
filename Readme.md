@@ -19,7 +19,9 @@ Preconditions:
 - At the end of the build you will also see the Local IP and the Network IP
 
 ### K8s (Kubernetes) opzet
-doe een 'kubectl apply -f deployment.yaml -n techlab' om het Techlab binnen K8s te installeren
+- doe eerst een 'kubectl create namespace techlab' om de techlab namespace te maken. Hierna zul je met elk kubectl commando het '-n techlab' stuk mee moeten geven om in de juiste namespace acties te doen.
+- doe een 'kubectl apply -f deployment.yaml -n techlab' om het Techlab binnen K8s te installeren
+- doe een 'kubectl port-forward -n techlab svc/phpmyadmin 8090:8090' om een port forward naar het phpmyadmin scherm te zetten om met http://localhost:8090 naar toe te gaan
 
 ### Chaos testing
 ...vanuit gaande dat de docker runt, kubernetes ook en kubectl apply is uitgevoerd...
