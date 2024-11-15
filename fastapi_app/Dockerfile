@@ -5,7 +5,7 @@ FROM python:3.10.5
 WORKDIR /fastapi_app
 
 # Copy the current directory contents into the container at /app
-COPY . /fastapi_app
+COPY . .
 
 # Install the required packages
 RUN pip install --no-cache-dir -r requirements.txt

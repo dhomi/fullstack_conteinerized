@@ -4,12 +4,13 @@ FROM python:3.10
 # Set the working directory to /django_app
 WORKDIR /django_app
 
-# Install dependencies
-# COPY requirements.txt /django_app/
-# RUN pip install -r requirements.txt
-
 # Copy the Django project code to /django_app
 COPY . /django_app/
+
+# Install dependencies
+# COPY requirements.txt /django_app/
+RUN pip install --no-cache-dir -r requirements.txt
+
 
 # Expose the port Django will run on
 EXPOSE 8001
