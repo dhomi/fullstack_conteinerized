@@ -1,0 +1,16 @@
+resources:
+- db-cm0-configmap.yaml
+- db-deployment.yaml
+- db-service.yaml
+- django-cm0-configmap.yaml
+- django-deployment.yaml
+- django-service.yaml
+- fastapi-app-deployment.yaml
+- fastapi-app-service.yaml
+- grafana-cm1-configmap.yaml
+- grafana-data-persistentvolumeclaim.yaml
+- grafana-deployment.yaml
+- grafana-service.yaml
+- phpmyadmin-deployment.yaml
+- phpmyadmin-service.yaml
+
