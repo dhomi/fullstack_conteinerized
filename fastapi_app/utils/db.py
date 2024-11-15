@@ -13,8 +13,8 @@ class DatabaseConnection:
             self.connection = mysql.connector.connect(
                 host="db",
                 port=3306,
-                user="root",
-                password="password",
+                user="QAuser",
+                password="QApassword",
                 database="QAsportartikelen"
             )
             if self.connection.is_connected():

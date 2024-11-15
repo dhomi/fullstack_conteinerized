@@ -1,22 +1,21 @@
-version: '3'
+version: "3"
 
 services:
   db:
-    image: mariadb 
+    image: mariadb
     restart: always
     build:
       context: ./mysql
-      dockerfile: Dockerfile    
+      dockerfile: Dockerfile
     environment:
-      - MYSQL_ROOT_PASSWORD=rootpassword
-      - MYSQL_DATABASE=QAsportartikelen
-      # - MYSQL_DATABASE=sampledb
-      - MYSQL_USER=user
-      - MYSQL_PASSWORD=userpassword
+      MYSQL_USER: QAuser
+      MYSQL_PASSWORD: QApassword
+      MYSQL_ROOT_PASSWORD: "password"
+      MYSQL_DATABASE: "QAsportartikelen"
     ports:
       - "3306:3306"
-    # volumes:
-    #   - ./mysql/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d
     networks:
       - backend
       - monitoring
@@ -25,9 +24,9 @@ services:
     image: phpmyadmin/phpmyadmin
     environment:
       PMA_HOST: db
-      MYSQL_USER: root
-      MYSQL_PASSWORD: password
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: QAuser
+      MYSQL_PASSWORD: QApassword
+      MYSQL_ROOT_PASSWORD: password
     ports:
       - "8090:80"
     depends_on:
@@ -35,49 +34,53 @@ services:
     networks:
       - backend
 
-  # fastapi_app:
-  #   build: ./fastapi_app
-  #   command: python3 ./fastapi_app/main.py
-  #   ports:
-  #     - "8000:8000"
-  #   depends_on:
-  #     - db
-  #   environment:
-  #     - MYSQL_HOST=db
-  #     - MYSQL_USER=root
-  #     - MYSQL_PASSWORD=password
-  #     - MYSQL_DATABASE=QAsportartikelen
-  #   networks:
-  #     - backend
+  fastapi_app:
+    build:
+      context: ./fastapi_app
+      dockerfile: Dockerfile
+    command: python3 main.py
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - MYSQL_HOST=db
+      - MYSQL_USER=QAuser
+      - MYSQL_PASSWORD=QApassword
+      - MYSQL_DATABASE=QAsportartikelen
+    networks:
+      - backend
 
-  # django:
-  #   build: ./django_app
-  #   command: python ./django_app/myproject/manage.py runserver 0.0.0.0:8001
-  #   ports:
-  #     - "8001:8001"
-  #   depends_on:
-  #     - db
-  #   environment:
-  #     - MYSQL_HOST=db
-  #     - MYSQL_USER=root
-  #     - MYSQL_PASSWORD=password
-  #     - MYSQL_DATABASE=QAsportartikelen
-  #   volumes:
-  #     - .:/django_app
-  #   networks:
-  #     - backend
+  django:
+    build:
+      context: ./django_app
+      dockerfile: Dockerfile
+    command: python ./django_app/myproject/manage.py runserver 0.0.0.0:8001
+    ports:
+      - "8001:8001"
+    depends_on:
+      - db
+    environment:
+      - MYSQL_HOST=db
+      - MYSQL_USER=QAuser
+      - MYSQL_PASSWORD=QApassword
+      - MYSQL_DATABASE=QAsportartikelen
+    volumes:
+      - .:/django_app
+    networks:
+      - backend
 
-  # grafana:
-  #   build: ./grafana
-  #   ports:
-  #     - "4000:3000"
-  #   volumes:
-  #     - grafana-data:/var/lib/grafana
-  #     - ./grafana/provisioning/datasources/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
-  #   depends_on:
-  #     - db
-  #   networks:
-  #     - monitoring
+  grafana:
+    build: ./grafana
+    ports:
+      - "4000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning/datasources/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
+    depends_on:
+      - db
+    networks:
+      - monitoring
 
 networks:
   backend:
@@ -86,13 +89,5 @@ networks:
     driver: bridge
 
 volumes:
-  # my-db:
-  #   driver: "local"
-  # mysql-scripts:
-  #   driver: "local"
-  #   driver_opts:
-  #     type: none
-  #     o: bind
-  #     device: .
   grafana-data:
     driver: "local"

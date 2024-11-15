@@ -272,20 +272,20 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: frontend
+  name: frontend_api
   namespace: techlab
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: frontend
+      app: frontend_api
   template:
     metadata:
       labels:
-        app: frontend
+        app: frontend_api
     spec:
       containers:
-        - name: frontend
+        - name: frontend_api
           image: frontend:latest
           ports:
             - containerPort: 3000
@@ -294,11 +294,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: frontend
+  name: frontend_api
   namespace: techlab
 spec:
   selector:
-    app: frontend
+    app: frontend_api
   ports:
     - protocol: TCP
       port: 3000

@@ -5,11 +5,11 @@ FROM python:3.10
 WORKDIR /django_app
 
 # Copy the Django project code to /django_app
-COPY . /django_app/
+COPY . .
 
 # Install dependencies
 # COPY requirements.txt /django_app/
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r /django_app/requirements.txt
 
 
 # Expose the port Django will run on
