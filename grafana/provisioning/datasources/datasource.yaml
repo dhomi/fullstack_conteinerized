@@ -6,32 +6,31 @@ datasources:
     orgId: 1
     type: mysql
     access: proxy
-    url: db:3306               
-    database: QAsportartikelen  
-    user: root                  
+    url: db:3306
+    database: QAsportartikelen
+    user: "QAuser"
     secureJsonData:
-      password: "password"     
+      password: "QApassword"
     jsonData:
       tlsAuth: false
       tlsAuthWithCACert: false
       maxOpenConns: 10
       maxIdleConns: 10
       connMaxLifetime: 14400
-    isDefault: true            
+    isDefault: true
 
-  - name: InfluxDB
-    uid: influxDB
-    orgId: 1
-    type: influxdb
-    access: proxy
-    url: http://influxdb:8086
-    user: myusername
-    password: passwordpasswordpassword
-    jsonData:
-      version: Flux
-      organization: myorg
-      defaultBucket: mybucket
-      tlsSkipVerify: true
-    secureJsonData:
-      token: mytoken
-
+  # - name: InfluxDB
+  #   uid: influxDB
+  #   orgId: 1
+  #   type: influxdb
+  #   access: proxy
+  #   url: http://influxdb:8086
+  #   user: myusername
+  #   password: passwordpasswordpassword
+  #   jsonData:
+  #     version: Flux
+  #     organization: myorg
+  #     defaultBucket: mybucket
+  #     tlsSkipVerify: true
+  #   secureJsonData:
+  #     token: mytoken
