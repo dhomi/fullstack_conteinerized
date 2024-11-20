@@ -15,7 +15,7 @@ class DatabaseConnection:
                 port=3306,
                 user="QAuser",
                 password="QApassword",
-                database="QAsportartikelen"
+                database="QAsportarticles"
             )
             if self.connection.is_connected():
                 print("Connected to the database!")

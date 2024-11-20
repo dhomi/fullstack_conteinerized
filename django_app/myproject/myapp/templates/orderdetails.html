@@ -27,13 +27,13 @@
         <tbody>
             {% for order in orderdetails %}
                 <tr>
-                    <td><a href="/suppliers/{{ order.suppliercode }}">{{ order.suppliercode}}</a></td>
-                    <td><a href="/orders/">{{ order.ordernr }}</a></td>
-                    <td><a href="/sportartikelen/{{ order.artcode }}">{{ order.artcode }}</a></td>
-                    <td><a href="/sportartikelen/{{ order.artcode }}">{{ order.artikelnaam }}</a></td>
-                    <td>{{ order.orderprice }}</td>
-                    <td>{{ order.orderdate }}</td>
-                    <td>{{ order.deliverydate }}</td>
+                    <td><a href="/suppliers/{{ order.supplier_code }}">{{ order.supplier_code}}</a></td>
+                    <td><a href="/orders/">{{ order.order_number }}</a></td>
+                    <td><a href="/sportarticles/{{ order.article_code }}">{{ order.article_code }}</a></td>
+                    <td><a href="/sportarticles/{{ order.article_code }}">{{ order.article_name }}</a></td>
+                    <td>{{ order.order_price }}</td>
+                    <td>{{ order.order_date }}</td>
+                    <td>{{ order.delivery_date }}</td>
                     <td>{{ order.status }}</td>
                 </tr>
                 {% endfor %}

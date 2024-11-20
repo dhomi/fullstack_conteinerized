@@ -8,7 +8,7 @@ services:
       MYSQL_USER: QAuser                  # non-root user (optional)
       MYSQL_PASSWORD: QApassword 
       MYSQL_ROOT_PASSWORD: 'password'
-      MYSQL_DATABASE: 'QAsportartikelen'
+      MYSQL_DATABASE: 'QAsportarticles'
     ports:
       - "3306:3306"
     volumes:
@@ -42,7 +42,7 @@ services:
       - MYSQL_HOST=db
       - MYSQL_USER=QAuser
       - MYSQL_PASSWORD=QApassword
-      - MYSQL_DATABASE=QAsportartikelen
+      - MYSQL_DATABASE=QAsportarticles
     networks:
       - backend
 
@@ -57,7 +57,7 @@ services:
       - MYSQL_HOST=db
       - MYSQL_USER=QAuser
       - MYSQL_PASSWORD=QApassword
-      - MYSQL_DATABASE=QAsportartikelen
+      - MYSQL_DATABASE=QAsportarticles
     volumes:
       - .:/django_app
     networks:
@@ -76,32 +76,6 @@ services:
       - db
     networks:
       - monitoring
-
-  # influxdb:
-  #   image: influxdb:2.6-alpine
-  #   platform: linux/amd64 # nodig voor macbook met M processor
-  #   # container_name: techLab_influx
-  #   env_file:
-  #     - influxv2.env
-  #   volumes:
-  #     - influxdbv2:/var/lib/influxdb2:rw
-  #   ports:
-  #     - "8086:8086"  # InfluxDB accessible on port 8086 on the host
-  #   networks:
-  #     - monitoring
-
-  # telegraf:
-  #   image: telegraf:1.25-alpine
-  #   platform: linux/amd64 # nodig voor macbook met M processor
-  #   container_name: techLab_telegraf
-  #   depends_on:
-  #     - influxdb
-  #   volumes:
-  #     - ./telegraf/mytelegraf.conf:/etc/telegraf/telegraf.conf:ro
-  #   env_file:
-  #     - influxv2.env
-  #   networks:
-  #     - monitoring
 
 # Networks
 networks:
@@ -122,5 +96,3 @@ volumes:
       device: .
   grafana-data:
     driver: "local"
-  # influxdbv2:
-  #   driver: "local"

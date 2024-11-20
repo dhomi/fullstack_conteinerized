@@ -5,11 +5,11 @@ from starlette.responses import JSONResponse
 from models.supplierdetails import LeverancierBase, LeverancierDetail, LeverancierCreate
 from models.orderdetails import BestellingBase, BestellingDetail, BestellingDetailBase, BestellingDetailCreate, BestellingDetailUpdate, BestellingDetails, BestellingDetailsArt
 from models.deliverydetails import SuccessfulDelivery, SuccessfulDeliveryBase
-from models.sportartikelDetails import SportartikelDetails
+# from models.sportarticlesDetails import SportsArticle
 from utils.db import DatabaseConnection
 from services.leveranciers import Leveranciers
 from services.bestellingen import Bestellingen
-from services.sportArtikelen import Sportartikelen
+# from services.sportArtikelen import SportsArticlesService
 from services.delivery import Delivery
 from pydantic import BaseModel
 import uvicorn
@@ -63,6 +63,14 @@ async def generic_exception_handler(request: Request, exc: Exception):
         content={"detail": "An unexpected error occurred. Please try again later."},
     )
 
+async def get_db():
+    db = DatabaseConnection()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
 # Example Dependency for Authorization
 async def get_current_user(token: str):
     if not token:
@@ -71,11 +79,8 @@ async def get_current_user(token: str):
 
 class routes:
     @app.get("/suppliers", description="Get all suppliers", tags=["suppliers"])
-    async def get_leveranciers():
+    async def get_leveranciers(db: DatabaseConnection = Depends(get_db)):
         try:
-            db = DatabaseConnection()
-            if db.connection is None:
-                raise_http_exception(500, "Database connection failed.")
             leveranciers = Leveranciers(db)
             result = leveranciers.get_levs()
             if not result:
@@ -86,9 +91,8 @@ class routes:
             raise_http_exception(500, "Failed to retrieve suppliers")
 
     @app.get("/suppliers/{suppliercode}", tags=["suppliers"])
-    async def get_leverancier(suppliercode: int):
+    async def get_leverancier(suppliercode: int, db: DatabaseConnection = Depends(get_db)):
         try:
-            db = DatabaseConnection()
             leveranciers = Leveranciers(db)
             result = leveranciers.get_lev(suppliercode)
             if not result:
@@ -108,7 +112,8 @@ class routes:
         try:
             db = DatabaseConnection()
             lev = Leveranciers(db)
-            result = lev.add_lev(leverancier)
+            # Pass individual attributes from the LeverancierCreate model to add_lev
+            result = lev.add_lev(leverancier.levnaam, leverancier.adres, leverancier.woonplaats)
             if "error" in result:
                 raise_http_exception(400, result["error"])
             return result
@@ -116,12 +121,18 @@ class routes:
             logger.exception("Failed to create supplier")
             raise_http_exception(500, "Failed to create supplier")
 
+
     @app.put("/suppliers/{suppliercode}", tags=["suppliers"])
-    async def update_leverancier(suppliercode: str, leverancier: LeverancierBase):
+    async def update_leverancier(suppliercode: str, leverancier: LeverancierBase, db: DatabaseConnection = Depends(get_db)):
         try:
-            db = DatabaseConnection()
             lev = Leveranciers(db)
-            result = lev.update_lev(suppliercode, leverancier)
+            # Pass individual attributes
+            result = lev.update_lev(
+                suppliercode, 
+                leverancier.levnaam, 
+                leverancier.adres, 
+                leverancier.woonplaats
+            )
             if "error" in result:
                 raise_http_exception(400, result["error"])
             return result
@@ -130,9 +141,8 @@ class routes:
             raise_http_exception(500, "Failed to update supplier")
 
     @app.delete("/suppliers/{suppliercode}", tags=["suppliers"])
-    async def delete_leverancier(suppliercode: str):
+    async def delete_leverancier(suppliercode: str, db: DatabaseConnection = Depends(get_db)):
         try:
-            db = DatabaseConnection()
             lev = Leveranciers(db)
             result = lev.delete_lev(suppliercode)
             if "error" in result:
@@ -143,11 +153,10 @@ class routes:
             raise_http_exception(500, "Failed to delete supplier")
 
     @app.get("/orders", tags=["orders"])
-    async def get_bestellingen():
+    async def get_bestellingen(db: DatabaseConnection = Depends(get_db)):
         try:
-            db = DatabaseConnection()
             bestellingen = Bestellingen(db)
-            result = bestellingen.get_all_bests()
+            result = bestellingen.get_all_orders()
             if not result:
                 raise_http_exception(404, "Orders not found")
             return [
@@ -159,11 +168,10 @@ class routes:
             raise_http_exception(500, "Failed to retrieve orders")
 
     @app.get("/orders/{suppliercode}", tags=["orders"])
-    async def get_bestelling(suppliercode: int):
+    async def get_bestelling(suppliercode: int, db: DatabaseConnection = Depends(get_db)):
         try:
-            db = DatabaseConnection()
             bestellingen = Bestellingen(db)
-            result = bestellingen.get_bests(suppliercode)
+            result = bestellingen.get_order(suppliercode)
             if not result:
                 raise_http_exception(404, "Order not found")
             return {
@@ -179,11 +187,13 @@ class routes:
             raise_http_exception(500, "Failed to retrieve order")
 
     @app.post("/orders/", tags=["orders"])
-    async def create_bestelling(bestelling: BestellingDetailCreate):
+    async def create_bestelling(bestelling: BestellingDetailCreate, db: DatabaseConnection = Depends(get_db)):
         try:
-            db = DatabaseConnection()
             best = Bestellingen(db)
-            result = best.create_best(bestelling)
+            result = best.add_neworders(
+                bestelling.suppliercode, bestelling.artcode, bestelling.amount,
+                bestelling.orderprice, bestelling.orderdate, bestelling.deliverydate, bestelling.price, bestelling.status
+            )
             if "error" in result:
                 raise_http_exception(400, result["error"])
             return result
@@ -192,11 +202,17 @@ class routes:
             raise_http_exception(500, "Failed to create bestelling")
 
     @app.put("/orders/{ordernr}", tags=["orders"])
-    async def update_bestelling(ordernr: str, bestelling: BestellingBase):
+    async def update_bestelling(ordernr: str, bestelling: BestellingBase, db: DatabaseConnection = Depends(get_db)):
         try:
-            db = DatabaseConnection()
             best = Bestellingen(db)
-            result = best.update_best(ordernr, bestelling)
+            result = best.update_orders(
+                ordernr,
+                bestelling.suppliercode,
+                bestelling.orderdate,
+                bestelling.deliverydate,
+                bestelling.amount,
+                bestelling.status
+            )
             if "error" in result:
                 raise_http_exception(400, result["error"])
             return result
@@ -205,11 +221,10 @@ class routes:
             raise_http_exception(500, "Failed to update bestelling")
 
     @app.delete("/orders/{ordernr}", tags=["orders"])
-    async def delete_bestelling(ordernr: str):
+    async def delete_bestelling(ordernr: str, db: DatabaseConnection = Depends(get_db)):
         try:
-            db = DatabaseConnection()
             best = Bestellingen(db)
-            result = best.delete_best(ordernr)
+            result = best.delete_orders(ordernr)
             if "error" in result:
                 raise_http_exception(400, result["error"])
             return {"message": "Bestelling deleted"}
@@ -218,22 +233,20 @@ class routes:
             raise_http_exception(500, "Failed to delete bestelling")
 
     @app.get("/orderdetails/{ordernr}", tags=["order details"])
-    async def get_bestellingdetails(ordernr: int, skip: int = 0, limit: int = 100):
+    async def get_bestellingdetails(ordernr: int, db: DatabaseConnection = Depends(get_db), skip: int = 0, limit: int = 100):
         try:
-            db = DatabaseConnection()
             bestDetails = Bestellingen(db)
-            results = bestDetails.get_bestregs(ordernr)
+            results = bestDetails.get_orderlines(ordernr)
             bestellingdetails = [
                 BestellingDetails(
-                    suppliercode=result[0],
-                    ordernr=result[1],
-                    artcode=result[2],
-                    artikelnaam=result[3],
-                    orderprice=result[4],
-                    orderdate=str(result[5]),
-                    deliverydate=str(result[6]),
-                    price=result[7],
-                    status=result[8]
+                    supplier_code=result[0],
+                    order_number=result[1],
+                    article_code=result[2],
+                    article_name=result[3],
+                    order_price=result[4],
+                    order_date=str(result[5]),
+                    delivery_date=str(result[6]),
+                    status=result[7]
                 )
                 for result in results
             ]
@@ -245,11 +258,10 @@ class routes:
             raise_http_exception(500, "Failed to retrieve bestelling details")
 
     @app.get("/orderdetailsArt/{artcode}", tags=["orderdetails with artcode"])
-    async def get_orderdetails_artcode(artcode: int):
+    async def get_orderdetails_artcode(artcode: int, db: DatabaseConnection = Depends(get_db)):
         try:
-            db = DatabaseConnection()
             bestDetails = Bestellingen(db)
-            results = bestDetails.get_bestregsWithArtcode(artcode)
+            results = bestDetails.get_orderlinewithArtcode(artcode)
             bestellingdetails = [
                 BestellingDetailsArt(
                     ordernr=result[0],
@@ -267,11 +279,10 @@ class routes:
             raise_http_exception(500, "Failed to retrieve bestelling details by artcode")
 
     @app.post("/orderdetails", tags=["order details"])
-    async def create_bestellingdetails(bestellingdetails: BestellingDetails):
+    async def create_bestellingdetails(bestellingdetails: BestellingDetails, db: DatabaseConnection = Depends(get_db)):
         try:
-            db = DatabaseConnection()
             bestDetails = Bestellingen(db)
-            result = bestDetails.create_best(
+            result = bestDetails.add_neworders(
                 bestellingdetails.suppliercode,
                 bestellingdetails.artcode,
                 bestellingdetails.amount,
@@ -289,11 +300,10 @@ class routes:
             raise_http_exception(500, "Failed to create bestelling details")
 
     @app.put("/orderdetails/{ordernr}", tags=["order details"])
-    async def update_bestellingdetails(ordernr: int, bestellingdetails: BestellingDetails):
+    async def update_bestellingdetails(ordernr: int, bestellingdetails: BestellingDetails, db: DatabaseConnection = Depends(get_db)):
         try:
-            db = DatabaseConnection()
             bestDetails = Bestellingen(db)
-            result = bestDetails.update_best(
+            result = bestDetails.update_orders(
                 ordernr,
                 bestellingdetails.suppliercode,
                 bestellingdetails.artcode,
@@ -305,7 +315,6 @@ class routes:
                 bestellingdetails.status,
                 bestellingdetails.price
             )
-            
             if "error" in result:
                 raise_http_exception(400, result["error"])
             return bestellingdetails
@@ -314,42 +323,45 @@ class routes:
             raise_http_exception(500, "Failed to update bestelling details")
 
     @app.delete("/orderdetails/{ordernr}", tags=["order details"])
-    async def delete_bestellingdetails(ordernr: int):
+    async def delete_bestellingdetails(ordernr: int, db: DatabaseConnection = Depends(get_db)):
         try:
-            db = DatabaseConnection()
             bestDetails = Bestellingen(db)
-            result = bestDetails.delete_best(ordernr)
+            result = bestDetails.delete_orders(ordernr)
             if "error" in result:
                 raise_http_exception(400, result["error"])
             return {"message": "Bestelling details deleted"}
         except Exception as e:
             logger.exception("Failed to delete bestelling details")
             raise_http_exception(500, "Failed to delete bestelling details")
+    
+    # @app.get("/sports_articles", response_model=List[SportsArticle])
+    # def read_sports_articles():
+    #     return SportsArticlesService.get_all_articles()
 
-    @app.get("/sportartikelen", tags=["sportartikelen"])
-    async def get_sportartikelen():
-        try:
-            db = DatabaseConnection()
-            sportartikelen = Sportartikelen(db)
-            result = sportartikelen.get_sportartikelen()
-            return [{"artcode": r[0], "artikelnaam": r[1], "categorie": r[2], "maat": r[3], "kleur": r[4], "prijs": r[5], "vrr_aantal": r[6], "vrr_min": r[7], "BTWtype": r[8]} for r in result]
-        except Exception as e:
-            logger.exception("Failed to retrieve sportartikelen")
-            raise_http_exception(500, "Failed to retrieve sportartikelen")
+    # @app.get("/sports_articles/{article_code}", response_model=SportsArticle)
+    # def read_sports_article(article_code: int):
+    #     return SportsArticlesService.get_article(article_code)
 
+    # @app.post("/sports_articles", response_model=SportsArticle)
+    # def create_sports_article(article: SportsArticle):
+    #     return SportsArticlesService.create_article(article)
+
+    # @app.put("/sports_articles/{article_code}", response_model=SportsArticle)
+    # def update_sports_article(article_code: int, article: SportsArticle):
+    #     return SportsArticlesService.update_article(article_code, article)
+
+    # @app.delete("/sports_articles/{article_code}", response_model=dict)
+    # def delete_sports_article(article_code: int):
+    #     return SportsArticlesService.delete_article(article_code)
+    
     @app.get("/successful_deliveries", description="Get all successful deliveries", tags=["deliveries"])
     async def get_successful_deliveries():
-        try:
-            db = DatabaseConnection()
-            successful_deliveries = Delivery(db)
-            result = successful_deliveries.get_delivery()
-            if not result:
-                raise_http_exception(404, "Successful deliveries not found")
-            return [{"ordernr": r[0], "artcode": r[1], "delivery_date": r[2], "amount_received": r[3], "status": r[4], "external_invoice_nr": r[5], "serial_number": r[6]} for r in result]
-        except Exception as e:
-            logger.exception("Failed to retrieve successful deliveries")
-            raise_http_exception(500, "Failed to retrieve successful deliveries")
-
+        db = DatabaseConnection()
+        successful_deliveries = Delivery(db)
+        result = successful_deliveries.get_delivery()
+        if not result:
+            raise HTTPException(status_code=400, detail="successful deliveries not found")
+        return [{"ordernr": r[0], "artcode": r[1], "delivery_date": r[2], "amount_received": r[3], "status": r[4], "external_invoice_nr": r[5], "serial_number": r[6]} for r in result]
 
     @app.get("/")
     async def root():

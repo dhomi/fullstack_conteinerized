@@ -1,43 +1,43 @@
 from pydantic import BaseModel
 
 class BestellingBase(BaseModel):
-    bestelnr: int
-    levcode: int
-    besteldat: str
-    leverdat: str
-    bedrag: float
+    order_number: int
+    supplier_code: int
+    order_date: str  # Overweeg datetime.date
+    delivery_date: str  # Overweeg datetime.date
+    amount: float
     status: str
 
 class BestellingDetail(BestellingBase):
     pass
 
 class BestellingDetailBase(BaseModel):
-    bestelnr: int
-    artcode: int
-    aantal: int
+    order_number: int
+    article_code: int
+    quantity: int
 
 class BestellingDetailCreate(BaseModel):
-    levcode: int
-    besteldat: str
-    leverdat: str
-    bedrag: float
+    supplier_code: int
+    order_date: str  # Overweeg datetime.date
+    delivery_date: str  # Overweeg datetime.date
+    amount: float
     status: str
 
 class BestellingDetailUpdate(BestellingDetailBase):
     pass
 
 class BestellingDetails(BaseModel):
-    suppliercode: str
-    ordernr: int
-    artcode: int
-    artikelnaam: str
-    orderprice: float
-    orderdate: str
-    deliverydate: str
+    supplier_code: str
+    order_number: int
+    article_code: int
+    article_name: str
+    order_price: float
+    order_date: str  # Overweeg datetime.date
+    delivery_date: str
     status: str
 
 class BestellingDetailsArt(BaseModel):
-    ordernr: int
-    artcode: int
+    order_number: int
+    article_code: int
     amount: int
-    orderprice: float
+    order_price: float

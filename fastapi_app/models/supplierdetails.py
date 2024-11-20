@@ -1,15 +1,15 @@
 from pydantic import BaseModel
 
 class LeverancierBase(BaseModel):
-    levcode: int
-    levnaam: str
-    adres: str
-    woonplaats: str
+    supplier_code: int
+    supplier_name: str
+    address: str
+    city: str
 
 class LeverancierDetail(LeverancierBase):
     pass 
 
 class LeverancierCreate(BaseModel):
-    levnaam: str
-    adres: str
-    woonplaats: str
+    supplier_name: str
+    address: str
+    city: str
