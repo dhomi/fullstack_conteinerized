@@ -29,7 +29,7 @@ DELIMITER $$
 --
 DROP PROCEDURE IF EXISTS `add_booking_line`$$
 CREATE DEFINER=`root`@`%` PROCEDURE `add_booking_line` (IN `p_booking_number` INT, IN `p_sequence_number` INT, IN `p_order_number` INT, IN `p_article_code` INT, IN `p_amount` DECIMAL(10,2))   BEGIN
-    -- Controleer of de combinatie al bestaat
+    
     IF EXISTS (
         SELECT 1
         FROM booking_line
@@ -39,7 +39,7 @@ CREATE DEFINER=`root`@`%` PROCEDURE `add_booking_line` (IN `p_booking_number` IN
         SIGNAL SQLSTATE '45000'
             SET MESSAGE_TEXT = 'Deze booking_number en sequence_number combinatie bestaat al.';
     ELSE
-        -- Voeg de booking_line toe
+        
         INSERT INTO booking_line (booking_number, sequence_number, order_number, article_code, amount)
         VALUES (p_booking_number, p_sequence_number, p_order_number, p_article_code, p_amount);
     END IF;
@@ -47,7 +47,7 @@ END$$
 
 DROP PROCEDURE IF EXISTS `add_goods_receipt`$$
 CREATE DEFINER=`root`@`%` PROCEDURE `add_goods_receipt` (IN `p_order_number` INT, IN `p_article_code` INT, IN `p_receipt_date` DATE, IN `p_receipt_quantity` INT, IN `p_status` CHAR(1), IN `p_booking_number` INT, IN `p_sequence_number` INT)   BEGIN
-    -- Controleer of de booking combinatie bestaat
+    
     IF NOT EXISTS (
         SELECT 1
         FROM booking_line
@@ -57,7 +57,7 @@ CREATE DEFINER=`root`@`%` PROCEDURE `add_goods_receipt` (IN `p_order_number` INT
         SIGNAL SQLSTATE '45000'
             SET MESSAGE_TEXT = 'Booking number and sequence number do not exist in booking_line.';
     ELSE
-        -- Voeg de goods receipt toe
+       
         INSERT INTO goods_receipt (order_number, article_code, receipt_date, receipt_quantity, status, booking_number, sequence_number)
         VALUES (p_order_number, p_article_code, p_receipt_date, p_receipt_quantity, p_status, p_booking_number, p_sequence_number);
     END IF;
@@ -128,14 +128,7 @@ CREATE TABLE IF NOT EXISTS `booking` (
   KEY `fk_booking_supplier` (`supplier_code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
---
--- Tabel leegmaken voor invoegen `booking`
---
-
 TRUNCATE TABLE `booking`;
---
--- Gegevens worden geëxporteerd voor tabel `booking`
---
 
 INSERT INTO `booking` (`booking_number`, `booking_date`, `amount`, `customer_code`, `supplier_code`, `status`) VALUES
 (1, '2024-07-17', 602.50, NULL, 13, 'A'),
@@ -184,14 +177,7 @@ CREATE TABLE IF NOT EXISTS `booking_line` (
   KEY `idx_booking_number_sequence_number` (`booking_number`,`sequence_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
---
--- Tabel leegmaken voor invoegen `booking_line`
---
-
 TRUNCATE TABLE `booking_line`;
---
--- Gegevens worden geëxporteerd voor tabel `booking_line`
---
 
 INSERT INTO `booking_line` (`booking_number`, `sequence_number`, `amount`, `order_number`, `article_code`) VALUES
 (1, 1, 100.00, 121, 31),
@@ -236,16 +222,12 @@ INSERT INTO `booking_line` (`booking_number`, `sequence_number`, `amount`, `orde
 (24, 1, 30.40, 0, 0),
 (25, 1, 390.00, 0, 0);
 
---
--- Triggers `booking_line`
---
 DROP TRIGGER IF EXISTS `before_insert_booking_line`;
 DELIMITER $$
 CREATE TRIGGER `before_insert_booking_line` BEFORE INSERT ON `booking_line` FOR EACH ROW BEGIN
     DECLARE exists_order INT;
     DECLARE exists_article INT;
 
-    -- Controleer of order_number bestaat in orders tabel
     SELECT COUNT(*) INTO exists_order
     FROM orders
     WHERE order_number = NEW.order_number;
@@ -255,7 +237,6 @@ CREATE TRIGGER `before_insert_booking_line` BEFORE INSERT ON `booking_line` FOR 
             SET MESSAGE_TEXT = 'order_number bestaat niet in orders tabel.';
     END IF;
 
-    -- Controleer of article_code bestaat in sports_articles tabel
     SELECT COUNT(*) INTO exists_article
     FROM sports_articles
     WHERE article_code = NEW.article_code;
@@ -303,10 +284,7 @@ CREATE TABLE IF NOT EXISTS `customers` (
 -- Tabel leegmaken voor invoegen `customers`
 --
 
-TRUNCATE TABLE `customers`;
---
--- Gegevens worden geëxporteerd voor tabel `customers`
---
+TRUNCATE TABLE `customers`
 
 INSERT INTO `customers` (`customer_code`, `customer_name`, `address`, `postal_code`, `phone`, `city`, `status`, `credit_limit`, `balance`) VALUES
 (100, 'QA Football Articles', 'Football Street 1', '2492 VJ', '012-3456789', 'The Hague', 'A', 1000.00, 0.00),
@@ -331,14 +309,7 @@ CREATE TABLE IF NOT EXISTS `delivery` (
   KEY `idx_delivery_invoice_number` (`invoice_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
---
--- Tabel leegmaken voor invoegen `delivery`
---
-
 TRUNCATE TABLE `delivery`;
---
--- Gegevens worden geëxporteerd voor tabel `delivery`
---
 
 INSERT INTO `delivery` (`purchase_number`, `article_code`, `delivery_date`, `quantity`, `invoice_number`) VALUES
 (1, 1, '2024-08-08', 23, 1),
@@ -388,14 +359,8 @@ CREATE TABLE IF NOT EXISTS `goods_receipt` (
   KEY `idx_article_code` (`article_code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=184 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
---
--- Tabel leegmaken voor invoegen `goods_receipt`
---
 
 TRUNCATE TABLE `goods_receipt`;
---
--- Gegevens worden geëxporteerd voor tabel `goods_receipt`
---
 
 INSERT INTO `goods_receipt` (`receipt_id`, `order_number`, `article_code`, `receipt_date`, `receipt_quantity`, `status`, `booking_number`, `sequence_number`) VALUES
 (1, 121, 31, '2024-07-31', 25, 'A', 1, 1),
@@ -435,9 +400,6 @@ INSERT INTO `goods_receipt` (`receipt_id`, `order_number`, `article_code`, `rece
 (182, 201, 470, '2024-10-02', 15, 'A', 13, 1),
 (183, 201, 478, '2024-10-07', 21, 'A', 13, 2);
 
---
--- Triggers `goods_receipt`
---
 DROP TRIGGER IF EXISTS `after_insert_goods_receipt`;
 DELIMITER $$
 CREATE TRIGGER `after_insert_goods_receipt` AFTER INSERT ON `goods_receipt` FOR EACH ROW BEGIN
@@ -465,14 +427,7 @@ CREATE TABLE IF NOT EXISTS `invoice` (
   KEY `fk_invoice_booking_line` (`booking_number`,`sequence_number`)
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
---
--- Tabel leegmaken voor invoegen `invoice`
---
-
 TRUNCATE TABLE `invoice`;
---
--- Gegevens worden geëxporteerd voor tabel `invoice`
---
 
 INSERT INTO `invoice` (`invoice_number`, `invoice_date`, `status`, `booking_number`, `sequence_number`) VALUES
 (1, '2024-08-07', 'A', 17, 1),
@@ -504,14 +459,8 @@ CREATE TABLE IF NOT EXISTS `orders` (
   KEY `fk_orders_suppliers` (`supplier_code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=205 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
---
--- Tabel leegmaken voor invoegen `orders`
---
 
 TRUNCATE TABLE `orders`;
---
--- Gegevens worden geëxporteerd voor tabel `orders`
---
 
 INSERT INTO `orders` (`order_number`, `supplier_code`, `order_date`, `delivery_date`, `amount`, `status`) VALUES
 (121, 13, '2024-07-17', '2024-07-31', 602.50, 'C'),
@@ -532,9 +481,6 @@ INSERT INTO `orders` (`order_number`, `supplier_code`, `order_date`, `delivery_d
 
 -- --------------------------------------------------------
 
---
--- Tabelstructuur voor tabel `order_lines`
---
 
 DROP TABLE IF EXISTS `order_lines`;
 CREATE TABLE IF NOT EXISTS `order_lines` (
@@ -546,14 +492,8 @@ CREATE TABLE IF NOT EXISTS `order_lines` (
   KEY `idx_order_lines_article_code` (`article_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
---
--- Tabel leegmaken voor invoegen `order_lines`
---
 
 TRUNCATE TABLE `order_lines`;
---
--- Gegevens worden geëxporteerd voor tabel `order_lines`
---
 
 INSERT INTO `order_lines` (`order_number`, `article_code`, `quantity`, `order_price`) VALUES
 (121, 31, 25, 6.35),
@@ -586,9 +526,6 @@ INSERT INTO `order_lines` (`order_number`, `article_code`, `quantity`, `order_pr
 (190, 102, 25, 0.55),
 (190, 455, 100, 1.15);
 
---
--- Triggers `order_lines`
---
 DROP TRIGGER IF EXISTS `check_stock_before_insert`;
 DELIMITER $$
 CREATE TRIGGER `check_stock_before_insert` BEFORE INSERT ON `order_lines` FOR EACH ROW BEGIN
@@ -615,12 +552,10 @@ DELIMITER $$
 CREATE TRIGGER `check_stock_before_update` BEFORE UPDATE ON `order_lines` FOR EACH ROW BEGIN
     DECLARE available_stock INT;
 
-    -- Haal de huidige voorraad op voor het artikel
     SELECT stock_quantity INTO available_stock
     FROM sports_articles
     WHERE article_code = NEW.article_code;
 
-    -- Controleer of het artikel bestaat
     IF available_stock IS NULL THEN
         SIGNAL SQLSTATE '45000'
             SET MESSAGE_TEXT = 'Artikelcode bestaat niet.';
@@ -650,14 +585,8 @@ CREATE TABLE IF NOT EXISTS `purchases` (
   KEY `fk_purchases_customers` (`customer_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
---
--- Tabel leegmaken voor invoegen `purchases`
---
 
 TRUNCATE TABLE `purchases`;
---
--- Gegevens worden geëxporteerd voor tabel `purchases`
---
 
 INSERT INTO `purchases` (`purchase_number`, `customer_code`, `purchase_date`) VALUES
 (1, 100, '2024-08-01'),
@@ -687,14 +616,7 @@ CREATE TABLE IF NOT EXISTS `purchase_line` (
   KEY `idx_purchase_line_article_code` (`article_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
---
--- Tabel leegmaken voor invoegen `purchase_line`
---
-
 TRUNCATE TABLE `purchase_line`;
---
--- Gegevens worden geëxporteerd voor tabel `purchase_line`
---
 
 INSERT INTO `purchase_line` (`purchase_number`, `article_code`, `quantity`, `purchase_price`) VALUES
 (1, 1, 23, 19.50),
@@ -752,14 +674,8 @@ CREATE TABLE IF NOT EXISTS `quotations` (
   KEY `fk_quotations_article` (`article_code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=217 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
 
---
--- Tabel leegmaken voor invoegen `quotations`
---
 
 TRUNCATE TABLE `quotations`;
---
--- Gegevens worden geëxporteerd voor tabel `quotations`
---
 
 INSERT INTO `quotations` (`quotation_id`, `supplier_code`, `article_code`, `supplier_article_code`, `delivery_time`, `quotation_price`) VALUES
 (1, 35, 190, 'ST4P5', 10, 0.85),
@@ -1000,14 +916,8 @@ CREATE TABLE IF NOT EXISTS `sports_articles` (
   KEY `fk_sports_articles_vat` (`VAT_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
---
--- Tabel leegmaken voor invoegen `sports_articles`
---
 
 TRUNCATE TABLE `sports_articles`;
---
--- Gegevens worden geëxporteerd voor tabel `sports_articles`
---
 
 INSERT INTO `sports_articles` (`article_code`, `article_name`, `category`, `size`, `color`, `price`, `stock_quantity`, `stock_min`, `VAT_type`) VALUES
 (1, 'Premium Football', 'Ball', '5', 'White/Black', 30.00, 50, 10, 'h'),
@@ -1229,14 +1139,8 @@ CREATE TABLE IF NOT EXISTS `suppliers` (
   PRIMARY KEY (`supplier_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
---
--- Tabel leegmaken voor invoegen `suppliers`
---
 
 TRUNCATE TABLE `suppliers`;
---
--- Gegevens worden geëxporteerd voor tabel `suppliers`
---
 
 INSERT INTO `suppliers` (`supplier_code`, `supplier_name`, `address`, `city`) VALUES
 (4, 'SPORT SHOP HOVENIER G.H.', 'SPORT AVENUE 50', 'ATHLETICAM'),
@@ -1264,14 +1168,8 @@ CREATE TABLE IF NOT EXISTS `vat` (
   PRIMARY KEY (`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
---
--- Tabel leegmaken voor invoegen `vat`
---
 
 TRUNCATE TABLE `vat`;
---
--- Gegevens worden geëxporteerd voor tabel `vat`
---
 
 INSERT INTO `vat` (`type`, `description`) VALUES
 ('h', 'VAT High'),
@@ -1294,14 +1192,8 @@ CREATE TABLE IF NOT EXISTS `vat_percentage` (
   PRIMARY KEY (`type`,`from_date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
---
--- Tabel leegmaken voor invoegen `vat_percentage`
---
 
 TRUNCATE TABLE `vat_percentage`;
---
--- Gegevens worden geëxporteerd voor tabel `vat_percentage`
---
 
 INSERT INTO `vat_percentage` (`type`, `from_date`, `to_date`, `percent`) VALUES
 ('h', '1992-01-01', '1998-01-01', 19.000),
@@ -1309,85 +1201,47 @@ INSERT INTO `vat_percentage` (`type`, `from_date`, `to_date`, `percent`) VALUES
 ('l', '1975-01-01', '1998-01-01', 4.500),
 ('l', '1998-01-02', NULL, 6.000);
 
---
--- Beperkingen voor geëxporteerde tabellen
---
-
---
--- Beperkingen voor tabel `booking`
---
 ALTER TABLE `booking`
   ADD CONSTRAINT `fk_booking_customer` FOREIGN KEY (`customer_code`) REFERENCES `customers` (`customer_code`),
   ADD CONSTRAINT `fk_booking_supplier` FOREIGN KEY (`supplier_code`) REFERENCES `suppliers` (`supplier_code`);
 
---
--- Beperkingen voor tabel `booking_line`
---
 ALTER TABLE `booking_line`
   ADD CONSTRAINT `fk_booking_line_article` FOREIGN KEY (`article_code`) REFERENCES `sports_articles` (`article_code`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_booking_line_booking` FOREIGN KEY (`booking_number`) REFERENCES `booking` (`booking_number`),
   ADD CONSTRAINT `fk_booking_line_order` FOREIGN KEY (`order_number`) REFERENCES `orders` (`order_number`) ON DELETE CASCADE ON UPDATE CASCADE;
 
---
--- Beperkingen voor tabel `delivery`
---
 ALTER TABLE `delivery`
   ADD CONSTRAINT `fk_delivery_invoice` FOREIGN KEY (`invoice_number`) REFERENCES `invoice` (`invoice_number`),
   ADD CONSTRAINT `fk_delivery_purchase_line` FOREIGN KEY (`purchase_number`,`article_code`) REFERENCES `purchase_line` (`purchase_number`, `article_code`);
 
---
--- Beperkingen voor tabel `goods_receipt`
---
 ALTER TABLE `goods_receipt`
   ADD CONSTRAINT `goods_receipt_ibfk_1` FOREIGN KEY (`booking_number`,`sequence_number`) REFERENCES `booking_line` (`booking_number`, `sequence_number`) ON DELETE CASCADE ON UPDATE CASCADE;
 
---
--- Beperkingen voor tabel `invoice`
---
 ALTER TABLE `invoice`
   ADD CONSTRAINT `fk_invoice_booking_line` FOREIGN KEY (`booking_number`,`sequence_number`) REFERENCES `booking_line` (`booking_number`, `sequence_number`);
 
---
--- Beperkingen voor tabel `orders`
---
 ALTER TABLE `orders`
   ADD CONSTRAINT `fk_orders_suppliers` FOREIGN KEY (`supplier_code`) REFERENCES `suppliers` (`supplier_code`);
 
---
--- Beperkingen voor tabel `order_lines`
---
 ALTER TABLE `order_lines`
   ADD CONSTRAINT `fk_order_lines_article` FOREIGN KEY (`article_code`) REFERENCES `sports_articles` (`article_code`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_order_lines_orders` FOREIGN KEY (`order_number`) REFERENCES `orders` (`order_number`);
 
---
--- Beperkingen voor tabel `purchases`
---
 ALTER TABLE `purchases`
   ADD CONSTRAINT `fk_purchases_customers` FOREIGN KEY (`customer_code`) REFERENCES `customers` (`customer_code`);
 
---
--- Beperkingen voor tabel `purchase_line`
---
 ALTER TABLE `purchase_line`
   ADD CONSTRAINT `fk_purchase_line_article` FOREIGN KEY (`article_code`) REFERENCES `sports_articles` (`article_code`),
   ADD CONSTRAINT `fk_purchase_line_purchase` FOREIGN KEY (`purchase_number`) REFERENCES `purchases` (`purchase_number`);
 
---
--- Beperkingen voor tabel `quotations`
---
+
 ALTER TABLE `quotations`
   ADD CONSTRAINT `fk_quotations_article` FOREIGN KEY (`article_code`) REFERENCES `sports_articles` (`article_code`);
 
---
--- Beperkingen voor tabel `sports_articles`
---
 ALTER TABLE `sports_articles`
   ADD CONSTRAINT `fk_sports_articles_vat` FOREIGN KEY (`VAT_type`) REFERENCES `vat` (`type`);
 
---
--- Beperkingen voor tabel `vat_percentage`
---
+
 ALTER TABLE `vat_percentage`
   ADD CONSTRAINT `fk_vat_percentage_vat` FOREIGN KEY (`type`) REFERENCES `vat` (`type`);
 COMMIT;
