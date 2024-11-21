@@ -5,7 +5,7 @@ services:
     image: mariadb
     restart: always
     build:
-      context: ./mysql
+      context: ./backend-mariadb
       dockerfile: Dockerfile
     environment:
       MYSQL_USER: QAuser                  # non-root user (optional)
@@ -34,9 +34,9 @@ services:
     networks:
       - backend
 
-  fastapi_app:
+  middleware-fastapi:
     build:
-      context: ./fastapi_app
+      context: ./middleware-fastapi
       dockerfile: Dockerfile
     command: python3 main.py
     ports:
@@ -51,11 +51,11 @@ services:
     networks:
       - backend
 
-  django:
+  frontend-django:
     build:
-      context: ./django_app
+      context: ./frontend-django
       dockerfile: Dockerfile
-    command: python ./django_app/myproject/manage.py runserver 0.0.0.0:8001
+    command: python ./frontend-django/myproject/manage.py runserver 0.0.0.0:8001
     ports:
       - "8001:8001"
     depends_on:
@@ -66,7 +66,7 @@ services:
       - MYSQL_PASSWORD=QApassword
       - MYSQL_DATABASE=QAsportarticles
     volumes:
-      - .:/django_app
+      - .:/frontend-django
     networks:
       - backend
 
