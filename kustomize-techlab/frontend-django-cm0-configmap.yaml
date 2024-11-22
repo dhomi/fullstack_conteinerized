@@ -1,0 +1,403 @@
+apiVersion: v1
+data:
+  .gitignore: |
+    # Logs
+    logs
+    *.log
+    npm-debug.log*
+    yarn-debug.log*
+    yarn-error.log*
+    pnpm-debug.log*
+    lerna-debug.log*
+
+    *node_modules
+    dist
+    dist-ssr
+    *.local
+    *features-gen
+    *test-results
+    *playwright-report
+
+    # Editor directories and files
+    .vscode/*
+    !.vscode/extensions.json
+    .idea
+    .DS_Store
+    *.suo
+    *.ntvs*
+    *.njsproj
+    *.sln
+    *.sw?
+
+    # github actions runner
+    *actions-runner
+
+    # Python bytecode files
+    __pycache__/
+    app/__pycache__/
+    *.pyc
+    *.pyo
+    *.pyd
+
+    # Virtual environment directories
+    venv/
+    env/
+    ENV/
+    .venv/
+    *.env/
+
+    # Django stuff:
+    *.log
+    *.pot
+    *.py[cod]
+    *.sqlite3
+    db.sqlite3
+
+    # Flask stuff:
+    instance/
+    .webassets-cache
+
+    # Distribution / packaging
+    *.egg
+    *.egg-info/
+    dist/
+    build/
+    *.bak
+    *.swp
+
+    # PyCharm / VSCode / JetBrains IDE files
+    .idea/
+    .vscode/
+
+    # Jupyter Notebook checkpoints
+    .ipynb_checkpoints
+
+    # mypy
+    .mypy_cache/
+
+    # pytest cache
+    __pycache__/
+    .pytest_cache/
+    ./django_app/myproject/myapp/__pycache__/
+
+    # VSCode settings
+    .vscode/
+
+    # IDE specific folders
+    .vscode/
+    .idea/
+  Readme.md: "![logo](src/qa.png)\n\n# Fullstack Containerized Project\n\nThis repository is an ongoing CI/CD project with fullstack technology examples in an containerized environment. \n\n## How-To\nFollow the instructions below. \n\n### Installation\nPreconditions:\n- [Docker Desktop](https://docs.docker.com/desktop/install/windows-install/) installed\n- [NodeJS](https://nodejs.org/en/download/package-manager) installed\n- Act is a very handy tool for local running, see <https://nektosact.com>\n\n### Start the container\n```docker-compose up --build```\n- After \"docker-compose\" go to dashboard at http://localhost:4000/\n- At the end of the build you will also see the Local IP and the Network IP\n\n### K8s (Kubernetes) opzet\ndoe een 'kubectl apply -f deployment.yaml -n techlab' om het Techlab binnen K8s te installeren\n\n### Chaos testing\n...vanuit gaande dat de docker runt, kubernetes ook en kubectl apply is uitgevoerd...\nstart de chaos dashboard:  kubectl port-forward -n chaos-mesh svc/chaos-dashboard 2333:2333\nga naar het dashboard:  http://127.0.0.1:2333/\nvia UI/dashboard: Selecteer de techlab namespace, en de grafana app. \nMaak een experiment door POD KIlL en Submit deze allemaal \n\nCLI:\n...zorg dat de betreffende name van een chaos experiment eerst ge-archived is in de experiments dashboard van de chaos mesh...\ncd chaos/\nkubectl apply -f ./kill_grafana_pod.yaml\n\ncheck de grafana pod in de docker ui. hij moet exited zijn, en binnen enkele seconden een nieuwe pod is running.\n\n### Monitor\nGrafana is a monitoring tool at http://localhost:4000\n\n- Monitoring dashboard is the 'TechLab backend monitor'\n- Grafana gets data from InfluxDB:8086, and Influx gets data every few seconds from Telegram scraper (on backend number)\n\n### Fetch Local IP address\n```ipconfig | grep IPv4 | awk 'END{print}'```  \n\n\n### View the Front- and Backend \n- Frontend is located at http://localhost:3000/\n- The frontend gets the 'jokes' from the backend that runs on http://localhost:8000/\n- To stop the Docker container:\n ```docker-compose down```\n\n### E2E tests\nFrom the shell (or other CLI tool) navigate to folder \"e2e\" and run the test with \"act\"\n\n```cd e2e\nact\n```\n### JMeter\nNavigate to folder \"jmeter\" and start \"act\"\n\n```cd jmeter\nact\n```\n\n## Testing CRUD operations\n\n### Read (GET) all items / returns status: 200\nGET http://localhost:8000\n\n### Read (GET) a specific item by ID / returns status: 200\nGET http://localhost:8000/6\n\n### Create (POST) a new joke / returns status: 201\nPOST http://localhost:8000\n- Body: {\"item\": \"POST nieuwe mop\" }\n\n### Update (PUT) an item by ID / returns status: 200\nPUT http://localhost:8000/6\n- Body: { \"item\": \"PUT update\" }\n\n### Delete (DELETE) an item by ID / returns status: 204\nDELETE http://localhost:8000/6\n\n## TODO\n- Chaos testing: https://github.com/chaos-mesh/chaos-mesh\n- Create an architectural picture to explain what and how this project works\n- Extra README instructions"
+  Readme_backend-frontend.md: "# QA - Techlab\n\n## Overzicht\n\nDit project bevat een API, gebouwd met de Python-bibliotheek FastAPI, die een RESTful-interface biedt voor interactie met een MySQL-database. De database bevat gegevens over sportartikelen, klanten, leveranciers en bestellingen. Deze API ondersteunt momenteel alleen **GET**-verzoeken op een aantal tabellen; uitbreiding naar volledige CRUD-functionaliteit is gepland.\n\n## Inhoud\n1. [Project Status en To-Do's](#project-status-en-to-dos)\n2. [Database Uitleg](#database-uitleg)\n3. [Backend Configuratie](#backend-configuratie)\n4. [Frontend Configuratie](#frontend-configuratie)\n5. [API Endpoints](#api-endpoints)\n6. [Vereisten en Installatie](#vereisten-en-installatie)\n\n---\n\n## Project Status en To-Do's\n\n- **Swagger API**:\n  - Momenteel werken alleen de GET-requests voor enkele tabellen.\n  - De POST-, PUT-, en DELETE-functionaliteit moet nog worden geïmplementeerd.\n  - In de toekomst kunnen er meer tabellen en functionaliteit worden toegevoegd.\n\n- **Database**:\n  - Enkele tabellen en gegevens, zoals prijzen, zijn aangepast ten opzichte van de originele database en worden nog geoptimaliseerd.\n\n## Database Uitleg\n\nDe `QAsportartikelen` database is bedoeld voor het beheren van sportartikelen en het ondersteunen van het verkoopproces. Deze database kan worden gebruikt voor:\n\n1. **Voorraadbeheer**: Houd bij hoeveel producten zijn ingekocht en op voorraad zijn. Zo weet je precies wat er nog beschikbaar is en wat eventueel moet worden bijbesteld.\n2. **Verkoopregistratie**: Registreer klantenaankopen en krijg inzicht in wie wat heeft gekocht en wanneer. Dit helpt bij het analyseren van populaire producten en klantloyaliteit.\n3. **Orderbeheer**: Volg bestellingen en leveringen van leveranciers. Handig om te weten welke bestellingen onderweg zijn en wanneer deze binnenkomen.\n4. **Klantoverzicht (CRM)**: Creëer een basis-klantenoverzicht met aankoopgeschiedenis, zodat je meer inzicht hebt in het koopgedrag van klanten.\n\n## Backend Configuratie\n\n- De MySQL-database draait op `localhost:3306`.\n- Toegang tot de database via de web-UI: [http://localhost:8090](http://localhost:8090)\n  - **Gebruiker**: `root`\n  - **Wachtwoord**: `password`\n- **Eerste keer database laden**:\n    1. Ga naar [http://localhost:8090](http://localhost:8090) en log in.\n    2. Navigeer naar de `Import`-sectie.\n    3. Upload het bestand `QA_sportartikelen_v1.2.sql` (te vinden in `app/mysql/`).\n    4. Klik op `Import`.\n    5. Controleer of de `QAsportartikelen` database is toegevoegd aan de lijst.\n\n## Frontend Configuratie\n\n- Toegang tot de front-end interface via [http://localhost:8001](http://localhost:8001).\n- De front-end ondersteunt momenteel nog geen volledige functionaliteit voor POST-, PUT- en DELETE-verzoeken.\n\n## API Endpoints\n\nHier zijn de beschikbare API-endpoints die interactie bieden met de database:\n\n- **Swagger-overzicht**:\n  - Ga naar [http://localhost:8000/docs](http://localhost:8000/docs) voor een overzicht van alle endpoints.\n\n### Beschikbare Endpoints\n\n1. **Leveranciers ophalen**  \n   **GET** `/suppliers`  \n   Haalt een lijst van alle leveranciers in de database op.\n\n2. **Bestellingen ophalen**  \n   **GET** `/orders`  \n   Haalt alle bestellingen in de database op.\n\n3. **Bestellingsdetails ophalen**  \n   **GET** `/ordersdetails/{ordernr}`  \n   Haalt details op voor een specifieke bestelling. De response bevat informatie zoals leverancierscode, bestelnummer, artikelcode, artikelnaam, hoeveelheid, prijs, besteldatum, leverdatum en status.\n\n4. **Artikelnaam-details ophalen**  \n   **GET** `/artikelnaam/{artcode}`  \n   Haalt details op van een specifiek artikel, inclusief informatie zoals artikelnaam, hoogte, levensduur, kleur, onderhoudsinstructies, kosten, verkoopprijs en type.\n\n## Vereisten en Installatie\n\n1. **Installeer Docker Desktop**: [Download hier](https://www.docker.com/)\n2. **Start de server**:\n   - Gebruik de volgende opdracht in PowerShell om de server te starten:\n     ```bash\n     docker-compose up\n     ```\n3. **API Testen**:\n   - Zodra de server actief is, kun je de API benaderen via [http://localhost:8000](http://localhost:8000)."
+  deployment.yaml: |
+    apiVersion: v1
+    kind: Namespace
+    metadata:
+      name: techlab
+
+    ---
+    apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: grafana-data
+      namespace: techlab
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
+
+    ---
+    apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: postgres-data
+      namespace: techlab
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
+
+    ---
+    apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: influxdbv2
+      namespace: techlab
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
+
+    ---
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: backend
+      namespace: techlab
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: backend
+      template:
+        metadata:
+          labels:
+            app: backend
+        spec:
+          containers:
+            - name: backend
+              image: backend:latest
+              ports:
+                - containerPort: 8000
+
+    ---
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: backend
+      namespace: techlab
+    spec:
+      selector:
+        app: backend
+      ports:
+        - protocol: TCP
+          port: 8000
+          targetPort: 8000
+      type: LoadBalancer
+
+    ---
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: grafana
+      namespace: techlab
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: grafana
+      template:
+        metadata:
+          labels:
+            app: grafana
+        spec:
+          containers:
+            - name: grafana
+              image: grafana:latest
+              ports:
+                - containerPort: 3000
+              volumeMounts:
+                - mountPath: /var/lib/grafana
+                  name: grafana-data
+          volumes:
+            - name: grafana-data
+              persistentVolumeClaim:
+                claimName: grafana-data
+
+    ---
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: grafana
+      namespace: techlab
+    spec:
+      selector:
+        app: grafana
+      ports:
+        - protocol: TCP
+          port: 3000
+          targetPort: 3000
+      type: LoadBalancer
+
+    ---
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: pg-db
+      namespace: techlab
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: pg-db
+      template:
+        metadata:
+          labels:
+            app: pg-db
+        spec:
+          containers:
+            - name: pg-db
+              image: postgres:latest
+              ports:
+                - containerPort: 5432
+              volumeMounts:
+                - mountPath: /var/lib/postgresql/data
+                  name: postgres-data
+          volumes:
+            - name: postgres-data
+              persistentVolumeClaim:
+                claimName: postgres-data
+
+    ---
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: pg-db
+      namespace: techlab
+    spec:
+      selector:
+        app: pg-db
+      ports:
+        - protocol: TCP
+          port: 5432
+          targetPort: 5432
+      type: LoadBalancer
+
+    ---
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: influxdb
+      namespace: techlab
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: influxdb
+      template:
+        metadata:
+          labels:
+            app: influxdb
+        spec:
+          containers:
+            - name: influxdb
+              image: influxdb:2.6-alpine
+              ports:
+                - containerPort: 8086
+              volumeMounts:
+                - mountPath: /var/lib/influxdb2
+                  name: influxdbv2
+                - mountPath: /var/data/influxdb2
+                  name: influxdbv2
+              envFrom:
+                - configMapRef:
+                    name: influxdb-env
+          volumes:
+            - name: influxdbv2
+              persistentVolumeClaim:
+                claimName: influxdbv2
+
+    ---
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: influxdb
+      namespace: techlab
+    spec:
+      selector:
+        app: influxdb
+      ports:
+        - protocol: TCP
+          port: 8086
+          targetPort: 8086
+      type: LoadBalancer
+
+    ---
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: influxdb-env
+      namespace: techlab
+    data:
+      INFLUXDB_DB: mydb
+      INFLUXDB_ADMIN_USER: admin
+      INFLUXDB_ADMIN_PASSWORD: adminpassword
+
+    ---
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: telegraf
+      namespace: techlab
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: telegraf
+      template:
+        metadata:
+          labels:
+            app: telegraf
+        spec:
+          containers:
+            - name: telegraf
+              image: telegraf:1.25-alpine
+              volumeMounts:
+                - mountPath: /etc/telegraf/telegraf.conf
+                  name: telegraf-config
+                  subPath: telegraf.conf
+              envFrom:
+                - configMapRef:
+                    name: influxdb-env
+          volumes:
+            - name: telegraf-config
+              configMap:
+                name: telegraf-config
+
+    ---
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: telegraf-config
+      namespace: techlab
+    data:
+      telegraf.conf: |
+        # Telegraf configuration file
+
+    ---
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: frontend_api
+      namespace: techlab
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: frontend_api
+      template:
+        metadata:
+          labels:
+            app: frontend_api
+        spec:
+          containers:
+            - name: frontend_api
+              image: frontend:latest
+              ports:
+                - containerPort: 3000
+
+    ---
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: frontend_api
+      namespace: techlab
+    spec:
+      selector:
+        app: frontend_api
+      ports:
+        - protocol: TCP
+          port: 3000
+          targetPort: 3000
+      type: LoadBalancer
+  docker-compose.yml: "version: \"3\"\n\nservices:\n  db:\n    image: mariadb\n    restart: always\n    build:\n      context: ./backend-mariadb\n      dockerfile: Dockerfile\n    environment:\n      MYSQL_USER: QAuser                  # non-root user (optional)\n      MYSQL_PASSWORD: QApassword \n      MYSQL_ROOT_PASSWORD: 'password'\n      MYSQL_DATABASE: 'QAsportarticles'\n    ports:\n      - \"3306:3306\"\n    volumes:\n      - ./db:/docker-entrypoint-initdb.d\n    networks:\n      - backend\n      - monitoring\n\n  phpmyadmin:\n    image: phpmyadmin/phpmyadmin\n    environment:\n      PMA_HOST: db\n      MYSQL_USER: QAuser\n      MYSQL_PASSWORD: QApassword\n      MYSQL_ROOT_PASSWORD: password\n    ports:\n      - \"8090:80\"\n    depends_on:\n      - db\n    networks:\n      - backend\n\n  middleware-fastapi:\n    build:\n      context: ./middleware-fastapi\n      dockerfile: Dockerfile\n    command: python3 main.py\n    ports:\n      - \"8000:8000\"\n    depends_on:\n      - db\n    environment:\n      - MYSQL_HOST=db\n      - MYSQL_USER=QAuser\n      - MYSQL_PASSWORD=QApassword\n      - MYSQL_DATABASE=QAsportarticles\n    networks:\n      - backend\n\n  frontend-django:\n    build:\n      context: ./frontend-django\n      dockerfile: Dockerfile\n    command: python ./frontend-django/myproject/manage.py runserver 0.0.0.0:8001\n    ports:\n      - \"8001:8001\"\n    depends_on:\n      - db\n    environment:\n      - MYSQL_HOST=db\n      - MYSQL_USER=QAuser\n      - MYSQL_PASSWORD=QApassword\n      - MYSQL_DATABASE=QAsportarticles\n    volumes:\n      - .:/frontend-django\n    networks:\n      - backend\n\n  grafana:\n    build: ./grafana\n    ports:\n      - \"4000:3000\"\n    volumes:\n      - grafana-data:/var/lib/grafana\n      - ./grafana/provisioning/datasources/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml\n    depends_on:\n      - db\n    networks:\n      - monitoring\n\n# Networks\nnetworks:\n  backend:\n    driver: bridge\n  monitoring:\n    driver: bridge\n\nvolumes:\n  grafana-data:\n    driver: \"local\"\n"
+kind: ConfigMap
+metadata:
+  labels:
+    io.kompose.service: frontend-django
+  name: frontend-django-cm0

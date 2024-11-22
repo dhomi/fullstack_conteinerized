@@ -19,7 +19,12 @@ Preconditions:
 - At the end of the build you will also see the Local IP and the Network IP
 
 ### K8s (Kubernetes) opzet
+maak de namespace aan: kubectl create namespace techlab
 doe een 'kubectl apply -f deployment.yaml -n techlab' om het Techlab binnen K8s te installeren
+check dat alle pods draaien: kubectl -n techlab get pods
+
+port forward middleware:  kubectl port-forward -n techlab svc/middleware-fastapi 8000:8000
+port forward frontend: kubectl port-forward svc/frontend-django -n techlab 8001:8001
 
 ### Chaos testing
 ...vanuit gaande dat de docker runt, kubernetes ook en kubectl apply is uitgevoerd...
