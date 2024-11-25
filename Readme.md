@@ -26,6 +26,11 @@ check dat alle pods draaien: kubectl -n techlab get pods
 port forward middleware:  kubectl port-forward -n techlab svc/middleware-fastapi 8000:8000
 port forward frontend: kubectl port-forward svc/frontend-django -n techlab 8001:8001
 
+## Helm install gebruiken om Techlab te starten ipv kubectl
+https://www.youtube.com/watch?v=SLlYDL573sw
+https://github.com/quickbooks2018/helmify
+
+
 ### Chaos testing
 ...vanuit gaande dat de docker runt, kubernetes ook en kubectl apply is uitgevoerd...
 

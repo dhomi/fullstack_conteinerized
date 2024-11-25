@@ -1299,7 +1299,7 @@ spec:
           value: password
         - name: MYSQL_USER
           value: QAuser
-        image: mariadb
+        image: mariadb:latest
         name: db
         ports:
         - containerPort: 3306
@@ -1474,7 +1474,7 @@ spec:
           value: QAuser
         - name: PMA_HOST
           value: db
-        image: phpmyadmin/phpmyadmin
+        image: phpmyadmin/phpmyadmin:latest
         name: phpmyadmin
         ports:
         - containerPort: 80
