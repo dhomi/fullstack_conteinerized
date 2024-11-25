@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "techlab-k8s.fullname" . }}-phpmyadmin
+  labels:
+    io.kompose.service: phpmyadmin
+  {{- include "techlab-k8s.labels" . | nindent 4 }}
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.34.0 (cbf2835db)
+spec:
+  type: {{ .Values.phpmyadmin.type }}
+  selector:
+    io.kompose.service: phpmyadmin
+  {{- include "techlab-k8s.selectorLabels" . | nindent 4 }}
+  ports:
+	{{- .Values.phpmyadmin.ports | toYaml | nindent 2 -}}

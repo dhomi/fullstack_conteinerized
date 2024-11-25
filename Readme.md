@@ -30,6 +30,9 @@ port forward frontend: kubectl port-forward svc/frontend-django -n techlab 8001:
 https://www.youtube.com/watch?v=SLlYDL573sw
 https://github.com/quickbooks2018/helmify
 
+...vanuit gaande dat je helm al geinstalleerd hebt...
+helm install techlab-release techlab-k8s -n techlab
+
 
 ### Chaos testing
 ...vanuit gaande dat de docker runt, kubernetes ook en kubectl apply is uitgevoerd...

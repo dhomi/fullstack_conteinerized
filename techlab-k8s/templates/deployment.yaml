@@ -1,0 +1,245 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "techlab-k8s.fullname" . }}-db
+  labels:
+    io.kompose.service: db
+  {{- include "techlab-k8s.labels" . | nindent 4 }}
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.34.0 (cbf2835db)
+spec:
+  replicas: {{ .Values.db.replicas }}
+  selector:
+    matchLabels:
+      io.kompose.service: db
+    {{- include "techlab-k8s.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        io.kompose.service: db
+      {{- include "techlab-k8s.selectorLabels" . | nindent 8 }}
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.34.0 (cbf2835db)
+    spec:
+      containers:
+      - env:
+        - name: MYSQL_DATABASE
+          value: QAsportarticles
+        - name: MYSQL_PASSWORD
+          value: QApassword
+        - name: MYSQL_ROOT_PASSWORD
+          value: password
+        - name: MYSQL_USER
+          value: QAuser
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ .Values.kubernetesClusterDomain }}
+        image: {{ .Values.db.db.image.repository }}:{{ .Values.db.db.image.tag | default
+          .Chart.AppVersion }}
+        name: db
+        ports:
+        - containerPort: 3306
+          protocol: TCP
+        resources: {}
+        volumeMounts:
+        - mountPath: /docker-entrypoint-initdb.d
+          name: db-cm0
+      restartPolicy: Always
+      volumes:
+      - configMap:
+          name: {{ include "techlab-k8s.fullname" . }}-db-cm0
+        name: db-cm0
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "techlab-k8s.fullname" . }}-frontend-django
+  labels:
+    app: frontend-django
+  {{- include "techlab-k8s.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.frontendDjango.replicas }}
+  selector:
+    matchLabels:
+      app: frontend-django
+    {{- include "techlab-k8s.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: frontend-django
+      {{- include "techlab-k8s.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - command:
+        - python
+        - manage.py
+        - runserver
+        - 0.0.0.0:8001
+        env:
+        - name: MYSQL_DATABASE
+          value: QAsportarticles
+        - name: MYSQL_HOST
+          value: db
+        - name: MYSQL_PASSWORD
+          value: QApassword
+        - name: MYSQL_USER
+          value: QAuser
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ .Values.kubernetesClusterDomain }}
+        image: {{ .Values.frontendDjango.frontendDjango.image.repository }}:{{ .Values.frontendDjango.frontendDjango.image.tag
+          | default .Chart.AppVersion }}
+        name: frontend-django
+        ports:
+        - containerPort: 8001
+        resources: {}
+      restartPolicy: Always
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "techlab-k8s.fullname" . }}-grafana
+  labels:
+    io.kompose.service: grafana
+  {{- include "techlab-k8s.labels" . | nindent 4 }}
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.34.0 (cbf2835db)
+spec:
+  replicas: {{ .Values.grafana.replicas }}
+  selector:
+    matchLabels:
+      io.kompose.service: grafana
+    {{- include "techlab-k8s.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        io.kompose.service: grafana
+      {{- include "techlab-k8s.selectorLabels" . | nindent 8 }}
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.34.0 (cbf2835db)
+    spec:
+      containers:
+      - env:
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ .Values.kubernetesClusterDomain }}
+        image: {{ .Values.grafana.grafana.image.repository }}:{{ .Values.grafana.grafana.image.tag
+          | default .Chart.AppVersion }}
+        name: grafana
+        ports:
+        - containerPort: 3000
+          protocol: TCP
+        resources: {}
+        volumeMounts:
+        - mountPath: /var/lib/grafana
+          name: grafana-data
+        - mountPath: /etc/grafana/provisioning/datasources/datasource.yaml
+          name: grafana-cm1
+          subPath: datasource.yaml
+      restartPolicy: Always
+      volumes:
+      - name: grafana-data
+        persistentVolumeClaim:
+          claimName: {{ include "techlab-k8s.fullname" . }}-grafana-data
+      - configMap:
+          items:
+          - key: datasource.yaml
+            path: datasource.yaml
+          name: {{ include "techlab-k8s.fullname" . }}-grafana-cm1
+        name: grafana-cm1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "techlab-k8s.fullname" . }}-middleware-fastapi
+  labels:
+    io.kompose.service: middleware-fastapi
+  {{- include "techlab-k8s.labels" . | nindent 4 }}
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.34.0 (cbf2835db)
+spec:
+  replicas: {{ .Values.middlewareFastapi.replicas }}
+  selector:
+    matchLabels:
+      io.kompose.service: middleware-fastapi
+    {{- include "techlab-k8s.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        io.kompose.service: middleware-fastapi
+      {{- include "techlab-k8s.selectorLabels" . | nindent 8 }}
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.34.0 (cbf2835db)
+    spec:
+      containers:
+      - args:
+        - python3
+        - main.py
+        env:
+        - name: MYSQL_DATABASE
+          value: QAsportarticles
+        - name: MYSQL_HOST
+          value: db
+        - name: MYSQL_PASSWORD
+          value: QApassword
+        - name: MYSQL_USER
+          value: QAuser
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ .Values.kubernetesClusterDomain }}
+        image: {{ .Values.middlewareFastapi.middlewareFastapi.image.repository }}:{{ .Values.middlewareFastapi.middlewareFastapi.image.tag
+          | default .Chart.AppVersion }}
+        name: middleware-fastapi
+        ports:
+        - containerPort: 8000
+          protocol: TCP
+        resources: {}
+      restartPolicy: Always
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "techlab-k8s.fullname" . }}-phpmyadmin
+  labels:
+    io.kompose.service: phpmyadmin
+  {{- include "techlab-k8s.labels" . | nindent 4 }}
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.34.0 (cbf2835db)
+spec:
+  replicas: {{ .Values.phpmyadmin.replicas }}
+  selector:
+    matchLabels:
+      io.kompose.service: phpmyadmin
+    {{- include "techlab-k8s.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        io.kompose.service: phpmyadmin
+      {{- include "techlab-k8s.selectorLabels" . | nindent 8 }}
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.34.0 (cbf2835db)
+    spec:
+      containers:
+      - env:
+        - name: MYSQL_PASSWORD
+          value: QApassword
+        - name: MYSQL_ROOT_PASSWORD
+          value: password
+        - name: MYSQL_USER
+          value: QAuser
+        - name: PMA_HOST
+          value: db
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ .Values.kubernetesClusterDomain }}
+        image: {{ .Values.phpmyadmin.phpmyadmin.image.repository }}:{{ .Values.phpmyadmin.phpmyadmin.image.tag
+          | default .Chart.AppVersion }}
+        name: phpmyadmin
+        ports:
+        - containerPort: 80
+          protocol: TCP
+        resources: {}
+      restartPolicy: Always

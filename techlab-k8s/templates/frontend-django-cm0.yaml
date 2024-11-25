@@ -1,0 +1,119 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "techlab-k8s.fullname" . }}-frontend-django-cm0
+  labels:
+    app: frontend-django
+  {{- include "techlab-k8s.labels" . | nindent 4 }}
+data:
+  .gitignore: {{ .Values.frontendDjangoCm0.Gitignore | quote }}
+  Readme.md: {{ .Values.frontendDjangoCm0.readmeMd | quote }}
+  Readme_backend-frontend.md: {{ .Values.frontendDjangoCm0.readmeBackendFrontendMd
+    | quote }}
+  deployment.yaml: |
+    apiVersion: v1
+    kind: Namespace
+    metadata:
+      name: {{ .Values.frontendDjangoCm0.deploymentYaml.metadata.name | quote }}
+  docker-compose.yml: |
+    networks:
+      backend:
+        driver: {{ .Values.frontendDjangoCm0.dockerComposeYml.networks.backend.driver
+          | quote }}
+      monitoring:
+        driver: {{ .Values.frontendDjangoCm0.dockerComposeYml.networks.monitoring.driver
+          | quote }}
+    services:
+      db:
+        build:
+          context: {{ .Values.frontendDjangoCm0.dockerComposeYml.services.db.build.context
+            | quote }}
+          dockerfile: {{ .Values.frontendDjangoCm0.dockerComposeYml.services.db.build.dockerfile
+            | quote }}
+        environment:
+          MYSQL_DATABASE: {{ .Values.frontendDjangoCm0.dockerComposeYml.services.db.environment.mysqlDatabase
+            | quote }}
+          MYSQL_PASSWORD: {{ .Values.frontendDjangoCm0.dockerComposeYml.services.db.environment.mysqlPassword
+            | quote }}
+          MYSQL_ROOT_PASSWORD: {{ .Values.frontendDjangoCm0.dockerComposeYml.services.db.environment.mysqlRootPassword
+            | quote }}
+          MYSQL_USER: {{ .Values.frontendDjangoCm0.dockerComposeYml.services.db.environment.mysqlUser
+            | quote }}
+        image: {{ .Values.frontendDjangoCm0.dockerComposeYml.services.db.image | quote
+          }}
+        networks: {{ toYaml .Values.frontendDjangoCm0.dockerComposeYml.services.db.networks
+          | nindent 10 }}
+        ports: {{ toYaml .Values.frontendDjangoCm0.dockerComposeYml.services.db.ports
+          | nindent 10 }}
+        restart: {{ .Values.frontendDjangoCm0.dockerComposeYml.services.db.restart |
+          quote }}
+        volumes: {{ toYaml .Values.frontendDjangoCm0.dockerComposeYml.services.db.volumes
+          | nindent 10 }}
+      frontend-django:
+        build:
+          context: {{ .Values.frontendDjangoCm0.dockerComposeYml.services.frontendDjango.build.context
+            | quote }}
+          dockerfile: {{ .Values.frontendDjangoCm0.dockerComposeYml.services.frontendDjango.build.dockerfile
+            | quote }}
+        command: {{ .Values.frontendDjangoCm0.dockerComposeYml.services.frontendDjango.command
+          | quote }}
+        depends_on: {{ toYaml .Values.frontendDjangoCm0.dockerComposeYml.services.frontendDjango.dependsOn
+          | nindent 10 }}
+        environment: {{ toYaml .Values.frontendDjangoCm0.dockerComposeYml.services.frontendDjango.environment
+          | nindent 10 }}
+        networks: {{ toYaml .Values.frontendDjangoCm0.dockerComposeYml.services.frontendDjango.networks
+          | nindent 10 }}
+        ports: {{ toYaml .Values.frontendDjangoCm0.dockerComposeYml.services.frontendDjango.ports
+          | nindent 10 }}
+        volumes: {{ toYaml .Values.frontendDjangoCm0.dockerComposeYml.services.frontendDjango.volumes
+          | nindent 10 }}
+      grafana:
+        build: {{ .Values.frontendDjangoCm0.dockerComposeYml.services.grafana.build |
+          quote }}
+        depends_on: {{ toYaml .Values.frontendDjangoCm0.dockerComposeYml.services.grafana.dependsOn
+          | nindent 10 }}
+        networks: {{ toYaml .Values.frontendDjangoCm0.dockerComposeYml.services.grafana.networks
+          | nindent 10 }}
+        ports: {{ toYaml .Values.frontendDjangoCm0.dockerComposeYml.services.grafana.ports
+          | nindent 10 }}
+        volumes: {{ toYaml .Values.frontendDjangoCm0.dockerComposeYml.services.grafana.volumes
+          | nindent 10 }}
+      middleware-fastapi:
+        build:
+          context: {{ .Values.frontendDjangoCm0.dockerComposeYml.services.middlewareFastapi.build.context
+            | quote }}
+          dockerfile: {{ .Values.frontendDjangoCm0.dockerComposeYml.services.middlewareFastapi.build.dockerfile
+            | quote }}
+        command: {{ .Values.frontendDjangoCm0.dockerComposeYml.services.middlewareFastapi.command
+          | quote }}
+        depends_on: {{ toYaml .Values.frontendDjangoCm0.dockerComposeYml.services.middlewareFastapi.dependsOn
+          | nindent 10 }}
+        environment: {{ toYaml .Values.frontendDjangoCm0.dockerComposeYml.services.middlewareFastapi.environment
+          | nindent 10 }}
+        networks: {{ toYaml .Values.frontendDjangoCm0.dockerComposeYml.services.middlewareFastapi.networks
+          | nindent 10 }}
+        ports: {{ toYaml .Values.frontendDjangoCm0.dockerComposeYml.services.middlewareFastapi.ports
+          | nindent 10 }}
+      phpmyadmin:
+        depends_on: {{ toYaml .Values.frontendDjangoCm0.dockerComposeYml.services.phpmyadmin.dependsOn
+          | nindent 10 }}
+        environment:
+          MYSQL_PASSWORD: {{ .Values.frontendDjangoCm0.dockerComposeYml.services.phpmyadmin.environment.mysqlPassword
+            | quote }}
+          MYSQL_ROOT_PASSWORD: {{ .Values.frontendDjangoCm0.dockerComposeYml.services.phpmyadmin.environment.mysqlRootPassword
+            | quote }}
+          MYSQL_USER: {{ .Values.frontendDjangoCm0.dockerComposeYml.services.phpmyadmin.environment.mysqlUser
+            | quote }}
+          PMA_HOST: {{ .Values.frontendDjangoCm0.dockerComposeYml.services.phpmyadmin.environment.pmaHost
+            | quote }}
+        image: {{ .Values.frontendDjangoCm0.dockerComposeYml.services.phpmyadmin.image
+          | quote }}
+        networks: {{ toYaml .Values.frontendDjangoCm0.dockerComposeYml.services.phpmyadmin.networks
+          | nindent 10 }}
+        ports: {{ toYaml .Values.frontendDjangoCm0.dockerComposeYml.services.phpmyadmin.ports
+          | nindent 10 }}
+    version: {{ .Values.frontendDjangoCm0.dockerComposeYml.version | quote }}
+    volumes:
+      grafana-data:
+        driver: {{ .Values.frontendDjangoCm0.dockerComposeYml.volumes.grafanaData.driver
+          | quote }}

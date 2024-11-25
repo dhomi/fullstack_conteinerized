@@ -1,0 +1,946 @@
+db:
+  db:
+    image:
+      repository: mariadb
+      tag: latest
+  ports:
+  - name: "3306"
+    port: 3306
+    targetPort: 3306
+  replicas: 1
+  type: ClusterIP
+dbCm0:
+  initSql: "-- phpMyAdmin SQL Dump\n-- version 5.2.1\n-- https://www.phpmyadmin.net/\n--\n--
+    Host: db\n-- Gegenereerd op: 17 nov 2024 om 13:12\n-- Serverversie: 11.5.2-MariaDB-ubu2404\n--
+    PHP-versie: 8.2.8\n\nSET SQL_MODE = \"NO_AUTO_VALUE_ON_ZERO\";\nSTART TRANSACTION;\nSET
+    time_zone = \"+00:00\";\n\n\n/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT
+    */;\n/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;\n/*!40101
+    SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;\n/*!40101 SET NAMES utf8mb4
+    */;\n\n--\n-- Database: `QAsportarticles`\n--\nCREATE DATABASE IF NOT EXISTS `QAsportarticles`
+    DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_uca1400_ai_ci;\nUSE `QAsportarticles`;\n\nDELIMITER
+    $$\n--\n-- Procedures\n--\nDROP PROCEDURE IF EXISTS `add_booking_line`$$\nCREATE
+    DEFINER=`root`@`%` PROCEDURE `add_booking_line` (IN `p_booking_number` INT, IN
+    `p_sequence_number` INT, IN `p_order_number` INT, IN `p_article_code` INT, IN
+    `p_amount` DECIMAL(10,2))   BEGIN\n    \n    IF EXISTS (\n        SELECT 1\n        FROM
+    booking_line\n        WHERE booking_number = p_booking_number\n          AND sequence_number
+    = p_sequence_number\n    ) THEN\n        SIGNAL SQLSTATE '45000'\n            SET
+    MESSAGE_TEXT = 'Deze booking_number en sequence_number combinatie bestaat al.';\n
+    \   ELSE\n        \n        INSERT INTO booking_line (booking_number, sequence_number,
+    order_number, article_code, amount)\n        VALUES (p_booking_number, p_sequence_number,
+    p_order_number, p_article_code, p_amount);\n    END IF;\nEND$$\n\nDROP PROCEDURE
+    IF EXISTS `add_goods_receipt`$$\nCREATE DEFINER=`root`@`%` PROCEDURE `add_goods_receipt`
+    (IN `p_order_number` INT, IN `p_article_code` INT, IN `p_receipt_date` DATE, IN
+    `p_receipt_quantity` INT, IN `p_status` CHAR(1), IN `p_booking_number` INT, IN
+    `p_sequence_number` INT)   BEGIN\n    \n    IF NOT EXISTS (\n        SELECT 1\n
+    \       FROM booking_line\n        WHERE booking_number = p_booking_number\n          AND
+    sequence_number = p_sequence_number\n    ) THEN\n        SIGNAL SQLSTATE '45000'\n
+    \           SET MESSAGE_TEXT = 'Booking number and sequence number do not exist
+    in booking_line.';\n    ELSE\n       \n        INSERT INTO goods_receipt (order_number,
+    article_code, receipt_date, receipt_quantity, status, booking_number, sequence_number)\n
+    \       VALUES (p_order_number, p_article_code, p_receipt_date, p_receipt_quantity,
+    p_status, p_booking_number, p_sequence_number);\n    END IF;\nEND$$\n\nDROP PROCEDURE
+    IF EXISTS `add_order_line`$$\nCREATE DEFINER=`root`@`%` PROCEDURE `add_order_line`
+    (IN `p_order_number` INT, IN `p_article_code` INT, IN `p_quantity` INT, IN `p_order_price`
+    DECIMAL(10,2))   BEGIN\n    DECLARE available_stock INT;\n\n    SELECT stock_quantity
+    INTO available_stock\n    FROM sports_articles\n    WHERE article_code = p_article_code;\n\n
+    \   IF available_stock IS NULL THEN\n        SIGNAL SQLSTATE '45000'\n            SET
+    MESSAGE_TEXT = 'Artikelcode bestaat niet.';\n    END IF;\n\n    IF p_quantity
+    > available_stock THEN\n        SIGNAL SQLSTATE '45000'\n            SET MESSAGE_TEXT
+    = 'Onvoldoende voorraad voor dit artikel.';\n    END IF;\n\n    INSERT INTO order_lines
+    (order_number, article_code, quantity, order_price)\n    VALUES (p_order_number,
+    p_article_code, p_quantity, p_order_price);\n\n    UPDATE sports_articles\n    SET
+    stock_quantity = stock_quantity - p_quantity\n    WHERE article_code = p_article_code;\nEND$$\n\nDROP
+    PROCEDURE IF EXISTS `check_low_stock`$$\nCREATE DEFINER=`root`@`%` PROCEDURE `check_low_stock`
+    ()   BEGIN\n    SELECT \n        sa.article_code, \n        sa.article_name, \n
+    \       sa.stock_quantity,\n        IFNULL(SUM(gr.receipt_quantity), 0) AS total_received,\n
+    \       sa.stock_quantity - IFNULL(SUM(gr.receipt_quantity), 0) AS remaining_stock\n
+    \   FROM \n        sports_articles sa\n    LEFT JOIN \n        goods_receipt gr
+    ON sa.article_code = gr.article_code\n    GROUP BY \n        sa.article_code,
+    sa.article_name, sa.stock_quantity, sa.stock_min\n    HAVING \n        remaining_stock
+    < sa.stock_min;\nEND$$\n\nDELIMITER ;\n\n-- --------------------------------------------------------\n\n--\n--
+    Tabelstructuur voor tabel `booking`\n--\n\nDROP TABLE IF EXISTS `booking`;\nCREATE
+    TABLE IF NOT EXISTS `booking` (\n  `booking_number` int(11) NOT NULL AUTO_INCREMENT,\n
+    \ `booking_date` date NOT NULL,\n  `amount` decimal(9,2) NOT NULL,\n  `customer_code`
+    int(11) DEFAULT NULL,\n  `supplier_code` int(11) DEFAULT NULL,\n  `status` char(1)
+    DEFAULT NULL,\n  PRIMARY KEY (`booking_number`),\n  KEY `fk_booking_customer`
+    (`customer_code`),\n  KEY `fk_booking_supplier` (`supplier_code`)\n) ENGINE=InnoDB
+    AUTO_INCREMENT=26 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;\n\nTRUNCATE
+    TABLE `booking`;\n\nINSERT INTO `booking` (`booking_number`, `booking_date`, `amount`,
+    `customer_code`, `supplier_code`, `status`) VALUES\n(1, '2024-07-17', 602.50,
+    NULL, 13, 'A'),\n(2, '2024-08-25', 117.50, NULL, 4, 'A'),\n(3, '2024-08-27', 399.50,
+    NULL, 4, 'A'),\n(4, '2024-09-06', 607.60, NULL, 9, 'A'),\n(5, '2024-09-06', 240.00,
+    NULL, 22, 'A'),\n(6, '2024-09-11', 422.50, NULL, 20, 'A'),\n(7, '2024-09-13',
+    680.25, NULL, 14, 'A'),\n(8, '2024-09-13', 1316.75, NULL, 13, 'A'),\n(9, '2024-09-13',
+    330.75, NULL, 35, 'A'),\n(10, '2024-09-14', 966.95, NULL, 35, 'A'),\n(11, '2024-09-14',
+    72.00, NULL, 4, 'A'),\n(12, '2024-09-26', 221.25, NULL, 4, 'A'),\n(13, '2024-09-26',
+    466.25, NULL, 14, 'A'),\n(14, '2024-10-01', 605.00, NULL, 19, 'A'),\n(15, '2024-10-01',
+    497.50, NULL, 34, 'A'),\n(16, '2024-08-01', 715.50, 100, NULL, 'A'),\n(17, '2024-08-08',
+    260.00, 100, NULL, 'A'),\n(18, '2024-08-15', 730.00, 100, NULL, 'A'),\n(19, '2024-09-11',
+    765.00, 100, NULL, 'A'),\n(20, '2024-08-05', 401.00, 101, NULL, 'A'),\n(21, '2024-08-27',
+    768.50, 101, NULL, 'A'),\n(22, '2024-09-08', 215.00, 101, NULL, 'A'),\n(23, '2024-08-25',
+    498.15, 102, NULL, 'A'),\n(24, '2024-09-05', 1107.00, 102, NULL, 'A'),\n(25, '2024-09-17',
+    256.25, 102, NULL, 'A');\n\n-- --------------------------------------------------------\n\n--\n--
+    Tabelstructuur voor tabel `booking_line`\n--\n\nDROP TABLE IF EXISTS `booking_line`;\nCREATE
+    TABLE IF NOT EXISTS `booking_line` (\n  `booking_number` int(11) NOT NULL,\n  `sequence_number`
+    int(11) NOT NULL,\n  `amount` decimal(10,2) NOT NULL DEFAULT 0.00,\n  `order_number`
+    int(11) NOT NULL,\n  `article_code` int(11) NOT NULL,\n  PRIMARY KEY (`booking_number`,`sequence_number`),\n
+    \ KEY `idx_booking_line_booking_number` (`booking_number`),\n  KEY `fk_booking_line_order`
+    (`order_number`),\n  KEY `fk_booking_line_article` (`article_code`),\n  KEY `idx_booking_number_sequence_number`
+    (`booking_number`,`sequence_number`)\n) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;\n\nTRUNCATE
+    TABLE `booking_line`;\n\nINSERT INTO `booking_line` (`booking_number`, `sequence_number`,
+    `amount`, `order_number`, `article_code`) VALUES\n(1, 1, 100.00, 121, 31),\n(1,
+    2, 100.00, 121, 31),\n(1, 3, 25.00, 121, 31),\n(2, 1, 602.50, 0, 0),\n(2, 2, 50.00,
+    174, 380),\n(2, 3, 50.00, 174, 380),\n(3, 1, 33.75, 0, 0),\n(3, 2, 83.75, 0, 0),\n(3,
+    3, 12.00, 175, 380),\n(3, 4, 25.00, 175, 434),\n(3, 5, 40.00, 175, 74),\n(3, 6,
+    400.00, 175, 157),\n(3, 7, 23.00, 175, 380),\n(3, 8, 250.00, 175, 426),\n(4, 1,
+    157.00, 0, 0),\n(4, 2, 52.90, 0, 0),\n(4, 3, 127.10, 0, 0),\n(4, 4, 62.50, 0,
+    0),\n(4, 5, 20.00, 181, 362),\n(4, 6, 5.00, 181, 397),\n(5, 1, 157.00, 0, 0),\n(5,
+    2, 85.00, 184, 365),\n(6, 1, 102.00, 0, 0),\n(8, 1, 5.80, 0, 0),\n(8, 2, 19.20,
+    0, 0),\n(8, 3, 4.00, 190, 56),\n(8, 4, 12.00, 190, 68),\n(13, 1, 17.50, 0, 0),\n(13,
+    2, 14.70, 0, 0),\n(13, 3, 5.00, 201, 36),\n(13, 4, 15.00, 201, 470),\n(13, 5,
+    21.00, 201, 478),\n(17, 1, 715.50, 0, 0),\n(18, 1, 157.50, 0, 0),\n(18, 2, 102.50,
+    0, 0),\n(19, 1, 730.00, 0, 0),\n(20, 1, 765.00, 0, 0),\n(21, 1, 193.50, 0, 0),\n(22,
+    1, 471.00, 0, 0),\n(24, 1, 30.40, 0, 0),\n(25, 1, 390.00, 0, 0);\n\nDROP TRIGGER
+    IF EXISTS `before_insert_booking_line`;\nDELIMITER $$\nCREATE TRIGGER `before_insert_booking_line`
+    BEFORE INSERT ON `booking_line` FOR EACH ROW BEGIN\n    DECLARE exists_order INT;\n
+    \   DECLARE exists_article INT;\n\n    SELECT COUNT(*) INTO exists_order\n    FROM
+    orders\n    WHERE order_number = NEW.order_number;\n\n    IF exists_order = 0
+    THEN\n        SIGNAL SQLSTATE '45000'\n            SET MESSAGE_TEXT = 'order_number
+    bestaat niet in orders tabel.';\n    END IF;\n\n    SELECT COUNT(*) INTO exists_article\n
+    \   FROM sports_articles\n    WHERE article_code = NEW.article_code;\n\n    IF
+    exists_article = 0 THEN\n        SIGNAL SQLSTATE '45000'\n            SET MESSAGE_TEXT
+    = 'article_code bestaat niet in sports_articles tabel.';\n    END IF;\nEND\n$$\nDELIMITER
+    ;\nDROP TRIGGER IF EXISTS `pre_insert_booking_line`;\nDELIMITER $$\nCREATE TRIGGER
+    `pre_insert_booking_line` BEFORE INSERT ON `booking_line` FOR EACH ROW BEGIN\n
+    \    SET NEW.sequence_number = (\n        SELECT IFNULL(MAX(sequence_number),
+    0) + 1\n        FROM booking_line\n        WHERE booking_number = NEW.booking_number\n
+    \    );\nEND\n$$\nDELIMITER ;\n\n-- --------------------------------------------------------\n\n--\n--
+    Tabelstructuur voor tabel `customers`\n--\n\nDROP TABLE IF EXISTS `customers`;\nCREATE
+    TABLE IF NOT EXISTS `customers` (\n  `customer_code` int(11) NOT NULL,\n  `customer_name`
+    varchar(50) DEFAULT NULL,\n  `address` varchar(50) DEFAULT NULL,\n  `postal_code`
+    varchar(10) DEFAULT NULL,\n  `phone` varchar(15) DEFAULT NULL,\n  `city` varchar(30)
+    DEFAULT NULL,\n  `status` char(1) DEFAULT NULL,\n  `credit_limit` decimal(10,2)
+    DEFAULT NULL,\n  `balance` decimal(10,2) DEFAULT NULL,\n  PRIMARY KEY (`customer_code`)\n)
+    ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;\n\n--\n-- Tabel
+    leegmaken voor invoegen `customers`\n--\n\nTRUNCATE TABLE `customers`;\n--\n--
+    Gegevens worden geëxporteerd voor tabel `customers`\n--\n\nINSERT INTO `customers`
+    (`customer_code`, `customer_name`, `address`, `postal_code`, `phone`, `city`,
+    `status`, `credit_limit`, `balance`) VALUES\n(100, 'QA Football Articles', 'Football
+    Street 1', '2492 VJ', '012-3456789', 'The Hague', 'A', 1000.00, 0.00),\n(101,
+    'QA Tennis Articles', 'Tennis Street 1', '3078 ZD', '032-1987654', 'Rotterdam',
+    'A', 1000.00, 0.00),\n(102, 'QA General Sports Articles', 'Sport Avenue 1', '9728
+    JT', '045-6123789', 'Groningen', 'A', 1000.00, 0.00),\n(103, 'QA Fitness Articles',
+    'Sport Street 1', '1076 TW', '089-7654321', 'Amsterdam', 'A', 1000.00, 0.00);\n\n\n--
+    --------------------------------------------------------\n\n--\n-- Tabelstructuur
+    voor tabel `delivery`\n--\n\nDROP TABLE IF EXISTS `delivery`;\nCREATE TABLE IF
+    NOT EXISTS `delivery` (\n  `purchase_number` int(11) NOT NULL,\n  `article_code`
+    int(11) NOT NULL,\n  `delivery_date` date NOT NULL,\n  `quantity` int(11) NOT
+    NULL,\n  `invoice_number` int(11) DEFAULT NULL,\n  PRIMARY KEY (`purchase_number`,`article_code`,`delivery_date`),\n
+    \ KEY `idx_delivery_invoice_number` (`invoice_number`)\n) ENGINE=InnoDB DEFAULT
+    CHARSET=latin1 COLLATE=latin1_swedish_ci;\n\nTRUNCATE TABLE `delivery`;\n\nINSERT
+    INTO `delivery` (`purchase_number`, `article_code`, `delivery_date`, `quantity`,
+    `invoice_number`) VALUES\n(1, 1, '2024-08-08', 23, 1),\n(1, 2, '2024-08-08', 2,
+    1),\n(1, 35, '2024-08-08', 60, 1),\n(1, 74, '2024-08-08', 90, 1),\n(2, 39, '2024-08-11',
+    18, 2),\n(2, 56, '2024-08-11', 45, 2),\n(3, 54, '2024-08-15', 35, 3),\n(3, 200,
+    '2024-08-15', 3, 3),\n(3, 210, '2024-08-20', 15, 4),\n(3, 383, '2024-08-20', 10,
+    4),\n(4, 12, '2024-08-21', 15, 5),\n(4, 332, '2024-08-21', 100, 5),\n(4, 397,
+    '2024-08-26', 12, 6),\n(5, 50, '2024-08-31', 9, 8),\n(5, 56, '2024-08-25', 10,
+    8),\n(6, 12, '2024-08-30', 20, 7),\n(6, 23, '2024-08-30', 45, 7),\n(7, 19, '2024-09-05',
+    78, 9),\n(9, 117, '2024-09-14', 60, 10),\n(9, 117, '2024-09-17', 15, 10),\n(9,
+    296, '2024-09-14', 8, 10),\n(9, 296, '2024-09-17', 2, 10),\n(9, 300, '2024-09-14',
+    17, 10),\n(9, 300, '2024-09-17', 10, 10),\n(9, 300, '2024-09-19', 8, 10);\n\n--
+    --------------------------------------------------------\n\n--\n-- Tabelstructuur
+    voor tabel `goods_receipt`\n--\n\nDROP TABLE IF EXISTS `goods_receipt`;\nCREATE
+    TABLE IF NOT EXISTS `goods_receipt` (\n  `receipt_id` int(11) NOT NULL AUTO_INCREMENT,\n
+    \ `order_number` int(11) NOT NULL,\n  `article_code` int(11) NOT NULL,\n  `receipt_date`
+    date NOT NULL,\n  `receipt_quantity` int(11) NOT NULL,\n  `status` char(1) NOT
+    NULL,\n  `booking_number` int(11) NOT NULL,\n  `sequence_number` int(11) NOT NULL,\n
+    \ PRIMARY KEY (`receipt_id`),\n  KEY `booking_number` (`booking_number`,`sequence_number`),\n
+    \ KEY `idx_article_code` (`article_code`)\n) ENGINE=InnoDB AUTO_INCREMENT=184
+    DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;\n\n\nTRUNCATE TABLE `goods_receipt`;\n\nINSERT
+    INTO `goods_receipt` (`receipt_id`, `order_number`, `article_code`, `receipt_date`,
+    `receipt_quantity`, `status`, `booking_number`, `sequence_number`) VALUES\n(1,
+    121, 31, '2024-07-31', 25, 'A', 1, 1),\n(135, 121, 31, '2024-07-31', 25, 'A',
+    1, 1),\n(136, 121, 87, '2024-07-31', 50, 'A', 1, 1),\n(137, 121, 311, '2024-07-31',
+    50, 'A', 1, 1),\n(138, 121, 314, '2024-07-31', 150, 'A', 1, 1),\n(139, 121, 365,
+    '2024-07-31', 150, 'A', 1, 1),\n(140, 121, 422, '2024-07-31', 25, 'A', 1, 1),\n(141,
+    174, 102, '2024-09-04', 25, 'A', 2, 1),\n(142, 174, 380, '2024-09-04', 25, 'A',
+    2, 1),\n(143, 174, 455, '2024-09-10', 50, 'A', 2, 2),\n(144, 174, 470, '2024-09-10',
+    25, 'A', 2, 2),\n(145, 175, 36, '2024-09-06', 30, 'A', 3, 1),\n(146, 175, 74,
+    '2024-09-06', 20, 'A', 3, 1),\n(147, 175, 95, '2024-09-06', 100, 'A', 3, 1),\n(148,
+    175, 380, '2024-09-06', 15, 'A', 3, 1),\n(149, 175, 455, '2024-09-06', 50, 'A',
+    3, 1),\n(150, 175, 470, '2024-09-06', 25, 'A', 3, 1),\n(151, 175, 478, '2024-09-06',
+    50, 'A', 3, 1),\n(152, 175, 36, '2024-09-15', 20, 'A', 3, 2),\n(153, 175, 74,
+    '2024-09-15', 40, 'A', 3, 2),\n(154, 175, 102, '2024-09-15', 10, 'A', 3, 2),\n(155,
+    175, 380, '2024-09-15', 30, 'A', 3, 2),\n(170, 175, 380, '2024-09-15', 12, 'A',
+    3, 2),\n(171, 175, 434, '2024-09-20', 25, 'A', 3, 3),\n(172, 175, 74, '2024-09-20',
+    40, 'A', 3, 3),\n(173, 175, 157, '2024-09-20', 400, 'A', 3, 3),\n(174, 175, 380,
+    '2024-09-20', 23, 'A', 3, 3),\n(175, 175, 426, '2024-09-25', 250, 'A', 3, 4),\n(176,
+    181, 362, '2024-09-27', 20, 'A', 4, 1),\n(177, 181, 397, '2024-09-27', 5, 'A',
+    4, 1),\n(178, 184, 365, '2024-09-19', 85, 'A', 5, 1),\n(179, 190, 56, '2024-09-23',
+    4, 'A', 8, 1),\n(180, 190, 68, '2024-09-27', 12, 'A', 8, 2),\n(181, 201, 36, '2024-10-02',
+    5, 'A', 13, 1),\n(182, 201, 470, '2024-10-02', 15, 'A', 13, 1),\n(183, 201, 478,
+    '2024-10-07', 21, 'A', 13, 2);\n\nDROP TRIGGER IF EXISTS `after_insert_goods_receipt`;\nDELIMITER
+    $$\nCREATE TRIGGER `after_insert_goods_receipt` AFTER INSERT ON `goods_receipt`
+    FOR EACH ROW BEGIN\n    UPDATE sports_articles\n    SET stock_quantity = stock_quantity
+    + NEW.receipt_quantity\n    WHERE article_code = NEW.article_code;\nEND\n$$\nDELIMITER
+    ;\n\n-- --------------------------------------------------------\n\n--\n-- Tabelstructuur
+    voor tabel `invoice`\n--\n\nDROP TABLE IF EXISTS `invoice`;\nCREATE TABLE IF NOT
+    EXISTS `invoice` (\n  `invoice_number` int(11) NOT NULL AUTO_INCREMENT,\n  `invoice_date`
+    date NOT NULL,\n  `status` char(1) DEFAULT NULL,\n  `booking_number` int(11) NOT
+    NULL,\n  `sequence_number` int(11) NOT NULL,\n  PRIMARY KEY (`invoice_number`),\n
+    \ KEY `fk_invoice_booking_line` (`booking_number`,`sequence_number`)\n) ENGINE=InnoDB
+    AUTO_INCREMENT=11 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;\n\nTRUNCATE
+    TABLE `invoice`;\n\nINSERT INTO `invoice` (`invoice_number`, `invoice_date`, `status`,
+    `booking_number`, `sequence_number`) VALUES\n(1, '2024-08-07', 'A', 17, 1),\n(2,
+    '2024-08-10', 'A', 21, 1),\n(3, '2024-08-15', 'A', 18, 1),\n(4, '2024-08-19',
+    'A', 18, 2),\n(5, '2024-08-21', 'A', 19, 1),\n(6, '2024-08-25', 'A', 19, 1),\n(7,
+    '2024-08-30', 'A', 22, 1),\n(8, '2024-08-30', 'A', 24, 1),\n(9, '2024-09-05',
+    'A', 25, 1),\n(10, '2024-09-14', 'A', 20, 1);\n\n-- --------------------------------------------------------\n\n--\n--
+    Tabelstructuur voor tabel `orders`\n--\n\nDROP TABLE IF EXISTS `orders`;\nCREATE
+    TABLE IF NOT EXISTS `orders` (\n  `order_number` int(11) NOT NULL AUTO_INCREMENT,\n
+    \ `supplier_code` int(11) NOT NULL,\n  `order_date` date DEFAULT NULL,\n  `delivery_date`
+    date DEFAULT NULL,\n  `amount` decimal(6,2) DEFAULT NULL,\n  `status` char(1)
+    DEFAULT NULL,\n  PRIMARY KEY (`order_number`),\n  KEY `fk_orders_suppliers` (`supplier_code`)\n)
+    ENGINE=InnoDB AUTO_INCREMENT=205 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;\n\n\nTRUNCATE
+    TABLE `orders`;\n\nINSERT INTO `orders` (`order_number`, `supplier_code`, `order_date`,
+    `delivery_date`, `amount`, `status`) VALUES\n(121, 13, '2024-07-17', '2024-07-31',
+    602.50, 'C'),\n(174, 4, '2024-08-25', '2024-09-04', 117.50, 'C'),\n(175, 4, '2024-08-27',
+    '2024-09-06', 399.50, 'C'),\n(181, 9, '2024-09-06', '2024-09-27', 607.60, 'C'),\n(184,
+    22, '2024-09-06', '2024-09-16', 240.00, 'C'),\n(186, 20, '2024-09-11', '2024-09-18',
+    422.50, 'C'),\n(190, 14, '2024-09-13', '2024-09-23', 680.25, 'C'),\n(191, 13,
+    '2024-09-13', '2024-09-27', 1316.75, 'C'),\n(192, 35, '2024-09-13', '2024-09-23',
+    330.75, 'C'),\n(197, 35, '2024-09-14', '2024-09-23', 966.95, 'C'),\n(200, 4, '2024-09-14',
+    '2024-09-21', 72.00, 'C'),\n(201, 4, '2024-09-26', '2024-10-02', 221.25, 'C'),\n(202,
+    14, '2024-09-26', '2024-10-05', 466.25, 'C'),\n(203, 19, '2024-10-01', '2024-10-15',
+    605.00, 'C'),\n(204, 34, '2024-10-01', '2024-10-15', 497.50, 'C');\n\n-- --------------------------------------------------------\n\n\nDROP
+    TABLE IF EXISTS `order_lines`;\nCREATE TABLE IF NOT EXISTS `order_lines` (\n  `order_number`
+    int(11) NOT NULL,\n  `article_code` int(11) NOT NULL,\n  `quantity` int(11) DEFAULT
+    NULL,\n  `order_price` decimal(4,2) DEFAULT NULL,\n  PRIMARY KEY (`order_number`,`article_code`),\n
+    \ KEY `idx_order_lines_article_code` (`article_code`)\n) ENGINE=InnoDB DEFAULT
+    CHARSET=latin1 COLLATE=latin1_swedish_ci;\n\n\nTRUNCATE TABLE `order_lines`;\n\nINSERT
+    INTO `order_lines` (`order_number`, `article_code`, `quantity`, `order_price`)
+    VALUES\n(121, 31, 25, 6.35),\n(121, 87, 50, 1.90),\n(121, 311, 50, 1.65),\n(121,
+    314, 100, 0.45),\n(121, 422, 25, 2.25),\n(174, 102, 25, 0.70),\n(174, 380, 10,
+    0.65),\n(174, 455, 50, 1.35),\n(174, 470, 25, 0.65),\n(175, 36, 50, 0.75),\n(175,
+    74, 100, 0.70),\n(175, 102, 10, 0.45),\n(175, 157, 100, 0.20),\n(175, 380, 10,
+    0.45),\n(175, 426, 10, 0.25),\n(175, 434, 10, 0.35),\n(175, 455, 50, 0.80),\n(175,
+    470, 25, 0.45),\n(175, 478, 50, 0.45),\n(181, 257, 10, 3.60),\n(181, 263, 25,
+    15.45),\n(181, 362, 10, 6.05),\n(181, 397, 5, 7.20),\n(186, 143, 10, 1.30),\n(190,
+    23, 10, 1.00),\n(190, 50, 6, 0.35),\n(190, 56, 10, 1.45),\n(190, 102, 25, 0.55),\n(190,
+    455, 100, 1.15);\n\nDROP TRIGGER IF EXISTS `check_stock_before_insert`;\nDELIMITER
+    $$\nCREATE TRIGGER `check_stock_before_insert` BEFORE INSERT ON `order_lines`
+    FOR EACH ROW BEGIN\n    DECLARE available_stock INT;\n\n    SELECT stock_quantity
+    INTO available_stock\n    FROM sports_articles\n    WHERE article_code = NEW.article_code;\n\n
+    \   IF available_stock IS NULL THEN\n        SIGNAL SQLSTATE '45000'\n            SET
+    MESSAGE_TEXT = 'Artikelcode bestaat niet.';\n    END IF;\n\n    IF NEW.quantity
+    > available_stock THEN\n        SIGNAL SQLSTATE '45000'\n            SET MESSAGE_TEXT
+    = 'Onvoldoende voorraad voor dit artikel.';\n    END IF;\nEND\n$$\nDELIMITER ;\nDROP
+    TRIGGER IF EXISTS `check_stock_before_update`;\nDELIMITER $$\nCREATE TRIGGER `check_stock_before_update`
+    BEFORE UPDATE ON `order_lines` FOR EACH ROW BEGIN\n    DECLARE available_stock
+    INT;\n\n    SELECT stock_quantity INTO available_stock\n    FROM sports_articles\n
+    \   WHERE article_code = NEW.article_code;\n\n    IF available_stock IS NULL THEN\n
+    \       SIGNAL SQLSTATE '45000'\n            SET MESSAGE_TEXT = 'Artikelcode bestaat
+    niet.';\n    END IF;\n\n    -- Controleer of de voorraad voldoende is\n    IF
+    NEW.quantity > available_stock THEN\n        SIGNAL SQLSTATE '45000'\n            SET
+    MESSAGE_TEXT = 'Onvoldoende voorraad voor dit artikel.';\n    END IF;\nEND\n$$\nDELIMITER
+    ;\n\n-- --------------------------------------------------------\n\n--\n-- Tabelstructuur
+    voor tabel `purchases`\n--\n\nDROP TABLE IF EXISTS `purchases`;\nCREATE TABLE
+    IF NOT EXISTS `purchases` (\n  `purchase_number` int(11) NOT NULL,\n  `customer_code`
+    int(11) NOT NULL,\n  `purchase_date` date DEFAULT NULL,\n  PRIMARY KEY (`purchase_number`),\n
+    \ KEY `fk_purchases_customers` (`customer_code`)\n) ENGINE=InnoDB DEFAULT CHARSET=latin1
+    COLLATE=latin1_swedish_ci;\n\n\nTRUNCATE TABLE `purchases`;\n\nINSERT INTO `purchases`
+    (`purchase_number`, `customer_code`, `purchase_date`) VALUES\n(1, 100, '2024-08-01'),\n(2,
+    101, '2024-08-05'),\n(3, 100, '2024-08-08'),\n(4, 100, '2024-08-15'),\n(5, 102,
+    '2024-08-25'),\n(6, 101, '2024-08-27'),\n(7, 102, '2024-09-05'),\n(8, 101, '2024-09-08'),\n(9,
+    100, '2024-09-11'),\n(10, 102, '2024-09-17');\n\n-- --------------------------------------------------------\n\n--\n--
+    Tabelstructuur voor tabel `purchase_line`\n--\n\nDROP TABLE IF EXISTS `purchase_line`;\nCREATE
+    TABLE IF NOT EXISTS `purchase_line` (\n  `purchase_number` int(11) NOT NULL,\n
+    \ `article_code` int(11) NOT NULL,\n  `quantity` int(11) DEFAULT NULL,\n  `purchase_price`
+    decimal(6,2) DEFAULT NULL,\n  PRIMARY KEY (`purchase_number`,`article_code`),\n
+    \ KEY `idx_purchase_line_article_code` (`article_code`)\n) ENGINE=InnoDB DEFAULT
+    CHARSET=latin1 COLLATE=latin1_swedish_ci;\n\nTRUNCATE TABLE `purchase_line`;\n\nINSERT
+    INTO `purchase_line` (`purchase_number`, `article_code`, `quantity`, `purchase_price`)
+    VALUES\n(1, 1, 23, 19.50),\n(1, 2, 2, 22.50),\n(1, 35, 60, 1.00),\n(1, 74, 90,
+    1.80),\n(2, 39, 20, 4.50),\n(2, 56, 60, 2.50),\n(2, 384, 12, 3.50),\n(2, 422,
+    34, 3.50),\n(3, 54, 35, 3.00),\n(3, 200, 3, 17.50),\n(3, 210, 15, 0.50),\n(3,
+    383, 10, 9.50),\n(4, 12, 15, 20.00),\n(4, 332, 100, 2.50),\n(4, 397, 12, 15.00),\n(5,
+    50, 9, 0.60),\n(5, 56, 12, 2.50),\n(5, 126, 85, 3.75),\n(5, 195, 7, 14.50),\n(5,
+    311, 17, 2.50),\n(6, 12, 20, 19.50),\n(6, 23, 45, 1.80),\n(6, 175, 10, 3.00),\n(6,
+    300, 25, 9.50),\n(6, 391, 15, 2.00),\n(7, 19, 90, 5.00),\n(7, 47, 21, 19.50),\n(7,
+    117, 45, 5.50),\n(8, 207, 65, 2.00),\n(8, 332, 34, 2.50),\n(9, 117, 75, 5.50),\n(9,
+    296, 10, 2.00),\n(9, 300, 35, 9.50),\n(10, 67, 15, 2.25),\n(10, 104, 5, 17.50),\n(10,
+    408, 6, 22.50);\n\n-- --------------------------------------------------------\n\n--\n--
+    Tabelstructuur voor tabel `quotations`\n--\n\nDROP TABLE IF EXISTS `quotations`;\nCREATE
+    TABLE IF NOT EXISTS `quotations` (\n  `quotation_id` int(11) NOT NULL AUTO_INCREMENT,\n
+    \ `supplier_code` int(11) NOT NULL,\n  `article_code` int(11) NOT NULL,\n  `supplier_article_code`
+    varchar(50) NOT NULL,\n  `delivery_time` int(11) NOT NULL,\n  `quotation_price`
+    decimal(10,2) NOT NULL,\n  PRIMARY KEY (`quotation_id`),\n  KEY `fk_quotations_article`
+    (`article_code`)\n) ENGINE=InnoDB AUTO_INCREMENT=217 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;\n\n\nTRUNCATE
+    TABLE `quotations`;\n\nINSERT INTO `quotations` (`quotation_id`, `supplier_code`,
+    `article_code`, `supplier_article_code`, `delivery_time`, `quotation_price`) VALUES\n(1,
+    35, 190, 'ST4P5', 10, 0.85),\n(2, 35, 42, 'ST4P6', 10, 3.30),\n(3, 35, 283, 'ST4P2',
+    10, 3.30),\n(4, 21, 364, 'BRE', 10, 2.50),\n(5, 21, 108, 'FOR', 10, 2.75),\n(6,
+    21, 408, 'HUL', 10, 11.25),\n(7, 21, 117, 'KOR', 10, 2.75),\n(8, 21, 210, 'LIG',
+    10, 0.20),\n(9, 21, 195, 'MAG', 10, 7.25),\n(10, 21, 471, 'OLI', 10, 5.00),\n(11,
+    21, 397, 'PEP', 10, 7.50),\n(12, 21, 1, 'ROD', 10, 9.75),\n(13, 21, 12, 'SER',
+    10, 9.75),\n(14, 21, 263, 'TOV', 10, 16.00),\n(15, 21, 19, 'VUU', 10, 2.50),\n(16,
+    21, 242, 'ZUU', 10, 1.75),\n(17, 22, 286, 'B-011', 14, 12.15),\n(18, 22, 281,
+    'B-034', 14, 6.75),\n(19, 22, 39, 'B-076', 14, 2.45),\n(20, 22, 28, 'B-104', 14,
+    22.95),\n(21, 22, 335, 'E-002', 10, 2.95),\n(22, 22, 365, 'E-003', 10, 0.80),\n(23,
+    22, 210, 'S-015', 14, 0.20),\n(24, 22, 471, 'S-077', 14, 5.40),\n(25, 22, 103,
+    'S-118', 14, 9.45),\n(26, 22, 364, 'S-154', 14, 2.70),\n(27, 34, 82, 'ACMO', 14,
+    2.15),\n(28, 34, 61, 'ALTH', 14, 1.25),\n(29, 34, 462, 'ANCE', 14, 1.25),\n(30,
+    34, 390, 'ANEM', 14, 2.15),\n(31, 34, 224, 'ANGR', 14, 1.25),\n(32, 34, 468, 'ANTI',
+    14, 0.50),\n(33, 34, 153, 'AQUI', 14, 1.55),\n(34, 34, 105, 'ARDR', 14, 1.25),\n(35,
+    34, 123, 'BEGO', 14, 0.40),\n(36, 34, 87, 'CAMP', 14, 1.85),\n(37, 34, 74, 'CHEI',
+    14, 1.10),\n(38, 34, 164, 'CHMA', 14, 1.55),\n(39, 34, 300, 'CORT', 14, 5.90),\n(40,
+    34, 398, 'CYNO', 14, 0.60),\n(41, 34, 212, 'DELP', 14, 1.85),\n(42, 34, 24, 'ECHI',
+    14, 1.85),\n(43, 34, 13, 'ERYN', 14, 1.85),\n(44, 34, 427, 'HEDE', 14, 4.65),\n(45,
+    34, 89, 'LUPI', 14, 1.55),\n(46, 34, 120, 'OCBA', 14, 1.25),\n(47, 34, 285, 'PAPA',
+    14, 3.10),\n(48, 34, 380, 'PARH', 14, 0.60),\n(49, 34, 143, 'PHLO', 14, 0.95),\n(50,
+    34, 455, 'PRIM', 14, 1.25),\n(51, 34, 319, 'RUSC', 14, 1.25),\n(52, 34, 391, 'SALV',
+    14, 1.25),\n(53, 34, 50, 'TAGE', 14, 0.35),\n(54, 34, 469, 'TULI', 14, 0.25),\n(55,
+    34, 157, 'VIOL', 14, 0.30),\n(56, 34, 31, 'VITI', 14, 6.20),\n(57, 34, 253, 'WIST',
+    14, 0.05),\n(58, 35, 89, 'ST1P1', 10, 1.65),\n(59, 35, 311, 'ST1P3', 10, 1.65),\n(60,
+    35, 130, 'ST1P4', 10, 1.30),\n(61, 35, 61, 'ST1P6', 10, 1.30),\n(62, 35, 428,
+    'ST1P8', 10, 2.95),\n(63, 35, 285, 'ST1P9', 10, 3.30),\n(64, 35, 467, 'ST2P1',
+    10, 1.30),\n(65, 35, 54, 'ST2P2', 10, 2.00),\n(66, 35, 82, 'ST2P3', 10, 2.30),\n(67,
+    35, 205, 'ST2P5', 10, 2.95),\n(68, 35, 68, 'ST2P6', 10, 2.00),\n(69, 35, 180,
+    'ST3P1', 10, 4.30),\n(70, 35, 427, 'ST3P2', 10, 4.95),\n(71, 35, 296, 'ST3P5',
+    10, 1.30),\n(72, 35, 320, 'ST4P1', 10, 7.90),\n(73, 21, 103, 'AZA', 10, 8.75),\n(74,
+    13, 312, 'G430', 10, 2.95),\n(75, 13, 316, 'H510', 10, 1.95),\n(76, 14, 455, '001-2',
+    10, 1.15),\n(77, 14, 212, '012-V', 10, 1.70),\n(78, 14, 372, '027-V', 10, 1.45),\n(79,
+    14, 384, '067-V', 10, 2.00),\n(80, 14, 297, '082-V', 10, 1.15),\n(81, 14, 23,
+    '103-2', 10, 1.05),\n(82, 14, 13, '117-V', 10, 1.70),\n(83, 14, 467, '118-V',
+    10, 1.15),\n(84, 14, 228, '162-V', 10, 1.15),\n(85, 14, 478, '195-1', 10, 0.55),\n(86,
+    14, 390, '201-V', 10, 2.00),\n(87, 14, 68, '209-V', 10, 1.70),\n(88, 14, 50, '255-1',
+    10, 0.35),\n(89, 14, 164, '257-V', 10, 1.45),\n(90, 14, 54, '263-V', 10, 1.70),\n(91,
+    14, 351, '264-V', 10, 1.45),\n(92, 14, 398, '273-2', 10, 0.55),\n(93, 14, 102,
+    '281-2', 10, 0.55),\n(94, 14, 87, '286-V', 10, 1.70),\n(95, 14, 71, '300-V', 10,
+    1.15),\n(96, 14, 147, '327-1', 10, 0.45),\n(97, 14, 438, '335-V', 10, 1.70),\n(98,
+    14, 311, '362-V', 10, 1.45),\n(99, 14, 157, '365-V', 10, 0.30),\n(100, 14, 56,
+    '393-V', 10, 1.45),\n(101, 14, 363, '397-V', 10, 2.55),\n(102, 14, 380, '400-2',
+    10, 0.55),\n(103, 14, 316, '408-V', 10, 1.70),\n(104, 14, 35, '471-2', 10, 0.55),\n(105,
+    14, 123, '498-1', 10, 0.35),\n(106, 19, 82, 'ACMO', 14, 2.10),\n(107, 19, 175,
+    'ACON', 14, 1.80),\n(108, 19, 425, 'ALSC', 14, 1.20),\n(109, 19, 61, 'ALTH', 14,
+    1.20),\n(110, 19, 87, 'CAMP', 14, 1.80),\n(111, 19, 80, 'CENT', 14, 1.20),\n(112,
+    19, 164, 'CHRY', 14, 1.50),\n(113, 19, 56, 'CYNO', 14, 1.50),\n(114, 19, 212,
+    'DELP', 14, 1.80),\n(115, 19, 438, 'DIAN', 14, 1.80),\n(116, 19, 13, 'ERYN', 14,
+    1.80),\n(117, 19, 372, 'EUPH', 14, 1.50),\n(118, 19, 316, 'GEUM', 14, 1.80),\n(119,
+    19, 363, 'GYPS', 14, 2.70),\n(120, 19, 467, 'HELI', 14, 1.20),\n(121, 19, 486,
+    'KNIP', 14, 2.10),\n(122, 19, 71, 'LAMI', 14, 1.20),\n(123, 19, 89, 'LUPI', 14,
+    1.50),\n(124, 19, 234, 'MATR', 14, 1.80),\n(125, 19, 78, 'PAEO', 14, 2.70),\n(126,
+    19, 67, 'POTE', 14, 1.35),\n(127, 19, 207, 'ROSM', 14, 1.20),\n(128, 20, 470,
+    '001', 7, 0.65),\n(129, 20, 361, '047', 7, 0.65),\n(130, 20, 253, '066', 7, 0.10),\n(131,
+    20, 36, '103', 7, 1.15),\n(132, 20, 468, '162', 7, 0.50),\n(133, 20, 184, '195',
+    7, 0.10),\n(134, 20, 123, '209', 7, 0.40),\n(135, 20, 434, '210', 7, 0.50),\n(136,
+    20, 266, '257', 7, 0.65),\n(137, 20, 169, '263', 7, 0.05),\n(138, 20, 126, '281',
+    7, 2.45),\n(139, 20, 383, '362', 7, 0.65),\n(140, 20, 147, '393', 7, 0.50),\n(141,
+    20, 143, '471', 7, 1.00),\n(142, 20, 314, '498', 7, 0.50),\n(143, 13, 31, 'G202',
+    14, 6.50),\n(144, 4, 426, 'A075', 7, 0.35),\n(145, 4, 157, 'A103', 7, 0.30),\n(146,
+    4, 478, 'A184', 7, 0.60),\n(147, 4, 36, 'A004', 7, 1.10),\n(148, 4, 95, 'A385',
+    7, 0.60),\n(149, 4, 455, 'A421', 7, 1.20),\n(150, 4, 380, 'B148', 7, 0.60),\n(151,
+    4, 102, 'B331', 7, 0.60),\n(152, 4, 74, 'B337', 7, 1.10),\n(153, 4, 470, 'C274',
+    7, 0.60),\n(154, 4, 434, 'D225', 7, 0.50),\n(155, 9, 498, '002', 21, 2.95),\n(156,
+    9, 420, '011', 21, 9.90),\n(157, 9, 195, '013', 21, 6.55),\n(158, 9, 104, '014',
+    21, 7.90),\n(159, 9, 364, '021', 21, 2.25),\n(160, 9, 408, '023', 21, 10.15),\n(161,
+    9, 103, '024', 21, 7.90),\n(162, 9, 117, '029', 21, 2.50),\n(163, 9, 257, '044',
+    21, 3.40),\n(164, 9, 397, '045', 21, 6.75),\n(165, 9, 1, '050', 21, 8.80),\n(166,
+    9, 286, '078', 21, 10.15),\n(167, 9, 178, '081', 21, 3.40),\n(168, 9, 471, '085',
+    21, 4.50),\n(169, 9, 27, '091', 21, 7.90),\n(170, 9, 210, '097', 21, 0.20),\n(171,
+    9, 362, '099', 21, 5.65),\n(172, 9, 66, '103', 21, 6.10),\n(173, 9, 209, '114',
+    21, 8.80),\n(174, 9, 281, '115', 21, 5.65),\n(175, 9, 263, '116', 21, 14.40),\n(176,
+    9, 162, '145', 21, 4.30),\n(177, 11, 335, 'E01R', 21, 2.90),\n(178, 11, 365, 'E05R',
+    10, 0.80),\n(179, 11, 327, 'E11X', 10, 1.05),\n(180, 11, 255, 'E23W', 10, 1.05),\n(181,
+    11, 408, 'H09', 14, 11.95),\n(182, 11, 1, 'H10R', 14, 10.35),\n(183, 11, 397,
+    'H14R', 14, 7.95),\n(184, 11, 195, 'H14W', 14, 7.70),\n(185, 11, 117, 'H17', 14,
+    2.90),\n(186, 11, 103, 'H19O', 14, 9.30),\n(187, 11, 12, 'H75P', 14, 10.35),\n(188,
+    11, 263, 'H99G', 14, 16.95),\n(189, 13, 67, 'A002', 10, 1.45),\n(190, 13, 36,
+    'A101', 7, 1.15),\n(191, 13, 184, 'A103', 7, 0.10),\n(192, 13, 314, 'A154', 7,
+    0.50),\n(193, 13, 372, 'A230', 10, 1.65),\n(194, 13, 82, 'A395', 10, 2.30),\n(195,
+    13, 383, 'A472', 7, 0.65),\n(196, 13, 391, 'A520', 10, 1.30),\n(197, 13, 437,
+    'A677', 10, 1.30),\n(198, 13, 365, 'B006', 14, 1.00),\n(199, 13, 123, 'B101',
+    7, 0.40),\n(200, 13, 422, 'B111', 10, 2.30),\n(201, 13, 311, 'B396', 10, 1.65),\n(202,
+    13, 1, 'B578', 14, 12.70),\n(203, 13, 281, 'C051', 14, 8.15),\n(204, 13, 262,
+    'C119', 14, 6.20),\n(205, 13, 200, 'C243', 14, 11.40),\n(206, 13, 471, 'D029',
+    14, 6.50),\n(207, 13, 362, 'D296', 14, 8.15),\n(208, 13, 56, 'D321', 10, 1.65),\n(209,
+    13, 47, 'D555', 14, 12.70),\n(210, 13, 364, 'D742', 14, 3.25),\n(211, 13, 87,
+    'E098', 10, 1.95),\n(212, 13, 228, 'E409', 10, 1.30),\n(213, 13, 300, 'F342',
+    10, 6.20),\n(214, 13, 332, 'F823', 10, 1.65),\n(215, 13, 71, 'G001', 10, 1.30),\n(216,
+    34, 39, 'VOETBALSCHOENEN', 14, 2.00);\n\n-- --------------------------------------------------------\n\n--\n--
+    Tabelstructuur voor tabel `sports_articles`\n--\n\nDROP TABLE IF EXISTS `sports_articles`;\nCREATE
+    TABLE IF NOT EXISTS `sports_articles` (\n  `article_code` int(11) NOT NULL,\n
+    \ `article_name` varchar(50) DEFAULT NULL,\n  `category` varchar(30) DEFAULT NULL,\n
+    \ `size` varchar(15) DEFAULT NULL,\n  `color` varchar(15) DEFAULT NULL,\n  `price`
+    decimal(6,2) DEFAULT NULL,\n  `stock_quantity` int(11) DEFAULT NULL,\n  `stock_min`
+    int(11) DEFAULT NULL,\n  `VAT_type` char(1) NOT NULL,\n  PRIMARY KEY (`article_code`),\n
+    \ KEY `fk_sports_articles_vat` (`VAT_type`)\n) ENGINE=InnoDB DEFAULT CHARSET=latin1
+    COLLATE=latin1_swedish_ci;\n\n\nTRUNCATE TABLE `sports_articles`;\n\nINSERT INTO
+    `sports_articles` (`article_code`, `article_name`, `category`, `size`, `color`,
+    `price`, `stock_quantity`, `stock_min`, `VAT_type`) VALUES\n(1, 'Premium Football',
+    'Ball', '5', 'White/Black', 30.00, 50, 10, 'h'),\n(2, 'Professional Tennis Racket',
+    'Racket', 'Standard', 'Black', 150.00, 20, 5, 'h'),\n(12, 'Advanced Basketball',
+    'Ball', '7', 'Orange', 25.00, 40, 10, 'h'),\n(13, 'Naam van Artikel 13', 'Categorie',
+    'Grootte', 'Kleur', 25.00, 30, 5, 'l'),\n(19, 'Table Tennis Paddle', 'Racket',
+    'Standard', 'Red/Black', 15.00, 60, 15, 'l'),\n(23, 'Volleyball Net', 'Accessory',
+    'Standard', 'White', 75.00, 100, 5, 'l'),\n(24, 'Naam van Artikel 24', 'Categorie',
+    'Grootte', 'Kleur', 20.00, 50, 10, 'h'),\n(27, 'Running Shoes', 'Footwear', '42',
+    'Black', 75.00, 50, 5, 'h'),\n(28, 'Product Name 28', 'Category', 'Size', 'Color',
+    10.00, 100, 10, 'h'),\n(31, 'Basketbalhoepel', 'Accessoire', 'Stand', 'Oranje',
+    60.00, 150, 50, 'h'),\n(35, 'Tafeltennisbat', 'Racket', 'Stand', 'Rood', 5.00,
+    100, 50, 'l'),\n(36, 'Schemershirt', 'Kleding', 'M', 'Blauw', 22.50, 155, 50,
+    'l'),\n(39, 'Voetbalschoenen', 'Schoenen', '42', 'Wit/Zwart', 65.00, 10, 50, 'h'),\n(42,
+    'BASEBALL GLOVE', 'SPORT', 'LILA', NULL, 90.00, 0, 50, 'h'),\n(47, 'PULL-UP BAR',
+    'FITNESS', 'ROOD', NULL, 50.00, 0, 50, 'h'),\n(50, 'SKEELERS', 'SKATEN', 'ZWART',
+    NULL, 50.00, 200, 50, 'h'),\n(52, 'BOXING GLOVES', 'BOXING', 'ROOD', NULL, 150.00,
+    0, 50, 'h'),\n(54, 'HOCKEYSTICK', 'HOCKEY', 'ZWART', NULL, 75.00, 50, 50, 'h'),\n(56,
+    'Boksbandage', 'Accessoire', 'L', 'Rood', 7.50, 24, 50, 'l'),\n(61, 'TENNISRACKET',
+    'RACKET', 'BLAUW', NULL, 300.00, 10, 50, 'h'),\n(66, 'Product Name 66', 'Category',
+    'Size', 'Color', 6.10, 100, 10, 'h'),\n(67, 'Potentiometer', 'Electronics', 'Standard',
+    'Black', 15.00, 50, 5, 'h'),\n(68, 'MOUNTAINBIKE', 'FIETS', 'ROOD', NULL, 30.00,
+    37, 50, 'h'),\n(71, 'Sporttape', 'Accessoire', '5m', 'Wit', 2.50, 100, 50, 'l'),\n(74,
+    'SOCCER CLEATS', 'FOOTBALL', 'GEEL', NULL, 400.00, 200, 50, 'h'),\n(78, 'Hardloopschoenen',
+    'Schoenen', '43', 'Blauw', 75.00, 100, 50, 'h'),\n(80, 'RUGBYBAL', 'BAL', 'BRUIN',
+    NULL, 200.00, 0, 50, 'l'),\n(82, 'WATERFLES', 'SPORT', 'WIT', NULL, 7.00, 0, 50,
+    'l'),\n(87, 'Gewichthefriem', 'Accessoire', 'M', 'Zwart', 12.00, 150, 50, 'l'),\n(89,
+    'LACROSSE STICK', 'SPORT', 'GEMEN', NULL, 100.00, 0, 50, 'l'),\n(95, 'JUMPBOOT',
+    'SPORT', 'LILA', NULL, 70.00, 200, 50, 'l'),\n(102, 'Unknown Article 102', 'CategoryX',
+    'SizeX', 'ColorX', 10.00, 135, 10, 'l'),\n(103, 'Basketbalschoenen', 'Schoenen',
+    '45', 'Zwart/Rood', 90.00, 100, 50, 'h'),\n(104, 'WIELERHANDSCHOENEN', 'FIETS',
+    'ZWART', NULL, 400.00, 0, 50, 'l'),\n(105, 'Tennisballen (3-pack)', 'Bal', 'Stand',
+    'Geel', 8.00, 100, 50, 'h'),\n(108, 'Voetbal', 'Bal', '5', 'Rood/Zwart', 25.00,
+    10, 50, 'h'),\n(111, 'ICE SKATES', 'SKATING', 'ZWART', NULL, 400.00, 0, 50, 'h'),\n(112,
+    'DUMBBELLS SET', 'WEIGHTS', 'GRIJS', NULL, 350.00, 0, 50, 'h'),\n(117, 'JUMP ROPE',
+    'EXERCISE', '', NULL, 250.00, 0, 50, 'h'),\n(120, 'SPORTTAS', 'FITNESS', 'ZWART',
+    NULL, 200.00, 0, 50, 'l'),\n(123, 'DUMBELLS', 'WEIGHTS', '', NULL, 500.00, 0,
+    50, 'h'),\n(124, 'GYMNASTICS RINGS', 'GYMNASTICS', '', NULL, 120.00, 0, 50, 'h'),\n(126,
+    'ZWEMBANDEN', 'WATERSPORT', 'GEEL', NULL, 350.00, 100, 50, 'l'),\n(127, 'ROLLER
+    SKATES', 'SKATING', 'ZWART', NULL, 120.00, 0, 50, 'h'),\n(130, 'Sports Cap', 'Accessories',
+    'One Size', 'Blue', 15.00, 50, 10, 'l'),\n(133, 'FIELD HOCKEY BALL', 'FIELD HOCKEY',
+    'WIT', NULL, 15.00, 0, 50, 'l'),\n(135, 'EQUESTRIAN HELMET', 'EQUESTRIAN', 'ZWART',
+    NULL, 300.00, 0, 50, 'h'),\n(137, 'ROLLER SKATES', 'SKATING', 'ROZE', NULL, 150.00,
+    0, 50, 'l'),\n(140, 'VOLLEYBALL NET', 'VOLLEYBALL', 'WIT', NULL, 250.00, 0, 50,
+    'h'),\n(143, 'Badmintonshuttle', 'Accessoire', 'Stand', 'Wit', 1.50, 25, 50, 'l'),\n(144,
+    'CAMPING TENT', 'CAMPING', 'GROEN', NULL, 500.00, 0, 50, 'h'),\n(147, 'Resistance
+    Bands (set)', 'Accessoire', 'Stand', 'Multicolor', 10.00, 100, 50, 'l'),\n(153,
+    'SPRINGTOUW', 'FITNESS', 'GROEN', NULL, 200.00, 0, 50, 'l'),\n(155, 'MARTIAL ARTS
+    MAT', 'MARTIAL ARTS', 'BLAUW', NULL, 400.00, 0, 50, 'h'),\n(157, 'Zwemvliezen',
+    'Accessoire', 'M', 'Blauw', 25.00, 800, 50, 'h'),\n(159, 'TREADMILL', 'FITNESS',
+    'ZWART', NULL, 2500.00, 0, 50, 'h'),\n(162, 'PULL-UP BAR', 'FITNESS', 'ROOD',
+    NULL, 50.00, 0, 50, 'h'),\n(163, 'WEIGHTED VEST', 'FITNESS', 'ZWART', NULL, 150.00,
+    0, 50, 'h'),\n(164, 'TENNIS RACKET', 'SPORT', 'WIT', NULL, 70.00, 0, 50, 'l'),\n(165,
+    'DIVE MASK', 'DIVING', 'BLAUW', NULL, 120.00, 0, 50, 'l'),\n(167, 'FRISBEE', 'OUTDOOR',
+    'ROOD', NULL, 25.00, 0, 50, 'l'),\n(169, 'TENNISTAS', 'TENNIS', 'BLAUW', NULL,
+    120.00, 0, 50, 'h'),\n(170, 'GOLF CLUB', 'SPORT', 'ZWART', NULL, 100.00, 0, 50,
+    'h'),\n(172, 'TABLE TENNIS PADDLE', 'TABLE TENNIS', 'ROOD', NULL, 45.00, 0, 50,
+    'l'),\n(175, 'TENNIS RACKET', 'SPORT', 'WIT', NULL, 70.00, 0, 50, 'l'),\n(178,
+    'Product Name 178', 'Category', 'Size', 'Color', 3.40, 100, 10, 'h'),\n(180, 'LOOPBAND',
+    'FITNESS', 'ZWART', NULL, 20.00, 0, 50, 'h'),\n(184, 'RUGBY BALL', 'SPORT', 'BLAUW',
+    NULL, 50.00, 0, 50, 'l'),\n(190, 'WATERFLES', 'SPORT', 'WIT', NULL, 7.00, 0, 50,
+    'l'),\n(193, 'CUE STICK', 'BILLIARDS', 'BRUIN', NULL, 180.00, 0, 50, 'h'),\n(195,
+    'DUIKBRIL', 'ZWEMMEN', 'ZWART', NULL, 300.00, 0, 50, 'l'),\n(197, 'BILLIARD BALLS
+    SET', 'BILLIARDS', 'MULTI', NULL, 200.00, 0, 50, 'l'),\n(200, 'FIETSBAND', 'FIETS',
+    'ZWART', NULL, 100.00, 0, 50, 'l'),\n(203, 'DIVING FINS', 'DIVING', 'BLAUW', NULL,
+    100.00, 0, 50, 'l'),\n(205, 'FLUITJE', 'VOETBAL', 'GROEN', NULL, 500.00, 0, 50,
+    'l'),\n(207, 'RESISTANCE BAND', 'FITNESS', 'GEMEN', NULL, 50.00, 0, 50, 'l'),\n(209,
+    'VOETBAL', 'BAL', 'Size', 'Color', 0.00, 3, 10, 'h'),\n(210, 'YOGABAL', 'YOGA',
+    'PAARS', NULL, 120.00, 0, 50, 'l'),\n(211, 'SWIMMING GOGGLES', 'SWIMMING', 'BLAUW',
+    NULL, 75.00, 0, 50, 'l'),\n(212, 'BASEBALL GLOVE', 'SPORT', 'LILA', NULL, 90.00,
+    0, 50, 'h'),\n(214, 'JAVELIN', 'TRACK AND FIELD', '', NULL, 150.00, 0, 50, 'h'),\n(215,
+    'ICE HOCKEY STICK', 'ICE HOCKEY', 'ZWART', NULL, 180.00, 0, 50, 'h'),\n(218, 'ARCHERY
+    TARGET', 'ARCHERY', '', NULL, 300.00, 0, 50, 'l'),\n(220, 'CLIMBING HARNESS',
+    'CLIMBING', '', NULL, 175.00, 0, 50, 'h'),\n(224, 'Sportsokken', 'Kleding', 'M',
+    'Zwart', 5.00, 100, 50, 'l'),\n(225, 'SKIPPING ROPE', 'FITNESS', 'ROOD', NULL,
+    75.00, 0, 50, 'l'),\n(228, 'Springtouw', 'Fitness', '2.5m', 'Rood', 8.00, 10,
+    50, 'l'),\n(232, 'FENCING MASK', 'FENCING', 'ZWART', NULL, 180.00, 0, 50, 'h'),\n(234,
+    'ZWEMBAD', 'WATERSPORT', 'BLAUW', NULL, 25.00, 0, 50, 'h'),\n(237, 'PICKLEBALL
+    PADDLE', 'PICKLEBALL', 'BLAUW', NULL, 50.00, 0, 50, 'l'),\n(239, 'BOWLING BALL',
+    'BOWLING', 'ZWART', NULL, 100.00, 0, 50, 'l'),\n(242, 'Water Bottle', 'Hydration',
+    '500ml', 'Transparent', 5.00, 200, 50, 'l'),\n(245, 'ARCHERY GLOVES', 'ARCHERY',
+    'BRUIN', NULL, 75.00, 0, 50, 'l'),\n(253, 'Golfbal', 'Bal', 'Stand', 'Wit', 1.25,
+    100, 50, 'l'),\n(255, 'BASKETBAL', 'Bal', 'Size', 'Color', 0.00, 0, 10, 'h'),\n(257,
+    'BALANSBOARD', 'Fitness', 'Standard', 'Black', 15.00, 50, 5, 'h'),\n(258, 'BICYCLE
+    HELMET', 'CYCLING', 'BLAUW', NULL, 80.00, 0, 50, 'l'),\n(260, 'HIKING SHOES',
+    'HIKING', 'BRUIN', NULL, 400.00, 0, 50, 'h'),\n(261, 'MMA GLOVES', 'MARTIAL ARTS',
+    'ZWART', NULL, 65.00, 0, 50, 'l'),\n(262, 'HULAHOEP', 'Fitness', 'Size', 'Color',
+    10.00, 0, 10, 'h'),\n(263, 'Kettlebell', 'Fitness', '10kg', 'Zwart', 35.00, 100,
+    50, 'h'),\n(266, 'MOUNTAINBIKE', 'FIETS', 'ROOD', NULL, 30.00, 0, 50, 'h'),\n(269,
+    'JUMP ROPE', 'FITNESS', 'GEEL', NULL, 15.00, 0, 50, 'l'),\n(273, 'BEACH VOLLEYBALL',
+    'VOLLEYBALL', 'GEEL', NULL, 30.00, 0, 50, 'l'),\n(274, 'KARATE UNIFORM', 'MARTIAL
+    ARTS', 'WIT', NULL, 120.00, 0, 50, 'l'),\n(276, 'ROLLERBLADES', 'SKATING', 'ZWART',
+    NULL, 275.00, 0, 50, 'h'),\n(281, 'Product Name 281', 'Category', 'Size', 'Color',
+    0.00, 0, 10, 'h'),\n(282, 'HIKING BACKPACK', 'HIKING', 'GROEN', NULL, 500.00,
+    0, 50, 'h'),\n(283, 'RUGBY BALL', 'SPORT', 'BLAUW', NULL, 50.00, 0, 50, 'l'),\n(285,
+    'VOETBALDOEL', 'VOETBAL', 'WIT', NULL, 10.00, 0, 50, 'h'),\n(286, 'Mountain Bike
+    Helmet', 'Cycling', 'M', 'Red', 75.00, 30, 5, 'h'),\n(289, 'YOGA MAT', 'YOGA',
+    'GROEN', NULL, 45.00, 0, 50, 'l'),\n(291, 'DARTBOARD', 'DARTS', '', NULL, 125.00,
+    0, 50, 'l'),\n(292, 'PARALLEL BARS', 'GYMNASTICS', '', NULL, 1500.00, 0, 50, 'h'),\n(294,
+    'HORSE SADDLE', 'EQUESTRIAN', 'BRUIN', NULL, 800.00, 0, 50, 'h'),\n(296, 'GIPSKRUIS',
+    'SPORT', 'WIT', NULL, 50.00, 0, 50, 'l'),\n(297, 'Sports Gloves', 'Accessories',
+    'L', 'Black', 25.00, 100, 20, 'l'),\n(298, 'ARCHERY BOW', 'ARCHERY', 'ZWART',
+    NULL, 550.00, 0, 50, 'h'),\n(300, 'EXERCISE MAT', 'YOGA', '', NULL, 50.00, 0,
+    50, 'l'),\n(302, 'FITNESS TOWEL', 'FITNESS', 'WIT', NULL, 25.00, 0, 50, 'l'),\n(306,
+    'MOUNTAIN BIKE', 'CYCLING', 'ZWART', NULL, 3500.00, 0, 50, 'h'),\n(307, 'FOOTBALL
+    GLOVES', 'FOOTBALL', 'ZWART', NULL, 90.00, 0, 50, 'l'),\n(308, 'SCUBA WETSUIT',
+    'DIVING', 'ZWART', NULL, 300.00, 0, 50, 'h'),\n(309, 'SLEDGE HAMMER', 'FITNESS',
+    'ZWART', NULL, 100.00, 0, 50, 'h'),\n(311, 'Trampoline', 'Accessoire', '2m', 'Groen',
+    200.00, 150, 50, 'h'),\n(312, 'SPORT DRINK BOTTLE', 'HYDRATION', 'GEEL', NULL,
+    200.00, 0, 50, 'l'),\n(314, 'TENNISBAL', 'Category', 'Size', 'Color', 10.00, 250,
+    10, 'h'),\n(315, 'BASEBALL CAP', 'BASEBALL', 'BLAUW', NULL, 25.00, 0, 50, 'l'),\n(316,
+    'LACROSSE STICK', 'SPORT', 'GEMEN', NULL, 100.00, 0, 50, 'l'),\n(319, 'Voetbalhandschoenen',
+    'Accessoire', 'Stand', 'Zwart', 12.50, 100, 50, 'l'),\n(320, 'SWIM GOGGLES', 'SWIMMING',
+    'WIT', NULL, 300.00, 0, 50, 'l'),\n(327, 'HEADELASTIC', 'TRAINING', 'GEMEN', NULL,
+    30.00, 0, 50, 'l'),\n(332, 'GOLF CLUB', 'SPORT', 'ZWART', NULL, 100.00, 0, 50,
+    'h'),\n(334, 'RUNNING TIGHTS', 'RUNNING', 'ZWART', NULL, 80.00, 0, 50, 'l'),\n(335,
+    'FOOTBALL', 'BAL', 'ROZE', NULL, 150.00, 0, 50, 'l'),\n(341, 'FIELD HOCKEY STICK',
+    'FIELD HOCKEY', 'BRUIN', NULL, 130.00, 0, 50, 'h'),\n(345, 'BOWLING PINS SET',
+    'BOWLING', 'WIT', NULL, 120.00, 0, 50, 'l'),\n(348, 'TENNIS SHIRT', 'TENNIS',
+    'WIT', NULL, 100.00, 0, 50, 'l'),\n(350, 'JUDO UNIFORM', 'MARTIAL ARTS', 'WIT',
+    NULL, 100.00, 0, 50, 'l'),\n(351, 'Yoga Mat', 'Yoga', 'Standard', 'Purple', 20.00,
+    150, 30, 'l'),\n(354, 'SKI GOGGLES', 'SKIING', 'GRIJS', NULL, 120.00, 0, 50, 'l'),\n(355,
+    'Product Name 355', 'Category', 'Size', 'Color', 1.05, 100, 10, 'h'),\n(361, 'RESISTANCE
+    BAND', 'FITNESS', 'GEMEN', NULL, 50.00, 0, 50, 'l'),\n(362, 'Yoga Block', '23x15',
+    'Paars', NULL, 10.00, 40, 50, 'l'),\n(363, 'SUPBOARD', 'WATERSPORT', 'BLAUW',
+    NULL, 30.00, 0, 50, 'h'),\n(364, 'HARTSLAGMETER', 'FITNESS', 'ZWART', NULL, 150.00,
+    0, 50, 'l'),\n(365, 'TREADMILL', 'FITNESS', '', NULL, 30.00, 785, 50, 'l'),\n(367,
+    'BASKETBALL HOOP', 'SPORT', 'GROEN', NULL, 50.00, 0, 50, 'h'),\n(369, 'WEIGHT
+    LIFTING BELT', 'FITNESS', 'ZWART', NULL, 75.00, 0, 50, 'l'),\n(371, 'SCUBA TANK',
+    'DIVING', '', NULL, 800.00, 0, 50, 'h'),\n(372, 'HEADELASTIC', 'TRAINING', 'GEMEN',
+    NULL, 30.00, 0, 50, 'l'),\n(374, 'TENNIS BALLS', 'TENNIS', 'GEEL', NULL, 10.00,
+    0, 50, 'l'),\n(378, 'SOCCER GOAL NET', 'FOOTBALL', 'WIT', NULL, 250.00, 0, 50,
+    'h'),\n(380, 'Squashbal', 'Bal', 'Stand', 'Blauw', 2.00, 125, 50, 'l'),\n(383,
+    'FITNESSMAT', 'FITNESS', 'GROEN', NULL, 75.00, 0, 50, 'l'),\n(384, 'Springtouw',
+    'Fitness', '3m', 'Rood', 7.50, 100, 50, 'l'),\n(386, 'PULL BUOY', 'SWIMMING',
+    'BLAUW', NULL, 45.00, 0, 50, 'l'),\n(387, 'SQUASH RACKET', 'SQUASH', 'ZWART',
+    NULL, 90.00, 0, 50, 'l'),\n(388, 'BALLET LEOTARD', 'DANCE', 'ZWART', NULL, 50.00,
+    0, 50, 'l'),\n(390, 'PINGPONGBAL', 'TAFELTENNIS', 'WIT', NULL, 1000.00, 0, 50,
+    'l'),\n(391, 'Hockeybal', 'Bal', 'Stand', 'Geel', 5.50, 10, 50, 'h'),\n(394, 'TREADMILL',
+    'FITNESS', '', NULL, 30.00, 0, 50, 'l'),\n(397, 'SPORT DRINK BOTTLE', 'Category',
+    'Size', 'Color', 20.00, 35, 10, 'l'),\n(398, 'Tennisracket', 'Racket', 'Stand',
+    'Zwart', 45.00, 10, 50, 'h'),\n(399, 'WEIGHT BENCH', 'FITNESS', 'ZWART', NULL,
+    700.00, 0, 50, 'h'),\n(401, 'FOLDING BIKE', 'CYCLING', 'ZWART', NULL, 2500.00,
+    0, 50, 'l'),\n(408, 'FIETSHELM', 'FIETS', 'BLAUW', NULL, 175.00, 0, 50, 'h'),\n(410,
+    'BALLET SHOES', 'DANCE', 'ROZE', NULL, 80.00, 0, 50, 'l'),\n(419, 'SWIMMING CAP',
+    'SWIMMING', 'BLAUW', NULL, 30.00, 0, 50, 'l'),\n(420, 'TENNIS BALLS', 'Category',
+    'Size', 'Color', 0.00, 0, 10, 'h'),\n(421, 'RUNNING WATER BOTTLE', 'RUNNING',
+    'GRIJS', NULL, 20.00, 0, 50, 'l'),\n(422, 'Tennissokken', 'Kleding', 'M', 'Wit',
+    3.50, 125, 50, 'l'),\n(425, 'BADMINTONRACKET', 'RACKET', 'ROOD', NULL, 85.00,
+    7, 50, 'l'),\n(426, 'Fitnessmat', 'Fitness', '180x6', 'Blauw', 15.00, 500, 50,
+    'l'),\n(427, 'EXERCISE MAT', 'YOGA', '', NULL, 50.00, 0, 50, 'l'),\n(428, 'SWIM
+    GOGGLES', 'SWIMMING', 'WIT', NULL, 300.00, 0, 50, 'l'),\n(432, 'BALANCE TRAINER',
+    'FITNESS', 'BLAUW', NULL, 200.00, 0, 50, 'h'),\n(433, 'SPEED LADDER', 'FITNESS',
+    'GEEL', NULL, 50.00, 0, 50, 'l'),\n(434, 'Basketbal', 'Bal', '7', 'Oranje', 28.00,
+    50, 50, 'h'),\n(437, 'Product Name 437', 'Category', 'Size', 'Color', 1.30, 100,
+    10, 'h'),\n(438, 'Voetbalshirt', 'Kleding', 'L', 'Rood', 30.00, 100, 50, 'h'),\n(441,
+    'WRESTLING SHOES', 'WRESTLING', 'ROOD', NULL, 250.00, 0, 50, 'h'),\n(450, 'BOXING
+    BAG', 'BOXING', '', NULL, 600.00, 0, 50, 'h'),\n(452, 'INLINE SKATES', 'SKATING',
+    'ZWART', NULL, 300.00, 0, 50, 'h'),\n(453, 'FENCING FOIL', 'FENCING', 'GRIJS',
+    NULL, 180.00, 0, 50, 'h'),\n(455, 'Handbal', 'Bal', 'Stand', 'Gemengd', 20.00,
+    300, 50, 'h'),\n(457, 'KITESURF BOARD', 'KITESURFING', 'BLAUW', NULL, 750.00,
+    0, 50, 'h'),\n(458, 'BASEBALL MITT', 'BASEBALL', 'BRUIN', NULL, 150.00, 0, 50,
+    'h'),\n(462, 'TENNIS BALLS', 'Category', 'Size', 'Color', 1.25, 0, 40, 'h'),\n(466,
+    'BIKE LOCK', 'CYCLING', 'ZWART', NULL, 40.00, 0, 50, 'l'),\n(467, 'Sports T-shirt',
+    'Kleding', 'L', 'Geel', 20.00, 300, 50, 'l'),\n(468, 'BOKSHANDSCHOENEN', 'BOKSEN',
+    'ROOD', NULL, 150.00, 100, 50, 'h'),\n(469, 'FOOTBALL', 'BAL', 'ROZE', NULL, 150.00,
+    0, 50, 'l'),\n(470, 'GIPSKRUIS', 'SPORT', 'WIT', NULL, 50.00, 115, 50, 'l'),\n(471,
+    'SOCCER CLEATS', 'FOOTBALL', 'GEEL', NULL, 400.00, 0, 50, 'h'),\n(477, 'BADMINTON
+    NET', 'BADMINTON', 'WIT', NULL, 150.00, 0, 50, 'l'),\n(478, 'Dumbbell', 'Fitness',
+    '5kg', 'Zwart', 15.00, 171, 50, 'h'),\n(481, 'SURFBOARD', 'SURFING', 'WIT', NULL,
+    600.00, 0, 50, 'h'),\n(486, 'BIKE HELMET', 'CYCLING', 'ROOD', NULL, 120.00, 0,
+    50, 'l'),\n(489, 'ROWING MACHINE', 'FITNESS', 'GRIJS', NULL, 1500.00, 0, 50, 'h'),\n(493,
+    'TRIATHLON WETSUIT', 'Running', 'Size', 'Color', 30.00, 0, 40, 'l'),\n(497, 'PULL-UP
+    BAR', 'FITNESS', 'ZWART', NULL, 120.00, 0, 50, 'l'),\n(498, 'JUMP ROPE', 'EXERCISE',
+    '', NULL, 250.00, 0, 50, 'h');\n\n-- --------------------------------------------------------\n\n--\n--
+    Tabelstructuur voor tabel `suppliers`\n--\n\nDROP TABLE IF EXISTS `suppliers`;\nCREATE
+    TABLE IF NOT EXISTS `suppliers` (\n  `supplier_code` int(11) NOT NULL,\n  `supplier_name`
+    varchar(50) DEFAULT NULL,\n  `address` varchar(50) DEFAULT NULL,\n  `city` varchar(30)
+    DEFAULT NULL,\n  PRIMARY KEY (`supplier_code`)\n) ENGINE=InnoDB DEFAULT CHARSET=latin1
+    COLLATE=latin1_swedish_ci;\n\n\nTRUNCATE TABLE `suppliers`;\n\nINSERT INTO `suppliers`
+    (`supplier_code`, `supplier_name`, `address`, `city`) VALUES\n(4, 'QA ALL SPORT
+    SHOP ', 'SPORT AVENUE 50', 'ATHLETICAM'),\n(9, 'QA RACING TEAM', 'VELOCE STREET
+    13', 'CYCLANDIA'),\n(11, 'QA VOLLEYBALL SPORT BV.', 'BASKET ROAD 1', 'DUNKCITY'),\n(13,
+    'QA BASKETBALL SPORT AND SONS', 'ATHLETICS AVENUE 9', 'RUNNERSVILLE'),\n(14, 'QA
+    LEISURE J.A.', 'RECREATION ROAD 101', 'SPORTHAVEN'),\n(19, 'QA FITNESS CO.', 'KRAFT
+    STREET 24', 'FITVILLAGE'),\n(20, 'QA BASEBALL shop', 'SPORT PARK LINNEAUSHOF 17',
+    'HILLEGYM'),\n(21, 'QA HOCKEY SPORT A.', 'FITNESS PLACE STREET 10', 'LISSEREN'),\n(22,
+    'QA LACROSS SPORT BV.', 'BALL ROAD 87', 'HEEMFIT'),\n(34, 'QA FITNESS BV.', 'SPORTGLASS
+    ROAD 1', 'FITLAND'),\n(35, 'QA FOOTBALL SPORT BV.', 'PRACTICE STREET 76', 'AALSPORT');\n\n--
+    --------------------------------------------------------\n\n--\n-- Tabelstructuur
+    voor tabel `vat`\n--\n\nDROP TABLE IF EXISTS `vat`;\nCREATE TABLE IF NOT EXISTS
+    `vat` (\n  `type` char(1) NOT NULL,\n  `description` varchar(30) DEFAULT NULL,\n
+    \ PRIMARY KEY (`type`)\n) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;\n\n\nTRUNCATE
+    TABLE `vat`;\n\nINSERT INTO `vat` (`type`, `description`) VALUES\n('h', 'VAT High'),\n('l',
+    'VAT Low'),\n('n', 'VAT Zero'),\n('v', 'VAT Shifted');\n\n-- --------------------------------------------------------\n\n--\n--
+    Tabelstructuur voor tabel `vat_percentage`\n--\n\nDROP TABLE IF EXISTS `vat_percentage`;\nCREATE
+    TABLE IF NOT EXISTS `vat_percentage` (\n  `type` char(1) NOT NULL,\n  `from_date`
+    date NOT NULL,\n  `to_date` date DEFAULT NULL,\n  `percent` decimal(5,3) DEFAULT
+    NULL,\n  PRIMARY KEY (`type`,`from_date`)\n) ENGINE=InnoDB DEFAULT CHARSET=latin1
+    COLLATE=latin1_swedish_ci;\n\n\nTRUNCATE TABLE `vat_percentage`;\n\nINSERT INTO
+    `vat_percentage` (`type`, `from_date`, `to_date`, `percent`) VALUES\n('h', '1992-01-01',
+    '1998-01-01', 19.000),\n('h', '1998-01-02', NULL, 18.500),\n('l', '1975-01-01',
+    '1998-01-01', 4.500),\n('l', '1998-01-02', NULL, 6.000);\n\nALTER TABLE `booking`\n
+    \ ADD CONSTRAINT `fk_booking_customer` FOREIGN KEY (`customer_code`) REFERENCES
+    `customers` (`customer_code`),\n  ADD CONSTRAINT `fk_booking_supplier` FOREIGN
+    KEY (`supplier_code`) REFERENCES `suppliers` (`supplier_code`);\n\nALTER TABLE
+    `booking_line`\n  ADD CONSTRAINT `fk_booking_line_article` FOREIGN KEY (`article_code`)
+    REFERENCES `sports_articles` (`article_code`) ON DELETE CASCADE ON UPDATE CASCADE,\n
+    \ ADD CONSTRAINT `fk_booking_line_booking` FOREIGN KEY (`booking_number`) REFERENCES
+    `booking` (`booking_number`),\n  ADD CONSTRAINT `fk_booking_line_order` FOREIGN
+    KEY (`order_number`) REFERENCES `orders` (`order_number`) ON DELETE CASCADE ON
+    UPDATE CASCADE;\n\nALTER TABLE `delivery`\n  ADD CONSTRAINT `fk_delivery_invoice`
+    FOREIGN KEY (`invoice_number`) REFERENCES `invoice` (`invoice_number`),\n  ADD
+    CONSTRAINT `fk_delivery_purchase_line` FOREIGN KEY (`purchase_number`,`article_code`)
+    REFERENCES `purchase_line` (`purchase_number`, `article_code`);\n\nALTER TABLE
+    `goods_receipt`\n  ADD CONSTRAINT `goods_receipt_ibfk_1` FOREIGN KEY (`booking_number`,`sequence_number`)
+    REFERENCES `booking_line` (`booking_number`, `sequence_number`) ON DELETE CASCADE
+    ON UPDATE CASCADE;\n\nALTER TABLE `invoice`\n  ADD CONSTRAINT `fk_invoice_booking_line`
+    FOREIGN KEY (`booking_number`,`sequence_number`) REFERENCES `booking_line` (`booking_number`,
+    `sequence_number`);\n\nALTER TABLE `orders`\n  ADD CONSTRAINT `fk_orders_suppliers`
+    FOREIGN KEY (`supplier_code`) REFERENCES `suppliers` (`supplier_code`);\n\nALTER
+    TABLE `order_lines`\n  ADD CONSTRAINT `fk_order_lines_article` FOREIGN KEY (`article_code`)
+    REFERENCES `sports_articles` (`article_code`) ON DELETE CASCADE ON UPDATE CASCADE,\n
+    \ ADD CONSTRAINT `fk_order_lines_orders` FOREIGN KEY (`order_number`) REFERENCES
+    `orders` (`order_number`);\n\nALTER TABLE `purchases`\n  ADD CONSTRAINT `fk_purchases_customers`
+    FOREIGN KEY (`customer_code`) REFERENCES `customers` (`customer_code`);\n\nALTER
+    TABLE `purchase_line`\n  ADD CONSTRAINT `fk_purchase_line_article` FOREIGN KEY
+    (`article_code`) REFERENCES `sports_articles` (`article_code`),\n  ADD CONSTRAINT
+    `fk_purchase_line_purchase` FOREIGN KEY (`purchase_number`) REFERENCES `purchases`
+    (`purchase_number`);\n\n\nALTER TABLE `quotations`\n  ADD CONSTRAINT `fk_quotations_article`
+    FOREIGN KEY (`article_code`) REFERENCES `sports_articles` (`article_code`);\n\nALTER
+    TABLE `sports_articles`\n  ADD CONSTRAINT `fk_sports_articles_vat` FOREIGN KEY
+    (`VAT_type`) REFERENCES `vat` (`type`);\n\n\nALTER TABLE `vat_percentage`\n  ADD
+    CONSTRAINT `fk_vat_percentage_vat` FOREIGN KEY (`type`) REFERENCES `vat` (`type`);\nCOMMIT;\n\n/*!40101
+    SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;\n/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS
+    */;\n/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;\n"
+frontendDjango:
+  frontendDjango:
+    image:
+      repository: daafinho/fullstack_conteinerized-frontend-django
+      tag: latest
+  ports:
+  - name: "8001"
+    port: 8001
+    targetPort: 8001
+  replicas: 1
+  type: ClusterIP
+frontendDjangoCm0:
+  Gitignore: |
+    # Logs
+    logs
+    *.log
+    npm-debug.log*
+    yarn-debug.log*
+    yarn-error.log*
+    pnpm-debug.log*
+    lerna-debug.log*
+
+    *node_modules
+    dist
+    dist-ssr
+    *.local
+    *features-gen
+    *test-results
+    *playwright-report
+
+    # Editor directories and files
+    .vscode/*
+    !.vscode/extensions.json
+    .idea
+    .DS_Store
+    *.suo
+    *.ntvs*
+    *.njsproj
+    *.sln
+    *.sw?
+
+    # github actions runner
+    *actions-runner
+
+    # Python bytecode files
+    __pycache__/
+    app/__pycache__/
+    *.pyc
+    *.pyo
+    *.pyd
+
+    # Virtual environment directories
+    venv/
+    env/
+    ENV/
+    .venv/
+    *.env/
+
+    # Django stuff:
+    *.log
+    *.pot
+    *.py[cod]
+    *.sqlite3
+    db.sqlite3
+
+    # Flask stuff:
+    instance/
+    .webassets-cache
+
+    # Distribution / packaging
+    *.egg
+    *.egg-info/
+    dist/
+    build/
+    *.bak
+    *.swp
+
+    # PyCharm / VSCode / JetBrains IDE files
+    .idea/
+    .vscode/
+
+    # Jupyter Notebook checkpoints
+    .ipynb_checkpoints
+
+    # mypy
+    .mypy_cache/
+
+    # pytest cache
+    __pycache__/
+    .pytest_cache/
+    ./django_app/myproject/myapp/__pycache__/
+
+    # VSCode settings
+    .vscode/
+
+    # IDE specific folders
+    .vscode/
+    .idea/
+  deploymentYaml:
+    metadata:
+      name: techlab
+  dockerComposeYml:
+    networks:
+      backend:
+        driver: bridge
+      monitoring:
+        driver: bridge
+    services:
+      db:
+        build:
+          context: ./backend-mariadb
+          dockerfile: Dockerfile
+        environment:
+          mysqlDatabase: QAsportarticles
+          mysqlPassword: QApassword
+          mysqlRootPassword: password
+          mysqlUser: QAuser
+        image: mariadb
+        networks:
+        - backend
+        - monitoring
+        ports:
+        - 3306:3306
+        restart: always
+        volumes:
+        - ./db:/docker-entrypoint-initdb.d
+      frontendDjango:
+        build:
+          context: ./frontend-django
+          dockerfile: Dockerfile
+        command: python ./myproject/manage.py runserver 0.0.0.0:8001
+        dependsOn:
+        - db
+        environment:
+        - MYSQL_HOST=db
+        - MYSQL_USER=QAuser
+        - MYSQL_PASSWORD=QApassword
+        - MYSQL_DATABASE=QAsportarticles
+        networks:
+        - backend
+        ports:
+        - 8001:8001
+        volumes:
+        - .:/frontend-django
+      grafana:
+        build: ./grafana
+        dependsOn:
+        - db
+        networks:
+        - monitoring
+        ports:
+        - 4000:3000
+        volumes:
+        - grafana-data:/var/lib/grafana
+        - ./grafana/provisioning/datasources/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
+      middlewareFastapi:
+        build:
+          context: ./middleware-fastapi
+          dockerfile: Dockerfile
+        command: python3 main.py
+        dependsOn:
+        - db
+        environment:
+        - MYSQL_HOST=db
+        - MYSQL_USER=QAuser
+        - MYSQL_PASSWORD=QApassword
+        - MYSQL_DATABASE=QAsportarticles
+        networks:
+        - backend
+        ports:
+        - 8000:8000
+      phpmyadmin:
+        dependsOn:
+        - db
+        environment:
+          mysqlPassword: QApassword
+          mysqlRootPassword: password
+          mysqlUser: QAuser
+          pmaHost: db
+        image: phpmyadmin/phpmyadmin
+        networks:
+        - backend
+        ports:
+        - 8090:80
+    version: "3"
+    volumes:
+      grafanaData:
+        driver: local
+  readmeBackendFrontendMd: "# QA - Techlab\n\n## Overzicht\n\nDit project bevat een
+    API, gebouwd met de Python-bibliotheek FastAPI, die een RESTful-interface biedt
+    voor interactie met een MySQL-database. De database bevat gegevens over sportartikelen,
+    klanten, leveranciers en bestellingen. Deze API ondersteunt momenteel alleen **GET**-verzoeken
+    op een aantal tabellen; uitbreiding naar volledige CRUD-functionaliteit is gepland.\n\n##
+    Inhoud\n1. [Project Status en To-Do's](#project-status-en-to-dos)\n2. [Database
+    Uitleg](#database-uitleg)\n3. [Backend Configuratie](#backend-configuratie)\n4.
+    [Frontend Configuratie](#frontend-configuratie)\n5. [API Endpoints](#api-endpoints)\n6.
+    [Vereisten en Installatie](#vereisten-en-installatie)\n\n---\n\n## Project Status
+    en To-Do's\n\n- **Swagger API**:\n  - Momenteel werken alleen de GET-requests
+    voor enkele tabellen.\n  - De POST-, PUT-, en DELETE-functionaliteit moet nog
+    worden geïmplementeerd.\n  - In de toekomst kunnen er meer tabellen en functionaliteit
+    worden toegevoegd.\n\n- **Database**:\n  - Enkele tabellen en gegevens, zoals
+    prijzen, zijn aangepast ten opzichte van de originele database en worden nog geoptimaliseerd.\n\n##
+    Database Uitleg\n\nDe `QAsportartikelen` database is bedoeld voor het beheren
+    van sportartikelen en het ondersteunen van het verkoopproces. Deze database kan
+    worden gebruikt voor:\n\n1. **Voorraadbeheer**: Houd bij hoeveel producten zijn
+    ingekocht en op voorraad zijn. Zo weet je precies wat er nog beschikbaar is en
+    wat eventueel moet worden bijbesteld.\n2. **Verkoopregistratie**: Registreer klantenaankopen
+    en krijg inzicht in wie wat heeft gekocht en wanneer. Dit helpt bij het analyseren
+    van populaire producten en klantloyaliteit.\n3. **Orderbeheer**: Volg bestellingen
+    en leveringen van leveranciers. Handig om te weten welke bestellingen onderweg
+    zijn en wanneer deze binnenkomen.\n4. **Klantoverzicht (CRM)**: Creëer een basis-klantenoverzicht
+    met aankoopgeschiedenis, zodat je meer inzicht hebt in het koopgedrag van klanten.\n\n##
+    Backend Configuratie\n\n- De MySQL-database draait op `localhost:3306`.\n- Toegang
+    tot de database via de web-UI: [http://localhost:8090](http://localhost:8090)\n
+    \ - **Gebruiker**: `root`\n  - **Wachtwoord**: `password`\n- **Eerste keer database
+    laden**:\n    1. Ga naar [http://localhost:8090](http://localhost:8090) en log
+    in.\n    2. Navigeer naar de `Import`-sectie.\n    3. Upload het bestand `QA_sportartikelen_v1.2.sql`
+    (te vinden in `app/mysql/`).\n    4. Klik op `Import`.\n    5. Controleer of de
+    `QAsportartikelen` database is toegevoegd aan de lijst.\n\n## Frontend Configuratie\n\n-
+    Toegang tot de front-end interface via [http://localhost:8001](http://localhost:8001).\n-
+    De front-end ondersteunt momenteel nog geen volledige functionaliteit voor POST-,
+    PUT- en DELETE-verzoeken.\n\n## API Endpoints\n\nHier zijn de beschikbare API-endpoints
+    die interactie bieden met de database:\n\n- **Swagger-overzicht**:\n  - Ga naar
+    [http://localhost:8000/docs](http://localhost:8000/docs) voor een overzicht van
+    alle endpoints.\n\n### Beschikbare Endpoints\n\n1. **Leveranciers ophalen**  \n
+    \  **GET** `/suppliers`  \n   Haalt een lijst van alle leveranciers in de database
+    op.\n\n2. **Bestellingen ophalen**  \n   **GET** `/orders`  \n   Haalt alle bestellingen
+    in de database op.\n\n3. **Bestellingsdetails ophalen**  \n   **GET** `/ordersdetails/{ordernr}`
+    \ \n   Haalt details op voor een specifieke bestelling. De response bevat informatie
+    zoals leverancierscode, bestelnummer, artikelcode, artikelnaam, hoeveelheid, prijs,
+    besteldatum, leverdatum en status.\n\n4. **Artikelnaam-details ophalen**  \n   **GET**
+    `/artikelnaam/{artcode}`  \n   Haalt details op van een specifiek artikel, inclusief
+    informatie zoals artikelnaam, hoogte, levensduur, kleur, onderhoudsinstructies,
+    kosten, verkoopprijs en type.\n\n## Vereisten en Installatie\n\n1. **Installeer
+    Docker Desktop**: [Download hier](https://www.docker.com/)\n2. **Start de server**:\n
+    \  - Gebruik de volgende opdracht in PowerShell om de server te starten:\n     ```bash\n
+    \    docker-compose up\n     ```\n3. **API Testen**:\n   - Zodra de server actief
+    is, kun je de API benaderen via [http://localhost:8000](http://localhost:8000)."
+  readmeMd: "![logo](src/qa.png)\n\n# Fullstack Containerized Project\n\nThis repository
+    is an ongoing CI/CD project with fullstack technology examples in an containerized
+    environment. \n\n## How-To\nFollow the instructions below. \n\n### Installation\nPreconditions:\n-
+    [Docker Desktop](https://docs.docker.com/desktop/install/windows-install/) installed\n-
+    [NodeJS](https://nodejs.org/en/download/package-manager) installed\n- Act is a
+    very handy tool for local running, see <https://nektosact.com>\n\n### Start the
+    container\n```docker-compose up --build```\n- After \"docker-compose\" go to dashboard
+    at http://localhost:4000/\n- At the end of the build you will also see the Local
+    IP and the Network IP\n\n### K8s (Kubernetes) opzet\ndoe een 'kubectl apply -f
+    deployment.yaml -n techlab' om het Techlab binnen K8s te installeren\n\n### Chaos
+    testing\n...vanuit gaande dat de docker runt, kubernetes ook en kubectl apply
+    is uitgevoerd...\nstart de chaos dashboard:  kubectl port-forward -n chaos-mesh
+    svc/chaos-dashboard 2333:2333\nga naar het dashboard:  http://127.0.0.1:2333/\nvia
+    UI/dashboard: Selecteer de techlab namespace, en de grafana app. \nMaak een experiment
+    door POD KIlL en Submit deze allemaal \n\nCLI:\n...zorg dat de betreffende name
+    van een chaos experiment eerst ge-archived is in de experiments dashboard van
+    de chaos mesh...\ncd chaos/\nkubectl apply -f ./kill_grafana_pod.yaml\n\ncheck
+    de grafana pod in de docker ui. hij moet exited zijn, en binnen enkele seconden
+    een nieuwe pod is running.\n\n### Monitor\nGrafana is a monitoring tool at http://localhost:4000\n\n-
+    Monitoring dashboard is the 'TechLab backend monitor'\n- Grafana gets data from
+    InfluxDB:8086, and Influx gets data every few seconds from Telegram scraper (on
+    backend number)\n\n### Fetch Local IP address\n```ipconfig | grep IPv4 | awk 'END{print}'```
+    \ \n\n\n### View the Front- and Backend \n- Frontend is located at http://localhost:3000/\n-
+    The frontend gets the 'jokes' from the backend that runs on http://localhost:8000/\n-
+    To stop the Docker container:\n ```docker-compose down```\n\n### E2E tests\nFrom
+    the shell (or other CLI tool) navigate to folder \"e2e\" and run the test with
+    \"act\"\n\n```cd e2e\nact\n```\n### JMeter\nNavigate to folder \"jmeter\" and
+    start \"act\"\n\n```cd jmeter\nact\n```\n\n## Testing CRUD operations\n\n### Read
+    (GET) all items / returns status: 200\nGET http://localhost:8000\n\n### Read (GET)
+    a specific item by ID / returns status: 200\nGET http://localhost:8000/6\n\n###
+    Create (POST) a new joke / returns status: 201\nPOST http://localhost:8000\n-
+    Body: {\"item\": \"POST nieuwe mop\" }\n\n### Update (PUT) an item by ID / returns
+    status: 200\nPUT http://localhost:8000/6\n- Body: { \"item\": \"PUT update\" }\n\n###
+    Delete (DELETE) an item by ID / returns status: 204\nDELETE http://localhost:8000/6\n\n##
+    TODO\n- Chaos testing: https://github.com/chaos-mesh/chaos-mesh\n- Create an architectural
+    picture to explain what and how this project works\n- Extra README instructions"
+grafana:
+  grafana:
+    image:
+      repository: daafinho/fullstack_conteinerized-grafana
+      tag: latest
+  ports:
+  - name: "4000"
+    port: 4000
+    targetPort: 3000
+  replicas: 1
+  type: ClusterIP
+grafanaCm1:
+  datasourceYaml:
+    datasources:
+    - access: proxy
+      database: QAsportartikelen
+      isDefault: true
+      jsonData:
+        connMaxLifetime: 14400
+        maxIdleConns: 10
+        maxOpenConns: 10
+        tlsAuth: false
+        tlsAuthWithCACert: false
+      name: mariadb-datasource
+      orgId: 1
+      secureJsonData:
+        password: QApassword
+      type: mysql
+      uid: mariadb-ds
+      url: db:3306
+      user: QAuser
+kubernetesClusterDomain: cluster.local
+middlewareFastapi:
+  middlewareFastapi:
+    image:
+      repository: daafinho/fullstack_conteinerized-middleware-fastapi
+      tag: latest
+  ports:
+  - name: "8000"
+    port: 8000
+    targetPort: 8000
+  replicas: 1
+  type: ClusterIP
+phpmyadmin:
+  phpmyadmin:
+    image:
+      repository: phpmyadmin/phpmyadmin
+      tag: latest
+  ports:
+  - name: "8090"
+    port: 8090
+    targetPort: 80
+  replicas: 1
+  type: ClusterIP
+pvc:
+  grafanaData:
+    storageRequest: 100Mi
