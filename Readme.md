@@ -6,11 +6,12 @@ This repository is an ongoing CI/CD project with fullstack technology examples i
 
 ### Installation
 Preconditions:
-- [Docker Desktop](https://docs.docker.com/desktop/install/windows-install/) installed
-- [NodeJS](https://nodejs.org/en/download/package-manager) installed
-- Act is a very handy tool for local running, see <https://nektosact.com>
+- [Docker Desktop](https://docs.docker.com/desktop/install/windows-install/)
+- Kubernetes tools als [kubectl](https://kubernetes.io/docs/tasks/tools/)
+- Act is handig voor het github actions lokaal runnen: <https://nektosact.com>
+- Als je wil ontwikkelen: [NodeJS](https://nodejs.org/en/download/package-manager)
 
-### K8s (Kubernetes) opzet
+### K8s (Kubernetes)
 - maak de namespace aan: kubectl create namespace techlab
 - start de k8: kubectl apply -f deployment.yaml -n techlab
 - check status van pods: kubectl -n techlab get pods
