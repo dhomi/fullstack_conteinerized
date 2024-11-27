@@ -570,7 +570,37 @@ data:
     `vat_percentage` (`type`, `from_date`, `to_date`, `percent`) VALUES\n('h', '1992-01-01',
     '1998-01-01', 19.000),\n('h', '1998-01-02', NULL, 18.500),\n('l', '1975-01-01',
     '1998-01-01', 4.500),\n('l', '1998-01-02', NULL, 6.000);\n\nALTER TABLE `booking`\n
-    ;\nCOMMIT;\n\n/*!40101
+    \ ADD CONSTRAINT `fk_booking_customer` FOREIGN KEY (`customer_code`) REFERENCES
+    `customers` (`customer_code`),\n  ADD CONSTRAINT `fk_booking_supplier` FOREIGN
+    KEY (`supplier_code`) REFERENCES `suppliers` (`supplier_code`);\n\nALTER TABLE
+    `booking_line`\n  ADD CONSTRAINT `fk_booking_line_article` FOREIGN KEY (`article_code`)
+    REFERENCES `sports_articles` (`article_code`) ON DELETE CASCADE ON UPDATE CASCADE,\n
+    \ ADD CONSTRAINT `fk_booking_line_booking` FOREIGN KEY (`booking_number`) REFERENCES
+    `booking` (`booking_number`),\n  ADD CONSTRAINT `fk_booking_line_order` FOREIGN
+    KEY (`order_number`) REFERENCES `orders` (`order_number`) ON DELETE CASCADE ON
+    UPDATE CASCADE;\n\nALTER TABLE `delivery`\n  ADD CONSTRAINT `fk_delivery_invoice`
+    FOREIGN KEY (`invoice_number`) REFERENCES `invoice` (`invoice_number`),\n  ADD
+    CONSTRAINT `fk_delivery_purchase_line` FOREIGN KEY (`purchase_number`,`article_code`)
+    REFERENCES `purchase_line` (`purchase_number`, `article_code`);\n\nALTER TABLE
+    `goods_receipt`\n  ADD CONSTRAINT `goods_receipt_ibfk_1` FOREIGN KEY (`booking_number`,`sequence_number`)
+    REFERENCES `booking_line` (`booking_number`, `sequence_number`) ON DELETE CASCADE
+    ON UPDATE CASCADE;\n\nALTER TABLE `invoice`\n  ADD CONSTRAINT `fk_invoice_booking_line`
+    FOREIGN KEY (`booking_number`,`sequence_number`) REFERENCES `booking_line` (`booking_number`,
+    `sequence_number`);\n\nALTER TABLE `orders`\n  ADD CONSTRAINT `fk_orders_suppliers`
+    FOREIGN KEY (`supplier_code`) REFERENCES `suppliers` (`supplier_code`);\n\nALTER
+    TABLE `order_lines`\n  ADD CONSTRAINT `fk_order_lines_article` FOREIGN KEY (`article_code`)
+    REFERENCES `sports_articles` (`article_code`) ON DELETE CASCADE ON UPDATE CASCADE,\n
+    \ ADD CONSTRAINT `fk_order_lines_orders` FOREIGN KEY (`order_number`) REFERENCES
+    `orders` (`order_number`);\n\nALTER TABLE `purchases`\n  ADD CONSTRAINT `fk_purchases_customers`
+    FOREIGN KEY (`customer_code`) REFERENCES `customers` (`customer_code`);\n\nALTER
+    TABLE `purchase_line`\n  ADD CONSTRAINT `fk_purchase_line_article` FOREIGN KEY
+    (`article_code`) REFERENCES `sports_articles` (`article_code`),\n  ADD CONSTRAINT
+    `fk_purchase_line_purchase` FOREIGN KEY (`purchase_number`) REFERENCES `purchases`
+    (`purchase_number`);\n\n\nALTER TABLE `quotations`\n  ADD CONSTRAINT `fk_quotations_article`
+    FOREIGN KEY (`article_code`) REFERENCES `sports_articles` (`article_code`);\n\nALTER
+    TABLE `sports_articles`\n  ADD CONSTRAINT `fk_sports_articles_vat` FOREIGN KEY
+    (`VAT_type`) REFERENCES `vat` (`type`);\n\n\nALTER TABLE `vat_percentage`\n  ADD
+    CONSTRAINT `fk_vat_percentage_vat` FOREIGN KEY (`type`) REFERENCES `vat` (`type`);\nCOMMIT;\n\n/*!40101
     SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;\n/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS
     */;\n/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;\n"
 kind: ConfigMap
@@ -1269,19 +1299,19 @@ spec:
           value: password
         - name: MYSQL_USER
           value: QAuser
-        image: mariadb
+        image: daafinho/db:latest
         name: db
         ports:
         - containerPort: 3306
           protocol: TCP
-        volumeMounts:
-        - mountPath: /docker-entrypoint-initdb.d
-          name: db-cm0
-      restartPolicy: Always
-      volumes:
-      - configMap:
-          name: db-cm0
-        name: db-cm0
+      #   volumeMounts:
+      #   - mountPath: /docker-entrypoint-initdb.d
+      #     name: db-cm0
+      # restartPolicy: Always
+      # volumes:
+      # - configMap:
+      #     name: db-cm0
+      #   name: db-cm0
 ---
 
 apiVersion: apps/v1
@@ -1316,7 +1346,7 @@ spec:
           value: QAuser
         command:
         - python
-        - manage.py
+        - /frontend-django/myproject/manage.py
         - runserver
         - 0.0.0.0:8001
       restartPolicy: Always
