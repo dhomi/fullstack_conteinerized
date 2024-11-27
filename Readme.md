@@ -4,24 +4,16 @@
 
 This repository is an ongoing CI/CD project with fullstack technology examples in an containerized environment. 
 
-## How-To
-Follow the instructions below. 
-
 ### Installation
 Preconditions:
 - [Docker Desktop](https://docs.docker.com/desktop/install/windows-install/) installed
 - [NodeJS](https://nodejs.org/en/download/package-manager) installed
 - Act is a very handy tool for local running, see <https://nektosact.com>
 
-### Start the container
-```docker-compose up --build```
-- After "docker-compose" go to dashboard at http://localhost:4000/
-- At the end of the build you will also see the Local IP and the Network IP
-
 ### K8s (Kubernetes) opzet
-maak de namespace aan: kubectl create namespace techlab
-doe een 'kubectl apply -f deployment.yaml -n techlab' om het Techlab binnen K8s te installeren
-check dat alle pods draaien: kubectl -n techlab get pods
+- maak de namespace aan: kubectl create namespace techlab
+- start de k8: 'kubectl apply -f deployment.yaml -n techlab' 
+- check status van pods: kubectl -n techlab get pods
 
 port forward middleware:  kubectl port-forward -n techlab svc/middleware-fastapi 8000:8000
 port forward frontend: kubectl port-forward svc/frontend-django -n techlab 8001:8001
@@ -71,25 +63,10 @@ Navigate to folder "jmeter" and start "act"
 ```cd jmeter
 act
 ```
-
-## Testing CRUD operations
-
-### Read (GET) all items / returns status: 200
-GET http://localhost:8000
-
-### Read (GET) a specific item by ID / returns status: 200
-GET http://localhost:8000/6
-
-### Create (POST) a new joke / returns status: 201
-POST http://localhost:8000
-- Body: {"item": "POST nieuwe mop" }
-
-### Update (PUT) an item by ID / returns status: 200
-PUT http://localhost:8000/6
-- Body: { "item": "PUT update" }
-
-### Delete (DELETE) an item by ID / returns status: 204
-DELETE http://localhost:8000/6
+### als de containers niet lukken
+Start the container: docker-compose up --build
+- After "docker-compose" go to dashboard at http://localhost:4000/
+- At the end of the build you will also see the Local IP and the Network IP
 
 ## TODO
 - Chaos testing: https://github.com/chaos-mesh/chaos-mesh
