@@ -12,6 +12,7 @@ Preconditions:
 - Als je wil ontwikkelen: [NodeJS](https://nodejs.org/en/download/package-manager)
 
 ### K8s (Kubernetes)
+- Docker desktop met Kubernetes is running
 - maak de namespace aan: kubectl create namespace techlab
 - start de k8: kubectl apply -f deployment.yaml -n techlab
 - check status van pods: kubectl -n techlab get pods
@@ -21,7 +22,6 @@ port forward frontend: kubectl port-forward svc/frontend-django -n techlab 8001:
 
 ### Chaos testing
 ...vanuit gaande dat de docker runt, kubernetes ook en kubectl apply is uitgevoerd...
-
 Start eerst het techlab en ga daarna verder om Chaos Mesh te installeren!
 
 https://chaos-mesh.org/docs/production-installation-using-helm/
