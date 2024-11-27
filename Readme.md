@@ -31,7 +31,7 @@ https://www.youtube.com/watch?v=SLlYDL573sw
 https://github.com/quickbooks2018/helmify
 
 ...vanuit gaande dat je helm al geinstalleerd hebt...
-helm install techlab-release techlab-k8s -n techlab
+helm install techlab-release techhelm -n techlab
 
 
 ### Chaos testing

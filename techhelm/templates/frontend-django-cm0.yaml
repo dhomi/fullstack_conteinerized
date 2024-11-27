@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "techlab-k8s.fullname" . }}-frontend-django-cm0
+  name: {{ include "techhelm.fullname" . }}-frontend-django-cm0
   labels:
     app: frontend-django
-  {{- include "techlab-k8s.labels" . | nindent 4 }}
+  {{- include "techhelm.labels" . | nindent 4 }}
 data:
   .gitignore: {{ .Values.frontendDjangoCm0.Gitignore | quote }}
   Readme.md: {{ .Values.frontendDjangoCm0.readmeMd | quote }}

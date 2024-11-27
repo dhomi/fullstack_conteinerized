@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ include "techlab-k8s.fullname" . }}-grafana-data
+  name: {{ include "techhelm.fullname" . }}-grafana-data
   labels:
     io.kompose.service: grafana-data
-  {{- include "techlab-k8s.labels" . | nindent 4 }}
+  {{- include "techhelm.labels" . | nindent 4 }}
 spec:
   accessModes:
   - ReadWriteOnce

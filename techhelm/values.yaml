@@ -1,7 +1,7 @@
 db:
   db:
     image:
-      repository: mariadb
+      repository: daafinho/db
       tag: latest
   ports:
   - name: "3306"
