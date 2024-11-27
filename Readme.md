@@ -23,9 +23,17 @@ port forward frontend: kubectl port-forward svc/frontend-django -n techlab 8001:
 ...vanuit gaande dat de docker runt, kubernetes ook en kubectl apply is uitgevoerd...
 
 https://chaos-mesh.org/docs/production-installation-using-helm/
+of doe: 
+- kubectl create ns chaos-mesh
+- helm install chaos-mesh chaos-mesh/chaos-mesh -n=chaos-mesh --version 2.7.0
 
-start de chaos dashboard:  kubectl port-forward -n chaos-mesh svc/chaos-dashboard 2333:2333
-ga naar het dashboard:  http://127.0.0.1:2333/
+to enable the dashboard
+helm upgrade chaos-mesh chaos-mesh/chaos-mesh -n=chaos-mesh --version 2.7.0 --set dashboard.securityMode=false
+
+kubectl port-forward -n chaos-mesh svc/chaos-dashboard 2333:2333
+
+dashboard is dus hier te zien: http://127.0.0.1:2333/
+
 via UI/dashboard: Selecteer de techlab namespace, en de grafana app. 
 Maak een experiment door POD KIlL en Submit deze allemaal 
 
