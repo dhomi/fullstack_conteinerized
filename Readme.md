@@ -12,7 +12,7 @@ Preconditions:
 
 ### K8s (Kubernetes) opzet
 - maak de namespace aan: kubectl create namespace techlab
-- start de k8: 'kubectl apply -f deployment.yaml -n techlab' 
+- start de k8: kubectl apply -f deployment.yaml -n techlab
 - check status van pods: kubectl -n techlab get pods
 
 port forward middleware:  kubectl port-forward -n techlab svc/middleware-fastapi 8000:8000
