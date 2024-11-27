@@ -1299,19 +1299,19 @@ spec:
           value: password
         - name: MYSQL_USER
           value: QAuser
-        image: mariadb:latest
+        image: daafinho/db:latest
         name: db
         ports:
         - containerPort: 3306
           protocol: TCP
-        volumeMounts:
-        - mountPath: /docker-entrypoint-initdb.d
-          name: db-cm0
-      restartPolicy: Always
-      volumes:
-      - configMap:
-          name: db-cm0
-        name: db-cm0
+      #   volumeMounts:
+      #   - mountPath: /docker-entrypoint-initdb.d
+      #     name: db-cm0
+      # restartPolicy: Always
+      # volumes:
+      # - configMap:
+      #     name: db-cm0
+      #   name: db-cm0
 ---
 
 apiVersion: apps/v1
@@ -1346,7 +1346,7 @@ spec:
           value: QAuser
         command:
         - python
-        - manage.py
+        - /frontend-django/myproject/manage.py
         - runserver
         - 0.0.0.0:8001
       restartPolicy: Always
@@ -1474,7 +1474,7 @@ spec:
           value: QAuser
         - name: PMA_HOST
           value: db
-        image: phpmyadmin/phpmyadmin:latest
+        image: phpmyadmin/phpmyadmin
         name: phpmyadmin
         ports:
         - containerPort: 80
