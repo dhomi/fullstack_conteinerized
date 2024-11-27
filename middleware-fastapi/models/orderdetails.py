@@ -39,5 +39,5 @@ class BestellingDetails(BaseModel):
 class BestellingDetailsArt(BaseModel):
     order_number: int
     article_code: int
-    amount: int
+    quantity: int
     order_price: float

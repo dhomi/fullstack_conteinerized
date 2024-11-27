@@ -5,12 +5,14 @@ from starlette.responses import JSONResponse
 from models.supplierdetails import LeverancierBase, LeverancierDetail, LeverancierCreate
 from models.orderdetails import BestellingBase, BestellingDetail, BestellingDetailBase, BestellingDetailCreate, BestellingDetailUpdate, BestellingDetails, BestellingDetailsArt
 from models.deliverydetails import SuccessfulDelivery, SuccessfulDeliveryBase
-# from models.sportarticlesDetails import SportsArticle
+from models.sportarticlesDetails import SportsArticle
+from models.goodsReceiptModel import GoodsReceiptBase
 from utils.db import DatabaseConnection
 from services.leveranciers import Leveranciers
 from services.bestellingen import Bestellingen
-# from services.sportArtikelen import SportsArticlesService
+from services.sportArtikelen import SportsArticlesService
 from services.delivery import Delivery
+from services.goodsReceipts import GoodsReceipts
 from pydantic import BaseModel
 import uvicorn
 from loguru import logger
@@ -264,10 +266,10 @@ class routes:
             results = bestDetails.get_orderlinewithArtcode(artcode)
             bestellingdetails = [
                 BestellingDetailsArt(
-                    ordernr=result[0],
-                    artcode=result[1],
-                    amount=result[2],
-                    orderprice=result[3]
+                    order_number=result[0],
+                    article_code=result[1],
+                    quantity=result[2],
+                    order_price=result[3]
                 )
                 for result in results
             ]
@@ -283,13 +285,13 @@ class routes:
         try:
             bestDetails = Bestellingen(db)
             result = bestDetails.add_neworders(
-                bestellingdetails.suppliercode,
-                bestellingdetails.artcode,
-                bestellingdetails.amount,
-                bestellingdetails.orderprice,
-                bestellingdetails.orderdate,
-                bestellingdetails.deliverydate,
-                bestellingdetails.price,
+                bestellingdetails.supplier_code,
+                bestellingdetails.article_code,
+                bestellingdetails.order_number,
+                bestellingdetails.order_price,
+                bestellingdetails.order_date,
+                bestellingdetails.delivery_date,
+                bestellingdetails.article_name,
                 bestellingdetails.status
             )
             if "error" in result:
@@ -305,15 +307,14 @@ class routes:
             bestDetails = Bestellingen(db)
             result = bestDetails.update_orders(
                 ordernr,
-                bestellingdetails.suppliercode,
-                bestellingdetails.artcode,
-                bestellingdetails.artikelnaam,
-                bestellingdetails.amount,
-                bestellingdetails.orderprice,
-                bestellingdetails.orderdate,
-                bestellingdetails.deliverydate,
-                bestellingdetails.status,
-                bestellingdetails.price
+                bestellingdetails.supplier_code,
+                bestellingdetails.order_number,
+                bestellingdetails.article_code,
+                bestellingdetails.article_name,
+                bestellingdetails.order_price,
+                bestellingdetails.order_date,
+                bestellingdetails.delivery_date,
+                bestellingdetails.status
             )
             if "error" in result:
                 raise_http_exception(400, result["error"])
@@ -333,10 +334,6 @@ class routes:
         except Exception as e:
             logger.exception("Failed to delete bestelling details")
             raise_http_exception(500, "Failed to delete bestelling details")
-    
-    # @app.get("/sports_articles", response_model=List[SportsArticle])
-    # def read_sports_articles():
-    #     return SportsArticlesService.get_all_articles()
 
     # @app.get("/sports_articles/{article_code}", response_model=SportsArticle)
     # def read_sports_article(article_code: int):
@@ -354,6 +351,20 @@ class routes:
     # def delete_sports_article(article_code: int):
     #     return SportsArticlesService.delete_article(article_code)
     
+    @app.get("/sports_articles", tags=["sportarticles"])
+    async def get_sportarticles():
+        db = DatabaseConnection()
+        sArticles = SportsArticlesService(db)
+        result = sArticles.get_all_articles()
+        return [{"article_code": r[0], "article_name": r[1], "category": r[2], "size": r[3], "color": r[4], "price": r[5], "stock_quantity": r[6], "stock_min": r[7], "vat_type": r[8]} for r in result]
+
+    @app.get("/sports_articles/{article_code}", tags=["sportarticles"])
+    async def get_plant(article_code: int):
+        db = DatabaseConnection()
+        sArticles = SportsArticlesService(db)
+        result = sArticles.get_article(article_code)
+        return [{"article_code": r[0], "article_name": r[1], "category": r[2], "size": r[3], "color": r[4], "price": r[5], "stock_quantity": r[6], "stock_min": r[7], "vat_type": r[8]} for r in result]
+
     @app.get("/successful_deliveries", description="Get all successful deliveries", tags=["deliveries"])
     async def get_successful_deliveries():
         db = DatabaseConnection()
@@ -362,6 +373,27 @@ class routes:
         if not result:
             raise HTTPException(status_code=400, detail="successful deliveries not found")
         return [{"ordernr": r[0], "artcode": r[1], "delivery_date": r[2], "amount_received": r[3], "status": r[4], "external_invoice_nr": r[5], "serial_number": r[6]} for r in result]
+
+    @app.get("/goodsReceipts", tags=["goodreceipts"])
+    async def get_goodsReceipts(db: DatabaseConnection = Depends(get_db)):
+        try:
+            goodsReceipts = GoodsReceipts(db)
+            results = goodsReceipts.get_goodsReceipts()
+            # goodreceiptDetails = [
+            #     GoodReceiptBase(
+            #         order_number=result[0],
+            #         article_code=result[1],
+            #         quantity=result[2],
+            #         order_price=result[3]
+            #     )
+            #     for result in results
+            # ]
+            if "error" in results:
+                raise_http_exception(400, results["error"])
+            return [{"receipt_id": r[0], "order_number": r[1], "article_code": r[2], "receipt_date": r[3], "receipt_quantity": r[4], "status": r[5], "booking_number": r[6], "sequence_number": r[7]} for r in results]
+        except Exception as e:
+            logger.exception("Failed to retrieve good receipts")
+            raise_http_exception(500, "Failed to retrieve good receipts")
 
     @app.get("/")
     async def root():

@@ -1,15 +1,14 @@
-# Use the official MariaDB image as a base
+# Use the official MariaDB image as the base
 FROM mariadb:latest
 
-# Set environment variables for MariaDB
-ENV MYSQL_ROOT_PASSWORD=rootpassword
-ENV MYSQL_DATABASE: 'QAsportartikelen'
-# ENV MYSQL_DATABASE=sampledb
-ENV MYSQL_USER=user
-ENV MYSQL_PASSWORD=userpassword
+# Set environment variables
+ENV MYSQL_USER=QAuser \
+    MYSQL_PASSWORD=QApassword \
+    MYSQL_ROOT_PASSWORD=password \
+    MYSQL_DATABASE=QAsportarticles
 
-# Copy the SQL file to the directory where MariaDB will auto-import it on startup
-COPY init.sql /docker-entrypoint-initdb.d/
+# Copy the init.sql script to the MariaDB initialization directory
+COPY ./init.sql /docker-entrypoint-initdb.d/
 
 # Expose the default MariaDB port
 EXPOSE 3306

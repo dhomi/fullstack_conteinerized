@@ -2,7 +2,7 @@ version: "3"
 
 services:
   db:
-    image: mariadb
+    image: daafinho/db:latest
     restart: always
     build:
       context: ./backend-mariadb

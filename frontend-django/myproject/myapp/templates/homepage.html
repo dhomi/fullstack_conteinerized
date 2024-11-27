@@ -15,6 +15,8 @@
       background-color: #f5f5f7;
       margin: 0;
       display: flex;
+      flex-direction: column;
+      min-height: 100vh;
     }
 
     /* Sidebar Styling */
@@ -48,15 +50,18 @@
       margin-left: 250px; /* Sidebar width */
       padding: 20px;
       flex: 1;
-      min-height: 100vh;
       display: flex;
       flex-direction: column;
+      align-items: center;
+      justify-content: center;
       background-color: white;
       box-sizing: border-box;
     }
 
     .w3-main {
       flex: 1;
+      width: 100%;
+      text-align: center;
     }
 
     /* Full-width Footer Styling */
@@ -64,10 +69,10 @@
       background-color: #2b5876;
       color: white;
       text-align: center;
-      padding: 20px;
+      padding: 10px; /* Reduced padding for less space */
       width: calc(100% - 250px); /* Full width minus sidebar width */
-      position: fixed;
-      bottom: 0;
+      position: relative;
+      margin-top: auto; /* Push footer to the bottom */
       left: 250px; /* Start the footer just after the sidebar */
       font-family: "Roboto", sans-serif;
     }
@@ -87,6 +92,15 @@
         left: 0;
       }
     }
+
+    /* Image Styling */
+    .homepage-image {
+      max-width: 80%; /* Reduced the max-width to make the image smaller */
+      height: auto;
+      border-radius: 10px;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px; /* Reduced margin below the image */
+    }
   </style>
 </head>
 
@@ -104,12 +118,12 @@
     </div>
     <div class="w3-padding-64 w3-large">
       <a href="/" class="w3-bar-item w3-button">Home</a>
-      <a href="/suppliers" class="w3-bar-item w3-button">Leveranciers</a>
-      <a href="/orders" class="w3-bar-item w3-button">Bestellingen</a>
-      <a onclick="myAccFunc()" href="javascript:void(0)" class="w3-button w3-block w3-left-align" id="myBtn">Sportartikelen<i class="fa fa-caret-down"></i></a>
+      <a href="/suppliers" class="w3-bar-item w3-button">Suppliers</a>
+      <a href="/orders" class="w3-bar-item w3-button">Orders</a>
+      <a onclick="myAccFunc()" href="javascript:void(0)" class="w3-button w3-block w3-left-align" id="myBtn">Sporting articles<i class="fa fa-caret-down"></i></a>
       <div id="demoAcc" class="w3-bar-block w3-hide w3-padding-large w3-medium">
-        <a href="/sportartikelen" class="w3-bar-item w3-button">Alle Sportartikelen</a>
-        <a href="#" class="w3-bar-item w3-button">Nieuw sportartikel toevoegen</a>
+        <a href="/sports_articles" class="w3-bar-item w3-button">All Sporting article</a>
+        <a href="#" class="w3-bar-item w3-button">add new Sporting article</a>
       </div>
     </div>
   </nav>
@@ -119,6 +133,9 @@
     <!-- Main content area -->
     <div class="w3-main">
       <div>
+        {% if request.path == '/' %}
+          <img src="{% static 'QA-techlab_dall-e.webp' %}" alt="QA-Techlab Home Image" class="homepage-image">
+        {% endif %}
         {% block content %}{% endblock %}
       </div>
     </div>

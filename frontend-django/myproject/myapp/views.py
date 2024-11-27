@@ -36,16 +36,16 @@ def orderdetails(request, ordernr):
     return render(request, 'orderdetails.html', {'orderdetails': orderdetails})
 
 def sportartikeldetails(request, artcode):
-    response = requests.get(f'http://middleware-fastapi:8000/sportartikelen/{artcode}')
-    plantdetails = response.json()
-    getArtcode = plantdetails[0]['artcode']
+    response = requests.get(f'http://middleware-fastapi:8000/sports_articles/{artcode}')
+    sportsarticle = response.json()
+    getArtcode = sportsarticle[0]['artcode']
     
-    return render(request, 'plantdetails.html', {'plantdetails': plantdetails})
+    return render(request, 'sports_articles.html', {'sportsarticle': sportsarticle})
 
 def sportartikelen(request):
-    response = requests.get(f"http://middleware-fastapi:8000/sportartikelen")
+    response = requests.get(f"http://middleware-fastapi:8000/sports_articles/")
     sportArtikelen = response.json()
-    return render(request, 'sportartikelen.html', {'sportartikelen': sportArtikelen})
+    return render(request, 'sports_articles.html', {'sports_articles': sportArtikelen})
 
 def orderdetailsArt(request, artcode):
     response = requests.get(f"http://middleware-fastapi:8000/orderdetailsArt/{artcode}")

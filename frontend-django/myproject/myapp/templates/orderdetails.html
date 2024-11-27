@@ -15,9 +15,9 @@
         <thead>
             <tr>
                 <th>suppliercode</th>
-                <th>ordernr</th>
-                <th>artcode</th>
-                <th>artikelnaam</th>
+                <th>order number</th>
+                <th>article code</th>
+                <th>sporting article name</th>
                 <th>orderprice</th>
                 <th>orderdate</th>
                 <th>deliverydate</th>
@@ -29,8 +29,8 @@
                 <tr>
                     <td><a href="/suppliers/{{ order.supplier_code }}">{{ order.supplier_code}}</a></td>
                     <td><a href="/orders/">{{ order.order_number }}</a></td>
-                    <td><a href="/sportarticles/{{ order.article_code }}">{{ order.article_code }}</a></td>
-                    <td><a href="/sportarticles/{{ order.article_code }}">{{ order.article_name }}</a></td>
+                    <td><a href="/sport_articles/{{ order.article_code }}">{{ order.article_code }}</a></td>
+                    <td><a href="/sport_articles/{{ order.article_code }}">{{ order.article_name }}</a></td>
                     <td>{{ order.order_price }}</td>
                     <td>{{ order.order_date }}</td>
                     <td>{{ order.delivery_date }}</td>

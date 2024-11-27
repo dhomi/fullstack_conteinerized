@@ -131,3 +131,23 @@
 #             raise
 #         finally:
 #             cursor.close()
+
+class SportsArticlesService:
+    def __init__(self, database_connection):
+        self.db = database_connection
+
+    def get_all_articles(self):
+        cursor = self.db.get_cursor()
+        zoek_string = "SELECT * from QAsportarticles.sports_articles"
+        cursor.execute(zoek_string)
+        result = cursor.fetchall()
+        return result
+
+    def get_article(self, key):
+        cursor = self.db.get_cursor()
+        zoek_string = "SELECT * FROM QAsportarticles.sports_articles p"
+        if key != 0:
+            zoek_string += " where p.article_code = " + str(key)
+        cursor.execute(zoek_string)
+        result = cursor.fetchall()
+        return result

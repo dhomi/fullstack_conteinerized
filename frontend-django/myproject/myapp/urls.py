@@ -10,7 +10,7 @@ urlpatterns = [
     path('orders/', views.orders, name='orders'),
     path('orders/<int:ordernr>/', views.orderdetails, name='orderdetails'),
     path('orderdetailsArt/<int:artcode>/', views.orderdetailsArt, name='orderdetails'),
-    path('sportartikelen/', views.sportartikelen, name='sportartikelen'),
-    path('sportartikelen/<int:artcode>/', views.sportartikeldetails, name='sportartikeldetails'),
+    path('sports_articles/', views.sportartikelen, name='sportartikelen'),
+    path('sports_articles/<int:artcode>/', views.sportartikeldetails, name='sportartikeldetails'),
     path('favicon.ico', RedirectView.as_view(url=staticfiles_storage.url('favicon/favicon.ico'))),
 ]
