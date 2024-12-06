@@ -81,3 +81,4 @@ Start the container: docker-compose up --build
 - Chaos testing: https://github.com/chaos-mesh/chaos-mesh
 - Create an architectural picture to explain what and how this project works
 - Extra README instructions
+- Wait time or time sleep when you execute the startup.sh. when you start the first time the script it doesnt wait till the pod is deployed with the status running. It will throw an error.
