@@ -15,4 +15,5 @@ helm upgrade chaos-mesh chaos-mesh/chaos-mesh -n=chaos-mesh --version 2.7.0 --se
 # port forwarding
 kubectl port-forward -n chaos-mesh svc/chaos-dashboard 2333:2333 &
 kubectl port-forward -n techlab svc/middleware-fastapi 8000:8000 &
+kubectl port-forward -n techlab svc/grafana 4000:4000 &
 kubectl port-forward svc/frontend-django -n techlab 8001:8001 &
