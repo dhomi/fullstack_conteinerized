@@ -10,30 +10,32 @@
 <link rel="stylesheet" href="http://cdn.datatables.net/1.10.2/css/jquery.dataTables.min.css"></style>
 <script type="text/javascript" src="http://cdn.datatables.net/1.10.2/js/jquery.dataTables.min.js"></script>
 <script type="text/javascript" src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-    <h2>Suppliers</h2>
-    <table id="myTable" class="table table-striped">
-        <thead>
+
+<h2>Suppliers</h2>
+<table id="myTable" class="table table-striped">
+    <thead>
+        <tr>
+            <th>Supplier Code</th>
+            <th>Supplier Name</th>
+            <th>Address</th>
+            <th>Residence</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for supplier in suppliers %}
             <tr>
-                <th>Supplier Code</th>
-                <th>Supplier Name</th>
-                <th>Address</th>
-                <th>Residence</th>
+                <!-- Updated link to include '/suppliers/' path -->
+                <td><a href="/suppliers/{{ supplier.suppliercode }}">{{ supplier.suppliercode }}</a></td>
+                <td>{{ supplier.suppliername }}</td>
+                <td>{{ supplier.address }}</td>
+                <td>{{ supplier.residence }}</td>
             </tr>
-        </thead>
-        <tbody>
-            {% for supplier in suppliers %}
-                <tr>
-                    <td><a href="{{ supplier.suppliercode }}">{{ supplier.suppliercode }}</a></td>
-                    <td>{{ supplier.suppliername }}</td>
-                    <td>{{ supplier.address }}</td>
-                    <td>{{ supplier.residence }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <script>
-        $(document).ready(function(){
-            $('#myTable').dataTable();
-        });
-    </script>
+        {% endfor %}
+    </tbody>
+</table>
+<script>
+    $(document).ready(function(){
+        $('#myTable').dataTable();
+    });
+</script>
 {% endblock %}

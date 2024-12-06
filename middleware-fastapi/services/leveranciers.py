@@ -25,11 +25,11 @@ class Leveranciers:
         cursor.close()
         return result
     
-    def add_lev(self, supplier_name: str, address: str, city: str):
+    def add_lev(self, supplier_code: int, supplier_name: str, address: str, city: str):
         cursor = self.db.get_cursor()
         try:
-            add_lev = "INSERT INTO QAsportarticles.suppliers (supplier_name, address, city) VALUES (%s, %s, %s)"
-            cursor.execute(add_lev, (supplier_name, address, city))
+            add_lev = "INSERT INTO QAsportarticles.suppliers (supplier_code, supplier_name, address, city) VALUES (%s, %s, %s, %s)"
+            cursor.execute(add_lev, (supplier_code, supplier_name, address, city))
             self.db.connection.commit()
         except Exception as e:
             print(f"Error adding supplier: {e}")
@@ -37,7 +37,7 @@ class Leveranciers:
             raise
         finally:
             cursor.close()
-        return {"suppliername": supplier_name, "address": address, "residence": city}
+        return {"suppliercode":supplier_code, "suppliername": supplier_name, "address": address, "residence": city}
 
     def update_lev(self, supplier_code: int, supplier_name: str, address: str, city: str):
         cursor = self.db.get_cursor()

@@ -10,6 +10,7 @@ class LeverancierDetail(LeverancierBase):
     pass 
 
 class LeverancierCreate(BaseModel):
+    supplier_code: int
     supplier_name: str
     address: str
     city: str

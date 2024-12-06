@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: db
--- Gegenereerd op: 26 nov 2024 om 20:31
+-- Gegenereerd op: 01 dec 2024 om 13:54
 -- Serverversie: 11.6.2-MariaDB-ubu2404
 -- PHP-versie: 8.2.8
 
@@ -116,17 +116,14 @@ DELIMITER ;
 --
 
 DROP TABLE IF EXISTS `booking`;
-CREATE TABLE IF NOT EXISTS `booking` (
-  `booking_number` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `booking` (
+  `booking_number` int(11) NOT NULL,
   `booking_date` date NOT NULL,
   `amount` decimal(9,2) NOT NULL,
   `customer_code` int(11) DEFAULT NULL,
   `supplier_code` int(11) DEFAULT NULL,
-  `status` char(1) DEFAULT NULL,
-  PRIMARY KEY (`booking_number`),
-  KEY `fk_booking_customer` (`customer_code`),
-  KEY `fk_booking_supplier` (`supplier_code`)
-) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+  `status` char(1) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Tabel leegmaken voor invoegen `booking`
@@ -171,17 +168,12 @@ INSERT INTO `booking` (`booking_number`, `booking_date`, `amount`, `customer_cod
 --
 
 DROP TABLE IF EXISTS `booking_line`;
-CREATE TABLE IF NOT EXISTS `booking_line` (
+CREATE TABLE `booking_line` (
   `booking_number` int(11) NOT NULL,
   `sequence_number` int(11) NOT NULL,
   `amount` decimal(10,2) NOT NULL DEFAULT 0.00,
   `order_number` int(11) NOT NULL,
-  `article_code` int(11) NOT NULL,
-  PRIMARY KEY (`booking_number`,`sequence_number`),
-  KEY `idx_booking_line_booking_number` (`booking_number`),
-  KEY `fk_booking_line_order` (`order_number`),
-  KEY `fk_booking_line_article` (`article_code`),
-  KEY `idx_booking_number_sequence_number` (`booking_number`,`sequence_number`)
+  `article_code` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
@@ -262,7 +254,7 @@ DELIMITER ;
 --
 
 DROP TABLE IF EXISTS `customers`;
-CREATE TABLE IF NOT EXISTS `customers` (
+CREATE TABLE `customers` (
   `customer_code` int(11) NOT NULL,
   `customer_name` varchar(50) DEFAULT NULL,
   `address` varchar(50) DEFAULT NULL,
@@ -271,8 +263,7 @@ CREATE TABLE IF NOT EXISTS `customers` (
   `city` varchar(30) DEFAULT NULL,
   `status` char(1) DEFAULT NULL,
   `credit_limit` decimal(10,2) DEFAULT NULL,
-  `balance` decimal(10,2) DEFAULT NULL,
-  PRIMARY KEY (`customer_code`)
+  `balance` decimal(10,2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
@@ -297,14 +288,12 @@ INSERT INTO `customers` (`customer_code`, `customer_name`, `address`, `postal_co
 --
 
 DROP TABLE IF EXISTS `delivery`;
-CREATE TABLE IF NOT EXISTS `delivery` (
+CREATE TABLE `delivery` (
   `purchase_number` int(11) NOT NULL,
   `article_code` int(11) NOT NULL,
   `delivery_date` date NOT NULL,
   `quantity` int(11) NOT NULL,
-  `invoice_number` int(11) DEFAULT NULL,
-  PRIMARY KEY (`purchase_number`,`article_code`,`delivery_date`),
-  KEY `idx_delivery_invoice_number` (`invoice_number`)
+  `invoice_number` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
@@ -350,19 +339,16 @@ INSERT INTO `delivery` (`purchase_number`, `article_code`, `delivery_date`, `qua
 --
 
 DROP TABLE IF EXISTS `goods_receipt`;
-CREATE TABLE IF NOT EXISTS `goods_receipt` (
-  `receipt_id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `goods_receipt` (
+  `receipt_id` int(11) NOT NULL,
   `order_number` int(11) NOT NULL,
   `article_code` int(11) NOT NULL,
   `receipt_date` date NOT NULL,
   `receipt_quantity` int(11) NOT NULL,
   `status` char(1) NOT NULL,
   `booking_number` int(11) NOT NULL,
-  `sequence_number` int(11) NOT NULL,
-  PRIMARY KEY (`receipt_id`),
-  KEY `booking_number` (`booking_number`,`sequence_number`),
-  KEY `idx_article_code` (`article_code`)
-) ENGINE=InnoDB AUTO_INCREMENT=184 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+  `sequence_number` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 --
 -- Tabel leegmaken voor invoegen `goods_receipt`
@@ -431,15 +417,13 @@ DELIMITER ;
 --
 
 DROP TABLE IF EXISTS `invoice`;
-CREATE TABLE IF NOT EXISTS `invoice` (
-  `invoice_number` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `invoice` (
+  `invoice_number` int(11) NOT NULL,
   `invoice_date` date NOT NULL,
   `status` char(1) DEFAULT NULL,
   `booking_number` int(11) NOT NULL,
-  `sequence_number` int(11) NOT NULL,
-  PRIMARY KEY (`invoice_number`),
-  KEY `fk_invoice_booking_line` (`booking_number`,`sequence_number`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+  `sequence_number` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Tabel leegmaken voor invoegen `invoice`
@@ -469,16 +453,15 @@ INSERT INTO `invoice` (`invoice_number`, `invoice_date`, `status`, `booking_numb
 --
 
 DROP TABLE IF EXISTS `orders`;
-CREATE TABLE IF NOT EXISTS `orders` (
-  `order_number` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `orders` (
+  `order_number` int(11) NOT NULL,
   `supplier_code` int(11) NOT NULL,
   `order_date` date DEFAULT NULL,
   `delivery_date` date DEFAULT NULL,
   `amount` decimal(6,2) DEFAULT NULL,
   `status` char(1) DEFAULT NULL,
-  PRIMARY KEY (`order_number`),
-  KEY `fk_orders_suppliers` (`supplier_code`)
-) ENGINE=InnoDB AUTO_INCREMENT=205 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+  `status_description` varchar(50) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Tabel leegmaken voor invoegen `orders`
@@ -489,22 +472,60 @@ TRUNCATE TABLE `orders`;
 -- Gegevens worden geëxporteerd voor tabel `orders`
 --
 
-INSERT INTO `orders` (`order_number`, `supplier_code`, `order_date`, `delivery_date`, `amount`, `status`) VALUES
-(121, 13, '2024-07-17', '2024-07-31', 602.50, 'C'),
-(174, 4, '2024-08-25', '2024-09-04', 117.50, 'C'),
-(175, 4, '2024-08-27', '2024-09-06', 399.50, 'C'),
-(181, 9, '2024-09-06', '2024-09-27', 607.60, 'C'),
-(184, 22, '2024-09-06', '2024-09-16', 240.00, 'C'),
-(186, 20, '2024-09-11', '2024-09-18', 422.50, 'C'),
-(190, 14, '2024-09-13', '2024-09-23', 680.25, 'C'),
-(191, 13, '2024-09-13', '2024-09-27', 1316.75, 'C'),
-(192, 35, '2024-09-13', '2024-09-23', 330.75, 'C'),
-(197, 35, '2024-09-14', '2024-09-23', 966.95, 'C'),
-(200, 4, '2024-09-14', '2024-09-21', 72.00, 'C'),
-(201, 4, '2024-09-26', '2024-10-02', 221.25, 'C'),
-(202, 14, '2024-09-26', '2024-10-05', 466.25, 'C'),
-(203, 19, '2024-10-01', '2024-10-15', 605.00, 'C'),
-(204, 34, '2024-10-01', '2024-10-15', 497.50, 'C');
+INSERT INTO `orders` (`order_number`, `supplier_code`, `order_date`, `delivery_date`, `amount`, `status`, `status_description`) VALUES
+(121, 13, '2024-07-17', '2024-07-31', 602.50, 'P', 'Pending'),
+(174, 4, '2024-08-25', '2024-09-04', 117.50, 'S', 'Shipped'),
+(175, 4, '2024-08-27', '2024-09-06', 399.50, 'D', 'Delivered'),
+(181, 9, '2024-09-06', '2024-09-27', 607.60, 'D', 'Delivered'),
+(184, 22, '2024-09-06', '2024-09-16', 240.00, 'C', 'Cancelled'),
+(186, 20, '2024-09-11', '2024-09-18', 422.50, 'R', 'Processed'),
+(190, 14, '2024-09-13', '2024-09-23', 680.25, 'C', 'Cancelled'),
+(191, 13, '2024-09-13', '2024-09-27', 1316.75, 'C', 'Cancelled'),
+(192, 35, '2024-09-13', '2024-09-23', 330.75, 'S', 'Shipped'),
+(197, 35, '2024-09-14', '2024-09-23', 966.95, 'R', 'Processed'),
+(200, 4, '2024-09-14', '2024-09-21', 72.00, 'S', 'Shipped'),
+(201, 4, '2024-09-26', '2024-10-02', 221.25, 'C', 'Cancelled'),
+(202, 14, '2024-09-26', '2024-10-05', 466.25, 'P', 'Pending'),
+(203, 19, '2024-10-01', '2024-10-15', 605.00, 'C', 'Cancelled'),
+(204, 34, '2024-10-01', '2024-10-15', 497.50, 'C', 'Cancelled');
+
+--
+-- Triggers `orders`
+--
+DROP TRIGGER IF EXISTS `before_update_status`;
+DELIMITER $$
+CREATE TRIGGER `before_update_status` BEFORE UPDATE ON `orders` FOR EACH ROW BEGIN
+  IF NEW.status = 'P' THEN
+    SET NEW.status_description = 'Pending';
+  ELSEIF NEW.status = 'S' THEN
+    SET NEW.status_description = 'Shipped';
+  ELSEIF NEW.status = 'D' THEN
+    SET NEW.status_description = 'Delivered';
+  ELSEIF NEW.status = 'C' THEN
+    SET NEW.status_description = 'Cancelled';
+  ELSEIF NEW.status = 'R' THEN
+    SET NEW.status_description = 'Processed';
+  END IF;
+END
+$$
+DELIMITER ;
+DROP TRIGGER IF EXISTS `before_update_status_description`;
+DELIMITER $$
+CREATE TRIGGER `before_update_status_description` BEFORE UPDATE ON `orders` FOR EACH ROW BEGIN
+  IF NEW.status_description = 'Pending' THEN
+    SET NEW.status = 'P';
+  ELSEIF NEW.status_description = 'Shipped' THEN
+    SET NEW.status = 'S';
+  ELSEIF NEW.status_description = 'Delivered' THEN
+    SET NEW.status = 'D';
+  ELSEIF NEW.status_description = 'Cancelled' THEN
+    SET NEW.status = 'C';
+  ELSEIF NEW.status_description = 'Processed' THEN
+    SET NEW.status = 'R';
+  END IF;
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -513,13 +534,11 @@ INSERT INTO `orders` (`order_number`, `supplier_code`, `order_date`, `delivery_d
 --
 
 DROP TABLE IF EXISTS `order_lines`;
-CREATE TABLE IF NOT EXISTS `order_lines` (
+CREATE TABLE `order_lines` (
   `order_number` int(11) NOT NULL,
   `article_code` int(11) NOT NULL,
   `quantity` int(11) DEFAULT NULL,
-  `order_price` decimal(4,2) DEFAULT NULL,
-  PRIMARY KEY (`order_number`,`article_code`),
-  KEY `idx_order_lines_article_code` (`article_code`)
+  `order_price` decimal(4,2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
@@ -616,12 +635,10 @@ DELIMITER ;
 --
 
 DROP TABLE IF EXISTS `purchases`;
-CREATE TABLE IF NOT EXISTS `purchases` (
+CREATE TABLE `purchases` (
   `purchase_number` int(11) NOT NULL,
   `customer_code` int(11) NOT NULL,
-  `purchase_date` date DEFAULT NULL,
-  PRIMARY KEY (`purchase_number`),
-  KEY `fk_purchases_customers` (`customer_code`)
+  `purchase_date` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
@@ -652,13 +669,11 @@ INSERT INTO `purchases` (`purchase_number`, `customer_code`, `purchase_date`) VA
 --
 
 DROP TABLE IF EXISTS `purchase_line`;
-CREATE TABLE IF NOT EXISTS `purchase_line` (
+CREATE TABLE `purchase_line` (
   `purchase_number` int(11) NOT NULL,
   `article_code` int(11) NOT NULL,
   `quantity` int(11) DEFAULT NULL,
-  `purchase_price` decimal(6,2) DEFAULT NULL,
-  PRIMARY KEY (`purchase_number`,`article_code`),
-  KEY `idx_purchase_line_article_code` (`article_code`)
+  `purchase_price` decimal(6,2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
@@ -715,16 +730,14 @@ INSERT INTO `purchase_line` (`purchase_number`, `article_code`, `quantity`, `pur
 --
 
 DROP TABLE IF EXISTS `quotations`;
-CREATE TABLE IF NOT EXISTS `quotations` (
-  `quotation_id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `quotations` (
+  `quotation_id` int(11) NOT NULL,
   `supplier_code` int(11) NOT NULL,
   `article_code` int(11) NOT NULL,
   `supplier_article_code` varchar(50) NOT NULL,
   `delivery_time` int(11) NOT NULL,
-  `quotation_price` decimal(10,2) NOT NULL,
-  PRIMARY KEY (`quotation_id`),
-  KEY `fk_quotations_article` (`article_code`)
-) ENGINE=InnoDB AUTO_INCREMENT=217 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
+  `quotation_price` decimal(10,2) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
 
 --
 -- Tabel leegmaken voor invoegen `quotations`
@@ -960,7 +973,7 @@ INSERT INTO `quotations` (`quotation_id`, `supplier_code`, `article_code`, `supp
 --
 
 DROP TABLE IF EXISTS `sports_articles`;
-CREATE TABLE IF NOT EXISTS `sports_articles` (
+CREATE TABLE `sports_articles` (
   `article_code` int(11) NOT NULL,
   `article_name` varchar(50) DEFAULT NULL,
   `category` varchar(30) DEFAULT NULL,
@@ -969,9 +982,7 @@ CREATE TABLE IF NOT EXISTS `sports_articles` (
   `price` decimal(6,2) DEFAULT NULL,
   `stock_quantity` int(11) DEFAULT NULL,
   `stock_min` int(11) DEFAULT NULL,
-  `VAT_type` char(1) NOT NULL,
-  PRIMARY KEY (`article_code`),
-  KEY `fk_sports_articles_vat` (`VAT_type`)
+  `VAT_type` char(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
@@ -1195,12 +1206,11 @@ INSERT INTO `sports_articles` (`article_code`, `article_name`, `category`, `size
 --
 
 DROP TABLE IF EXISTS `suppliers`;
-CREATE TABLE IF NOT EXISTS `suppliers` (
+CREATE TABLE `suppliers` (
   `supplier_code` int(11) NOT NULL,
   `supplier_name` varchar(50) DEFAULT NULL,
   `address` varchar(50) DEFAULT NULL,
-  `city` varchar(30) DEFAULT NULL,
-  PRIMARY KEY (`supplier_code`)
+  `city` varchar(30) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
@@ -1232,10 +1242,9 @@ INSERT INTO `suppliers` (`supplier_code`, `supplier_name`, `address`, `city`) VA
 --
 
 DROP TABLE IF EXISTS `vat`;
-CREATE TABLE IF NOT EXISTS `vat` (
+CREATE TABLE `vat` (
   `type` char(1) NOT NULL,
-  `description` varchar(30) DEFAULT NULL,
-  PRIMARY KEY (`type`)
+  `description` varchar(30) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
@@ -1260,12 +1269,11 @@ INSERT INTO `vat` (`type`, `description`) VALUES
 --
 
 DROP TABLE IF EXISTS `vat_percentage`;
-CREATE TABLE IF NOT EXISTS `vat_percentage` (
+CREATE TABLE `vat_percentage` (
   `type` char(1) NOT NULL,
   `from_date` date NOT NULL,
   `to_date` date DEFAULT NULL,
-  `percent` decimal(5,3) DEFAULT NULL,
-  PRIMARY KEY (`type`,`from_date`)
+  `percent` decimal(5,3) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
@@ -1282,6 +1290,150 @@ INSERT INTO `vat_percentage` (`type`, `from_date`, `to_date`, `percent`) VALUES
 ('h', '1998-01-02', NULL, 18.500),
 ('l', '1975-01-01', '1998-01-01', 4.500),
 ('l', '1998-01-02', NULL, 6.000);
+
+--
+-- Indexen voor geëxporteerde tabellen
+--
+
+--
+-- Indexen voor tabel `booking`
+--
+ALTER TABLE `booking`
+  ADD PRIMARY KEY (`booking_number`),
+  ADD KEY `fk_booking_customer` (`customer_code`),
+  ADD KEY `fk_booking_supplier` (`supplier_code`);
+
+--
+-- Indexen voor tabel `booking_line`
+--
+ALTER TABLE `booking_line`
+  ADD PRIMARY KEY (`booking_number`,`sequence_number`),
+  ADD KEY `idx_booking_line_booking_number` (`booking_number`),
+  ADD KEY `fk_booking_line_order` (`order_number`),
+  ADD KEY `fk_booking_line_article` (`article_code`),
+  ADD KEY `idx_booking_number_sequence_number` (`booking_number`,`sequence_number`);
+
+--
+-- Indexen voor tabel `customers`
+--
+ALTER TABLE `customers`
+  ADD PRIMARY KEY (`customer_code`);
+
+--
+-- Indexen voor tabel `delivery`
+--
+ALTER TABLE `delivery`
+  ADD PRIMARY KEY (`purchase_number`,`article_code`,`delivery_date`),
+  ADD KEY `idx_delivery_invoice_number` (`invoice_number`);
+
+--
+-- Indexen voor tabel `goods_receipt`
+--
+ALTER TABLE `goods_receipt`
+  ADD PRIMARY KEY (`receipt_id`),
+  ADD KEY `booking_number` (`booking_number`,`sequence_number`),
+  ADD KEY `idx_article_code` (`article_code`);
+
+--
+-- Indexen voor tabel `invoice`
+--
+ALTER TABLE `invoice`
+  ADD PRIMARY KEY (`invoice_number`),
+  ADD KEY `fk_invoice_booking_line` (`booking_number`,`sequence_number`);
+
+--
+-- Indexen voor tabel `orders`
+--
+ALTER TABLE `orders`
+  ADD PRIMARY KEY (`order_number`),
+  ADD KEY `fk_orders_suppliers` (`supplier_code`);
+
+--
+-- Indexen voor tabel `order_lines`
+--
+ALTER TABLE `order_lines`
+  ADD PRIMARY KEY (`order_number`,`article_code`),
+  ADD KEY `idx_order_lines_article_code` (`article_code`);
+
+--
+-- Indexen voor tabel `purchases`
+--
+ALTER TABLE `purchases`
+  ADD PRIMARY KEY (`purchase_number`),
+  ADD KEY `fk_purchases_customers` (`customer_code`);
+
+--
+-- Indexen voor tabel `purchase_line`
+--
+ALTER TABLE `purchase_line`
+  ADD PRIMARY KEY (`purchase_number`,`article_code`),
+  ADD KEY `idx_purchase_line_article_code` (`article_code`);
+
+--
+-- Indexen voor tabel `quotations`
+--
+ALTER TABLE `quotations`
+  ADD PRIMARY KEY (`quotation_id`),
+  ADD KEY `fk_quotations_article` (`article_code`);
+
+--
+-- Indexen voor tabel `sports_articles`
+--
+ALTER TABLE `sports_articles`
+  ADD PRIMARY KEY (`article_code`),
+  ADD KEY `fk_sports_articles_vat` (`VAT_type`);
+
+--
+-- Indexen voor tabel `suppliers`
+--
+ALTER TABLE `suppliers`
+  ADD PRIMARY KEY (`supplier_code`);
+
+--
+-- Indexen voor tabel `vat`
+--
+ALTER TABLE `vat`
+  ADD PRIMARY KEY (`type`);
+
+--
+-- Indexen voor tabel `vat_percentage`
+--
+ALTER TABLE `vat_percentage`
+  ADD PRIMARY KEY (`type`,`from_date`);
+
+--
+-- AUTO_INCREMENT voor geëxporteerde tabellen
+--
+
+--
+-- AUTO_INCREMENT voor een tabel `booking`
+--
+ALTER TABLE `booking`
+  MODIFY `booking_number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+
+--
+-- AUTO_INCREMENT voor een tabel `goods_receipt`
+--
+ALTER TABLE `goods_receipt`
+  MODIFY `receipt_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=184;
+
+--
+-- AUTO_INCREMENT voor een tabel `invoice`
+--
+ALTER TABLE `invoice`
+  MODIFY `invoice_number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT voor een tabel `orders`
+--
+ALTER TABLE `orders`
+  MODIFY `order_number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=205;
+
+--
+-- AUTO_INCREMENT voor een tabel `quotations`
+--
+ALTER TABLE `quotations`
+  MODIFY `quotation_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=217;
 
 --
 -- Beperkingen voor geëxporteerde tabellen

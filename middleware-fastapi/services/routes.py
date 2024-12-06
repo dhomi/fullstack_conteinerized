@@ -1,4 +1,5 @@
-from fastapi import FastAPI, HTTPException, Request, Depends
+from datetime import datetime
+from fastapi import FastAPI, HTTPException, Request, Depends, status
 from fastapi.security import OAuth2PasswordBearer
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
@@ -7,12 +8,14 @@ from models.orderdetails import BestellingBase, BestellingDetail, BestellingDeta
 from models.deliverydetails import SuccessfulDelivery, SuccessfulDeliveryBase
 from models.sportarticlesDetails import SportsArticle
 from models.goodsReceiptModel import GoodsReceiptBase
+from models.inventoryModel import InventoryOverview
 from utils.db import DatabaseConnection
 from services.leveranciers import Leveranciers
 from services.bestellingen import Bestellingen
 from services.sportArtikelen import SportsArticlesService
 from services.delivery import Delivery
 from services.goodsReceipts import GoodsReceipts
+from services.inventory import Inventory
 from pydantic import BaseModel
 import uvicorn
 from loguru import logger
@@ -100,10 +103,10 @@ class routes:
             if not result:
                 raise_http_exception(404, "Supplier not found")
             return {
-                "suppliercode": result[0][0],
-                "suppliername": result[0][1],
+                "supplier_code": result[0][0],
+                "supplier_name": result[0][1],
                 "address": result[0][2],
-                "residence": result[0][3]
+                "city": result[0][3]
             }
         except Exception as e:
             logger.exception("Failed to retrieve supplier")
@@ -115,7 +118,7 @@ class routes:
             db = DatabaseConnection()
             lev = Leveranciers(db)
             # Pass individual attributes from the LeverancierCreate model to add_lev
-            result = lev.add_lev(leverancier.levnaam, leverancier.adres, leverancier.woonplaats)
+            result = lev.add_lev(leverancier.supplier_code, leverancier.supplier_name, leverancier.address, leverancier.city)
             if "error" in result:
                 raise_http_exception(400, result["error"])
             return result
@@ -125,15 +128,15 @@ class routes:
 
 
     @app.put("/suppliers/{suppliercode}", tags=["suppliers"])
-    async def update_leverancier(suppliercode: str, leverancier: LeverancierBase, db: DatabaseConnection = Depends(get_db)):
+    async def update_leverancier(supplier_code: str, leverancier: LeverancierBase, db: DatabaseConnection = Depends(get_db)):
         try:
             lev = Leveranciers(db)
             # Pass individual attributes
             result = lev.update_lev(
-                suppliercode, 
-                leverancier.levnaam, 
-                leverancier.adres, 
-                leverancier.woonplaats
+                supplier_code, 
+                leverancier.supplier_name, 
+                leverancier.address, 
+                leverancier.city
             )
             if "error" in result:
                 raise_http_exception(400, result["error"])
@@ -162,7 +165,7 @@ class routes:
             if not result:
                 raise_http_exception(404, "Orders not found")
             return [
-                {"ordernr": r[0], "suppliercode": r[1], "orderdate": r[2], "deliverydate": r[3], "price": r[4], "status": r[5]}
+                {"ordernr": r[0], "suppliercode": r[1], "orderdate": r[2], "deliverydate": r[3], "price": r[4], "status": r[6]}
                 for r in result
             ]
         except Exception as e:
@@ -173,16 +176,44 @@ class routes:
     async def get_bestelling(suppliercode: int, db: DatabaseConnection = Depends(get_db)):
         try:
             bestellingen = Bestellingen(db)
-            result = bestellingen.get_order(suppliercode)
+            results = bestellingen.get_order(suppliercode)  # Assuming this returns a list of orders
+    
+            if not results:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Orders not found")
+    
+            orders = [
+                {
+                    "order_number": row[0],
+                    "supplier_code": row[1],
+                    "order_date": row[2],
+                    "delivery_date": row[3],
+                    "amount": row[4],
+                    "status": row[6]
+                }
+                for row in results
+            ]
+    
+            return orders
+    
+        except Exception as e:
+            logger.exception("Failed to retrieve orders")
+            raise HTTPException(status_code=500, detail="Failed to retrieve orders")
+
+    
+    @app.get("/trackorder/{order_number}", tags=["trackorder"])
+    async def track_orders(order_number: int, db: DatabaseConnection = Depends(get_db)):
+        try:
+            bestellingen = Bestellingen(db)
+            result = bestellingen.track_order(order_number)
             if not result:
-                raise_http_exception(404, "Order not found")
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Order not found")
             return {
-                "ordernr": result[0][0],
-                "suppliercode": result[0][1],
-                "orderdate": result[0][2],
-                "deliverydate": result[0][3],
+                "order_number": result[0][0],
+                "supplier_code": result[0][1],
+                "order_date": result[0][2],
+                "delivery_date": result[0][3],
                 "amount": result[0][4],
-                "status": result[0][5]
+                "status": result[0][6]
             }
         except Exception as e:
             logger.exception("Failed to retrieve order")
@@ -191,17 +222,35 @@ class routes:
     @app.post("/orders/", tags=["orders"])
     async def create_bestelling(bestelling: BestellingDetailCreate, db: DatabaseConnection = Depends(get_db)):
         try:
+        # Convert the dates to correct format if they aren't
+            try:
+                order_date = datetime.strptime(bestelling.order_date, '%Y-%m-%d').strftime('%Y-%m-%d')
+                delivery_date = datetime.strptime(bestelling.delivery_date, '%Y-%m-%d').strftime('%Y-%m-%d')
+            except ValueError as ve:
+                raise HTTPException(status_code=400, detail="Incorrect date format. Use 'YYYY-MM-DD'.")
+
             best = Bestellingen(db)
-            result = best.add_neworders(
-                bestelling.suppliercode, bestelling.artcode, bestelling.amount,
-                bestelling.orderprice, bestelling.orderdate, bestelling.deliverydate, bestelling.price, bestelling.status
-            )
+            
+            # Preparing the data with new attributes
+            bestelling_data = {
+                "order_number": bestelling.order_number,
+                "supplier_code": bestelling.supplier_code,
+                "amount": bestelling.amount,
+                "order_date": order_date,
+                "delivery_date": delivery_date,
+                "status": bestelling.status
+            }
+
+            # Adding the new order to the database
+            result = best.add_neworders(**bestelling_data)
+
             if "error" in result:
-                raise_http_exception(400, result["error"])
-            return result
+                raise HTTPException(status_code=400, detail=result["error"])
+            return {"message": "Order created successfully"}
+
         except Exception as e:
             logger.exception("Failed to create bestelling")
-            raise_http_exception(500, "Failed to create bestelling")
+            raise HTTPException(status_code=500, detail="Failed to create bestelling")
 
     @app.put("/orders/{ordernr}", tags=["orders"])
     async def update_bestelling(ordernr: str, bestelling: BestellingBase, db: DatabaseConnection = Depends(get_db)):
@@ -209,9 +258,9 @@ class routes:
             best = Bestellingen(db)
             result = best.update_orders(
                 ordernr,
-                bestelling.suppliercode,
-                bestelling.orderdate,
-                bestelling.deliverydate,
+                bestelling.supplier_code,
+                bestelling.order_date,
+                bestelling.delivery_date,
                 bestelling.amount,
                 bestelling.status
             )
@@ -379,21 +428,24 @@ class routes:
         try:
             goodsReceipts = GoodsReceipts(db)
             results = goodsReceipts.get_goodsReceipts()
-            # goodreceiptDetails = [
-            #     GoodReceiptBase(
-            #         order_number=result[0],
-            #         article_code=result[1],
-            #         quantity=result[2],
-            #         order_price=result[3]
-            #     )
-            #     for result in results
-            # ]
             if "error" in results:
                 raise_http_exception(400, results["error"])
             return [{"receipt_id": r[0], "order_number": r[1], "article_code": r[2], "receipt_date": r[3], "receipt_quantity": r[4], "status": r[5], "booking_number": r[6], "sequence_number": r[7]} for r in results]
         except Exception as e:
             logger.exception("Failed to retrieve good receipts")
             raise_http_exception(500, "Failed to retrieve good receipts")
+
+    @app.get("/inventory", tags=["inventory"])
+    async def get_inventory(db: DatabaseConnection = Depends(get_db)):
+        try:
+            invent = Inventory(db)
+            results = invent.get_inventory_from_db()
+            if "error" in results:
+                raise_http_exception(400, results["error"])
+            return [{"article_code": r[0], "article_name":r[1],"category":r[2],"size":r[3],"color":r[4],"price":r[5],"stock_quantity":r[6],"stock_min":r[7],"incoming_stock":r[8],"reserved_stock":r[9],"status":r[10]} for r in results]
+        except Exception as e:
+            logger.exception("Failed to retrieve inventory")
+            raise_http_exception(500, "Failed to retrieve inventory")
 
     @app.get("/")
     async def root():

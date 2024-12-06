@@ -25,7 +25,7 @@
         <tbody>
             {% for order in orders %}
                 <tr>
-                    <td><a href="{{ order.ordernr }}">{{ order.ordernr }}</a></td>
+                    <td><a href="/ordermanagement/orders/{{ order.ordernr }}">{{ order.ordernr }}</a></td>
                     <td><a href="/suppliers/{{ order.suppliercode }}">{{ order.suppliercode }}</a></td>
                     <td>{{ order.orderdate }}</td>
                     <td>{{ order.deliverydate }}</td>

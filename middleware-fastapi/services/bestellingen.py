@@ -9,22 +9,46 @@ class Bestellingen:
         result = cursor.fetchall()
         return result
 
-    def get_order(self, key):
+    def get_order(self, suppliercode: int):
+        try:
+            cursor = self.db.get_cursor()
+            query = """
+                SELECT order_number, supplier_code, order_date, delivery_date, amount, status, status_description
+                FROM orders
+                WHERE supplier_code = %s
+            """
+            # self.db.cursor.execute(query, (suppliercode,))
+            # return self.db.cursor.fetchall()  # Fetch all matching rows
+            cursor.execute(query, (suppliercode,))
+            result = cursor.fetchall()
+            return result      
+        except Exception as e:
+            logger.exception("Error fetching orders for supplier code")
+            return []
+    
+    def track_order(self, key):
         cursor = self.db.get_cursor()
         query = "SELECT * FROM QAsportarticles.orders"
-        query += " where supplier_code = " + str(key) 
-        query += " order by order_number"
+        query += " where order_number = " + str(key) 
         cursor.execute(query)
         result = cursor.fetchall()
         return result
     
-    def add_neworders(self, levcode: int, besteldat: str, leverdat: str, bedrag: float, status: str):
-        cursor = self.db.get_cursor()
-        query = "INSERT INTO QAsportarticles.orders (supplier_code, order_date, delivery_date, amount, status) VALUES (%s, %s, %s, %s, %s)"
-        best_data = (levcode, besteldat, leverdat, bedrag, status)
-        cursor.execute(query, best_data)
-        self.db.connection.commit()
-        return {"message": "Order created successfully."} 
+    def add_neworders(self, order_number: int, supplier_code: int, order_date: str, delivery_date: str, amount: float, status: str, status_description: str):
+        try:
+            cursor = self.db.get_cursor()
+            query = """
+                INSERT INTO QAsportarticles.orders 
+                (order_number, supplier_code, order_date, delivery_date, amount, status, status_description) 
+                VALUES (%s, %s, %s, %s, %s, %s)
+            """
+            best_data = (order_number, supplier_code, order_date, delivery_date, amount, status, status_description)
+            cursor.execute(query, best_data)
+            self.db.connection.commit()
+            return {"message": "Order created successfully."}
+        except Exception as e:
+            print(f"Error adding new order: {e}")
+            raise 
 
     def update_orders(self, best_nr: int, levcode: int, besteldat: str, leverdat: str, bedrag: float, status: str):
         cursor = self.db.get_cursor()

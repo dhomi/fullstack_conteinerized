@@ -25,6 +25,8 @@ SECRET_KEY = 'django-insecure-x3my1lu5-hcc@uf8w&9-le8q=v(da!2peq^u3za%i1(szdf%kx
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+API_HOST = 'http://middleware-fastapi:8000'
+
 ALLOWED_HOSTS = []
 
 # Application definition
@@ -36,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'ordermanagement',
     'myapp',  # Make sure this is added correctly for your app
 ]
 
@@ -50,6 +53,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'myproject.urls'
+
+APPEND_SLASH = True
 
 TEMPLATES = [
     {

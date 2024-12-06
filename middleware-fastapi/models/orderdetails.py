@@ -7,6 +7,7 @@ class BestellingBase(BaseModel):
     delivery_date: str  # Overweeg datetime.date
     amount: float
     status: str
+    status_description: str
 
 class BestellingDetail(BestellingBase):
     pass
@@ -17,11 +18,14 @@ class BestellingDetailBase(BaseModel):
     quantity: int
 
 class BestellingDetailCreate(BaseModel):
+    order_number: int
     supplier_code: int
     order_date: str  # Overweeg datetime.date
     delivery_date: str  # Overweeg datetime.date
     amount: float
     status: str
+    status_description: str
+    
 
 class BestellingDetailUpdate(BestellingDetailBase):
     pass
