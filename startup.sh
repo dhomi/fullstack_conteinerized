@@ -6,12 +6,13 @@ kubectl apply -f deployment.yaml -n techlab
 kubectl -n techlab get pods
 kubectl create ns chaos-mesh
 
+#vergeet niet eerst helm zelf te installeren!
 helm repo add chaos-mesh https://charts.chaos-mesh.org
 helm install chaos-mesh chaos-mesh/chaos-mesh -n=chaos-mesh --version 2.7.0 --set dashboard.securityMode=false
 
 # todo: hier moet de terminal effe een tijd wachten totdat alles hierboven is uitgevoerd 
 # anders start de port forwarding maar de services is nog down...
-sleep 2m # Waits 5 minutes.
+sleep 2m # Waits 2 minutes.
 
 # port forwarding
 kubectl port-forward -n chaos-mesh svc/chaos-dashboard 2333:2333 &
