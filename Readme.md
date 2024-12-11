@@ -8,9 +8,19 @@ This repository is an ongoing CI/CD project with fullstack technology examples i
 Preconditions:
 - [Docker Desktop](https://docs.docker.com/desktop/install/windows-install/)
 - Kubernetes tools als [kubectl](https://kubernetes.io/docs/tasks/tools/)
-- Act is handig voor het github actions lokaal runnen: <https://nektosact.com>
-- Als je wil ontwikkelen: [NodeJS](https://nodejs.org/en/download/package-manager)
+- [Helm] (https://helm.sh/docs/intro/install/)
+- Act is handig voor het github actions lokaal runnen:[ACT] (https://nektosact.com)
 
+- Als je wil ontwikkelen: 
+  - [NodeJS](https://nodejs.org/en/download/package-manager)
+  - [Python] (https://docs.python-guide.org/starting/install3/)
+
+handig om te zien welke pods en services aan zijn in k8:  
+    kubectl get all -o wide -n techlab
+### Gebruik het startup.sh shell script
+open een git-shell terminal, of een bash. startup.sh moet executable zijn, je kan het handmatig ook doen:  chmod +x startup.sh
+dan start je het op door:  
+    ./startup.sh
 ### K8s (Kubernetes)
 - Docker desktop met Kubernetes is running
 - maak de namespace aan: kubectl create namespace techlab
