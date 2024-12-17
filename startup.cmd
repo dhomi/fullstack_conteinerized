@@ -1,22 +1,26 @@
 @echo off
 
-REM vergeet niet eerst helm zelf te installeren!
-REM https://helm.sh/docs/intro/install/
+:: Install Chocolatey if not already installed
+powershell -NoProfile -ExecutionPolicy Bypass -Command "Set-ExecutionPolicy Bypass -Scope Process; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))"
 
-REM create both namespaces
+:: Install Helm using Chocolatey
+choco install kubernetes-helm -y
+
+:: Create both namespaces
 kubectl create namespace techlab
 kubectl apply -f deployment.yaml -n techlab
 kubectl -n techlab get pods
 kubectl create ns chaos-mesh
 
+:: Add Helm repo and install/upgrade Chaos Mesh
 helm repo add chaos-mesh https://charts.chaos-mesh.org
 helm install chaos-mesh chaos-mesh/chaos-mesh -n=chaos-mesh --version 2.7.0
 helm upgrade chaos-mesh chaos-mesh/chaos-mesh -n=chaos-mesh --version 2.7.0 --set dashboard.securityMode=false
 
-REM Wacht tot de services zijn gestart
+:: Wait for 2 minutes to ensure services are up
 timeout /t 120
 
-REM port forwarding
+:: Port forwarding
 start /b kubectl port-forward -n chaos-mesh svc/chaos-dashboard 2333:2333
 start /b kubectl port-forward -n techlab svc/middleware-fastapi 8000:8000
 start /b kubectl port-forward -n techlab svc/grafana 4000:4000
