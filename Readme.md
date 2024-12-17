@@ -23,7 +23,6 @@ win, in powerShell: .\startup.cmd
   check dat startup.sh  executable is, anders handmatig zelf doen:  chmod +x startup.sh
 
 ### Chaos testing
-Start eerst het techlab en ga daarna verder om Chaos Mesh te installeren!
 dashboard is dus hier te zien: http://localhost:2333/
 
 #### chaos uitvoeren
