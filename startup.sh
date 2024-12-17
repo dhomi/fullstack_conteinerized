@@ -1,14 +1,19 @@
 #!/usr/bin/env bash
 
+# install helm first
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+chmod 700 get_helm.sh
+./get_helm.sh
+
 # create both namespaces
 kubectl create namespace techlab
 kubectl apply -f deployment.yaml -n techlab
 kubectl -n techlab get pods
 kubectl create ns chaos-mesh
 
-#vergeet niet eerst helm zelf te installeren!
 helm repo add chaos-mesh https://charts.chaos-mesh.org
-helm install chaos-mesh chaos-mesh/chaos-mesh -n=chaos-mesh --version 2.7.0 --set dashboard.securityMode=false
+helm install chaos-mesh chaos-mesh/chaos-mesh -n=chaos-mesh --version 2.7.0 &
+helm upgrade chaos-mesh chaos-mesh/chaos-mesh -n=chaos-mesh --version 2.7.0 --set dashboard.securityMode=false
 
 # todo: hier moet de terminal effe een tijd wachten totdat alles hierboven is uitgevoerd 
 # anders start de port forwarding maar de services is nog down...

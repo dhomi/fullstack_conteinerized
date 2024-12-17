@@ -1,17 +1,19 @@
 @echo off
 
+REM vergeet niet eerst helm zelf te installeren!
+REM https://helm.sh/docs/intro/install/
+
 REM create both namespaces
 kubectl create namespace techlab
 kubectl apply -f deployment.yaml -n techlab
 kubectl -n techlab get pods
 kubectl create ns chaos-mesh
 
-REM vergeet niet eerst helm zelf te installeren!
 helm repo add chaos-mesh https://charts.chaos-mesh.org
-helm install chaos-mesh chaos-mesh/chaos-mesh -n=chaos-mesh --version 2.7.0 --set dashboard.securityMode=false
+helm install chaos-mesh chaos-mesh/chaos-mesh -n=chaos-mesh --version 2.7.0
+helm upgrade chaos-mesh chaos-mesh/chaos-mesh -n=chaos-mesh --version 2.7.0 --set dashboard.securityMode=false
 
-REM todo: hier moet de terminal effe een tijd wachten totdat alles hierboven is uitgevoerd 
-REM anders start de port forwarding maar de services is nog down...
+REM Wacht tot de services zijn gestart
 timeout /t 120
 
 REM port forwarding
