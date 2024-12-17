@@ -13,10 +13,21 @@ else
 fi
 
 # Create both namespaces
-kubectl create namespace techlab
+# Check if namespace techlab exists, if not, create it
+if ! kubectl get namespace techlab; then
+  kubectl create namespace techlab
+fi
+
+# Apply the deployment in the techlab namespace
 kubectl apply -f deployment.yaml -n techlab
+
+# Get the pods in the techlab namespace
 kubectl -n techlab get pods
-kubectl create ns chaos-mesh
+
+# Check if namespace chaos-mesh exists, if not, create it
+if ! kubectl get namespace chaos-mesh; then
+  kubectl create namespace chaos-mesh
+fi
 
 # Add Helm repo and install/upgrade Chaos Mesh
 helm repo add chaos-mesh https://charts.chaos-mesh.org
