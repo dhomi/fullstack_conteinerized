@@ -7,7 +7,7 @@ This repository is an ongoing CI/CD project with fullstack technology examples i
 ## Installatie
 Preconditions:
 MAC: [Install Brew](https://docs.brew.sh/Installation)
-WINDOWS: [Install Chocolatey](https://chocolatey.org/install)
+WINDOWS: Open een powerShell venster met administrator rechten
 
 Daarna,
 
