@@ -4,46 +4,29 @@
 
 This repository is an ongoing CI/CD project with fullstack technology examples in an containerized environment. 
 
-### Installation
+## Installatie
 Preconditions:
-- [Docker Desktop](https://docs.docker.com/desktop/install/windows-install/)
-- Kubernetes tools als [kubectl](https://kubernetes.io/docs/tasks/tools/)
-- [Helm] (https://helm.sh/docs/intro/install/)
-- Act is handig voor het github actions lokaal runnen:[ACT] (https://nektosact.com)
+MAC: [Install Brew](https://docs.brew.sh/Installation)
+WINDOWS: [Install Chocolatey](https://chocolatey.org/install)
 
-- Als je wil ontwikkelen: 
-  - [NodeJS](https://nodejs.org/en/download/package-manager)
-  - [Python] (https://docs.python-guide.org/starting/install3/)
+Daarna,
 
-handig om te zien welke pods en services aan zijn in k8:  
-    kubectl get all -o wide -n techlab
-### Gebruik het startup.sh shell script
-open een git-shell terminal, of een bash. startup.sh moet executable zijn, je kan het handmatig ook doen:  chmod +x startup.sh
-dan start je het op door:  
-    ./startup.sh
-### K8s (Kubernetes)
-- Docker desktop met Kubernetes is running
-- maak de namespace aan: kubectl create namespace techlab
-- start de k8: kubectl apply -f deployment.yaml -n techlab
-- check status van pods: kubectl -n techlab get pods
+mac, in shell: ./install.sh
+win, in powerShell: .\install.cmd
 
-port forward middleware:  kubectl port-forward -n techlab svc/middleware-fastapi 8000:8000
-port forward frontend: kubectl port-forward svc/frontend-django -n techlab 8001:8001
+### Opstartan
+mac, in shell: ./startup.sh
+win, in powerShell: .\startup.cmd
+
+  voor mac:
+  Open een git-shell (of andere linux terminal)
+  check dat startup.sh  executable is, anders handmatig zelf doen:  chmod +x startup.sh
 
 ### Chaos testing
-...vanuit gaande dat de docker runt, kubernetes ook en kubectl apply is uitgevoerd...
 Start eerst het techlab en ga daarna verder om Chaos Mesh te installeren!
+dashboard is dus hier te zien: http://localhost:2333/
 
-https://chaos-mesh.org/docs/production-installation-using-helm/
-of doe: 
-- kubectl create ns chaos-mesh
-- helm install chaos-mesh chaos-mesh/chaos-mesh -n=chaos-mesh --version 2.7.0
-- helm upgrade chaos-mesh chaos-mesh/chaos-mesh -n=chaos-mesh --version 2.7.0 --set dashboard.securityMode=false
-
-kubectl port-forward -n chaos-mesh svc/chaos-dashboard 2333:2333
-
-dashboard is dus hier te zien: http://127.0.0.1:2333/
-
+#### chaos uitvoeren
 via UI/dashboard: Selecteer de techlab namespace, en de grafana app. 
 Maak een experiment door POD KIlL en Submit deze allemaal 
 
@@ -53,6 +36,15 @@ cd chaos/
 kubectl apply -f ./kill_grafana_pod.yaml
 
 check de grafana pod in de docker ui. hij moet exited zijn, en binnen enkele seconden een nieuwe pod is running.
+
+#### manuele installatie en opstartprocedure:
+https://chaos-mesh.org/docs/production-installation-using-helm/
+of doe: 
+- kubectl create ns chaos-mesh
+- helm install chaos-mesh chaos-mesh/chaos-mesh -n=chaos-mesh --version 2.7.0
+- helm upgrade chaos-mesh chaos-mesh/chaos-mesh -n=chaos-mesh --version 2.7.0 --set dashboard.securityMode=false
+
+kubectl port-forward -n chaos-mesh svc/chaos-dashboard 2333:2333
 
 ### Monitor
 Grafana is a monitoring tool at http://localhost:4000

@@ -1,18 +1,5 @@
 @echo off
 
-REM Check if Helm is installed
-helm version >nul 2>&1
-IF %ERRORLEVEL% NEQ 0 (
-    REM Helm is not installed, proceed with installation
-
-    REM Install Chocolatey if not already installed
-    powershell -NoProfile -ExecutionPolicy Bypass -Command "Set-ExecutionPolicy Bypass -Scope Process; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))"
-
-    REM Install Helm using Chocolatey
-    choco install kubernetes-helm -y
-) ELSE (
-    echo Helm is already installed.
-)
 
 REM Create both namespaces
 REM Check if namespace techlab exists, if not, create it
