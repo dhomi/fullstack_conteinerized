@@ -7,6 +7,7 @@ This repository is an ongoing CI/CD project with fullstack technology examples i
 ## Installatie
 Preconditions:
 MAC: [Install Brew](https://docs.brew.sh/Installation)
+
 WINDOWS: Open een powerShell venster met administrator rechten
 ![powerShellScreenshot](image.png)
 
