@@ -9,21 +9,27 @@ Preconditions:
 
 MAC: [Install Brew](https://docs.brew.sh/Installation)
 
-WINDOWS: Open een powerShell venster met administrator rechten
+WINDOWS: installeer Git (https://git-scm.com/downloads)
+GIT Gui starten -> Clone Existing Repository ->
+Source Location: https://github.com/dhomi/fullstack_conteinerized.git
+Target Directory: c:\[..]\Techlab 
+->Clone
+
+Open een powerShell venster met administrator rechten
 ![powerShellScreenshot](image.png)
 
 
 Daarna,
 
-mac, in shell: ./install.sh
+MAC: in shell: ./install.sh
 
-win, in powerShell: .\install.cmd
+Windows: in powerShell (met admin rechten): .\install.cmd
 
 ### Opstartan
-mac, in shell: ./startup.sh
-win, in powerShell: .\startup.cmd
+MAC: in shell: ./startup.sh
+Windows: in powerShell (met admin rechten): .\startup.cmd
 
-  voor mac:
+  voor MAC:
   Open een git-shell (of andere linux terminal)
   check dat startup.sh  executable is, anders handmatig zelf doen:  chmod +x startup.sh
 
@@ -57,8 +63,9 @@ Grafana is a monitoring tool at http://localhost:4000
 - Grafana gets data from InfluxDB:8086, and Influx gets data every few seconds from Telegram scraper (on backend number)
 
 ### Fetch Local IP address
-```ipconfig | grep IPv4 | awk 'END{print}'```  
 
+MAC: ```ipconfig | grep IPv4 | awk 'END{print}'```  
+Windows: gitbash  
 
 ### View the Front- and Backend 
 - Frontend is located at http://localhost:3000/
