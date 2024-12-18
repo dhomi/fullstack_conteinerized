@@ -50,7 +50,15 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-]
+
+    # Custom middleware
+    'myapp.middleware.auth_middleware.AuthenticationMiddleware',  # Correct path to middleware
+] 
+
+SESSION_ENGINE = "django.contrib.sessions.backends.db"  # Store session data in the database
+SESSION_COOKIE_AGE = 1209600  # Session expires in 2 weeks (14 days)
+SESSION_SAVE_EVERY_REQUEST = True  # Save session data on every request
+
 
 ROOT_URLCONF = 'myproject.urls'
 

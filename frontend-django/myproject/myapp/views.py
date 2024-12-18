@@ -1,15 +1,29 @@
 import requests
 import json
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.messages import get_messages
+from django.contrib.auth import logout
+from django.conf import settings
+from django.http import HttpResponseNotFound
+from .utils import login_required 
+
 
 #todo create ini file for hostname
 
 def homepage(request):
     return render(request, 'homepage.html')
 
+@login_required
 def suppliers(request):
+    token = request.session.get("access_token")
+    if not token:
+        messages.error(request, "You need to log in to view this page.")
+        return redirect("login")
+
+    headers = {"Authorization": f"Bearer {token}"}
     try:
-        response = requests.get('http://middleware-fastapi:8000/suppliers')
+        response = requests.get('http://middleware-fastapi:8000/suppliers', headers=headers)
         suppliers = response.json()
         print(suppliers)
         if response.status_code == 404:
@@ -20,11 +34,18 @@ def suppliers(request):
     except KeyError:
         return render(request, 'error.html', {'message': suppliers['error']})
 
+@login_required
 def supplierdetail(request, suppliercode):
+    token = request.session.get("access_token")
+    if not token:
+        messages.error(request, "You need to log in to view this page.")
+        return redirect("login")
+
+    headers = {"Authorization": f"Bearer {token}"}
     try:
         # Fetch supplier details from FastAPI middleware
-        response1 = requests.get(f'http://middleware-fastapi:8000/suppliers/{suppliercode}')
-        response2 = requests.get(f"http://middleware-fastapi:8000/orders/{suppliercode}")
+        response1 = requests.get(f"http://middleware-fastapi:8000/suppliers/{suppliercode}", headers=headers)
+        response2 = requests.get(f"http://middleware-fastapi:8000/orders/{suppliercode}", headers=headers)
 
         # Handle supplier not found
         if response1.status_code == 404:
@@ -79,17 +100,20 @@ def supplierdetail(request, suppliercode):
 #     print(orderdetails) 
 #     return render(request, 'orderdetails.html', {'orderdetails': orderdetails})
 
-import requests
-from django.shortcuts import render
-from django.http import HttpResponseNotFound
-
+@login_required
 def sportartikeldetails(request, artcode):
     """
     Fetch and display details of a specific sporting article based on its article code.
     """
+    token = request.session.get("access_token")
+    if not token:
+        messages.error(request, "You need to log in to view this page.")
+        return redirect("login")
+
+    headers = {"Authorization": f"Bearer {token}"}
     try:
         # Fetch article details from the middleware
-        response = requests.get(f'http://middleware-fastapi:8000/sports_articles/{artcode}', timeout=5)
+        response = requests.get(f'http://middleware-fastapi:8000/sports_articles/{artcode}', headers=headers,timeout=5)
         
         if response.status_code == 404:
             return HttpResponseNotFound("Sporting article not found.")
@@ -113,13 +137,20 @@ def sportartikeldetails(request, artcode):
     except Exception as e:
         return render(request, 'error.html', {'message': f"An unexpected error occurred: {str(e)}"})
 
+@login_required
 def sportartikelen(request):
     """
     Fetch and display a list of all sporting articles.
     """
+    token = request.session.get("access_token")
+    if not token:
+        messages.error(request, "You need to log in to view this page.")
+        return redirect("login")
+
+    headers = {"Authorization": f"Bearer {token}"}
     try:
         # Fetch list of articles from the middleware
-        response = requests.get(f"http://middleware-fastapi:8000/sports_articles/", timeout=5)
+        response = requests.get(f"http://middleware-fastapi:8000/sports_articles/", headers=headers,timeout=5)
         if response.status_code != 200:
             return render(request, 'error.html', {'message': 'An error occurred while retrieving the articles list.'})
         
@@ -142,21 +173,36 @@ def sportartikelen(request):
         # Catch-all for other exceptions
         return render(request, 'error.html', {'message': f"An unexpected error occurred: {str(e)}"})
 
+@login_required
 def orderdetailsArt(request, artcode):
+    token = request.session.get("access_token")
+    if not token:
+        messages.error(request, "You need to log in to view this page.")
+        return redirect("login")
+
+    headers = {"Authorization": f"Bearer {token}"}
     try:
-        response = requests.get(f"http://middleware-fastapi:8000/orderdetailsArt/{artcode}")
+        response = requests.get(f"http://middleware-fastapi:8000/orderdetailsArt/{artcode}", headers=headers)
         orderdetails = response.json()
         getOrderNr = orderdetails[0]['ordernr']
-        response = requests.get(f'http://middleware-fastapi:8000/orderdetails/{getOrderNr}')
+        response = requests.get(f"http://middleware-fastapi:8000/orderdetails/{getOrderNr}", headers=headers)
         orderdetails = response.json()
    
         return render(request, 'orderdetails.html', {'orderdetails': orderdetails})
     except KeyError:
         return render(request, 'error.html', {'message': orderdetails['error']})
-    
+
+@login_required
 def inventory(request):
+    token = request.session.get("access_token")
+    if not token:
+        messages.error(request, "You need to log in to view this page.")
+        return redirect("login")
+
+    headers = {"Authorization": f"Bearer {token}"}
+    print(request.session.get("access_token"))
     try:
-        response = requests.get(f"http://middleware-fastapi:8000/inventory")
+        response = requests.get(f"http://middleware-fastapi:8000/inventory", headers=headers)
         inventoryDetails = response.json()
         return render(request, 'inventory.html', {'inventory': inventoryDetails})
     except KeyError:
@@ -164,3 +210,91 @@ def inventory(request):
 
 def login_under_construction(request):
     return render(request, 'under_construction.html')
+
+def login_view(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        response = requests.post(
+            "http://middleware-fastapi:8000/users/login",
+            data={"username": username, "password": password},
+        )
+
+        if response.status_code == 200:
+            token = response.json().get("access_token")
+            request.session["access_token"] = token
+            print(f"Session set: {request.session['access_token']}")
+            messages.success(request, "Login successful!")
+            return redirect("/")  # Redirect to homepage
+        else:
+            messages.error(request, "Invalid username or password")
+            return redirect("login")
+
+    # Consume any leftover messages to ensure they don't persist
+    storage = get_messages(request)
+    for _ in storage:  # This will mark messages as read
+        pass
+
+    return render(request, "login.html")
+
+@login_required
+def secure_view(request):
+    token = request.session.get("access_token")
+    print("Secure view token:", token)  # Debugging print statement
+
+    if not token:
+        return redirect("login")  # This should not trigger if the token exists
+
+    headers = {"Authorization": f"Bearer {token}"}
+    try:
+        response = requests.get(
+            "http://middleware-fastapi:8000/secure-data", headers=headers, timeout=10
+        )
+        if response.status_code == 200:
+            data = response.json()
+            return render(request, "secure_view.html", {"data": data})
+        elif response.status_code == 401:
+            messages.error(request, "Session expired. Please log in again.")
+            del request.session["access_token"]
+            return redirect("login")
+        else:
+            messages.error(request, "An error occurred.")
+            return redirect("login")
+    except requests.exceptions.RequestException as e:
+        messages.error(request, "Unable to connect to the server.")
+        return redirect("login")
+
+def logout_view(request):
+    request.session.flush()  # Clear session data
+    messages.success(request, "You have successfully logged out.")
+    return redirect("/")
+
+def register_view(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+        confirm_password = request.POST.get("confirm_password")
+
+        if password != confirm_password:
+            messages.error(request, "Passwords do not match")
+            return redirect("register")
+
+        response = requests.post(
+            "http://middleware-fastapi:8000/users/register",
+            json={"username": username, "email": email, "password": password},
+        )
+
+        if response.status_code == 200:
+            messages.success(request, "Registration successful! Please login.")
+            return redirect("login")
+        else:
+            messages.error(request, response.json().get("detail", "Registration failed"))
+            return redirect("register")
+
+    return render(request, "register.html")
+
+# def home_page(request):
+#     if request.session.get("access_token"):
+#         return render(request, "homepage_logged_in.html")
+#     return render(request, "homepage.html")

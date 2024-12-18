@@ -15,5 +15,10 @@ urlpatterns = [
     path('inventory/', views.inventory, name='inventory'),
     path('ordermanagement/', include('ordermanagement.urls')),
     path('favicon.ico', RedirectView.as_view(url=staticfiles_storage.url('favicon/favicon.ico'))),
-    path('login/', views.login_under_construction, name='login'),
+    # path('login/', views.login_under_construction, name='login'),
+    path("login/", views.login_view, name="login"),
+    path("logout/", views.logout_view, name="logout"),
+    path("secure-page/", views.secure_view, name="secure_page"),
+    path("register/", views.register_view, name="register"),
+    # path('', views.home_page, name='homePage'), 
 ]

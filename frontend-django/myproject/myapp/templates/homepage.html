@@ -8,10 +8,10 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Montserrat">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <style>
-    /* Overall Page Styling */
+    /* Page Styling */
     body {
       font-family: "Roboto", sans-serif;
-      color: #333333;
+      color: #333;
       background-color: #f5f5f7;
       margin: 0;
       display: flex;
@@ -19,110 +19,113 @@
       min-height: 100vh;
     }
 
-    /* Top bar styling */
+    /* Top Bar Styling */
     .top-bar {
-      width: calc(100% - 250px); /* Adjust for sidebar width */
+      width: calc(100% - 250px);
       height: 50px;
       background-color: #2b5876;
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-end;
       align-items: center;
       color: white;
       padding: 0 20px;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
       position: fixed;
-      left: 250px; /* Start after the sidebar */
+      left: 250px;
       z-index: 1000;
     }
 
-    .top-bar .login-button {
+    .top-bar button {
       background-color: #5b798e;
       color: white;
       border: none;
-      padding: 10px 20px;
+      padding: 8px 15px;
       border-radius: 5px;
       cursor: pointer;
       font-family: "Roboto", sans-serif;
+      margin-left: 10px;
     }
 
-    .top-bar .login-button:hover {
+    .top-bar button:hover {
       background-color: #3d5973;
     }
 
     /* Sidebar Styling */
     .w3-sidebar {
       background-color: #2b5876;
-      color: #ffffff;
+      color: white;
       width: 250px;
       position: fixed;
       top: 0;
       left: 0;
       height: 100%;
       overflow-x: hidden;
+      padding-top: 20px;
     }
 
     .w3-sidebar a {
-      color: #ffffff;
-      padding: 14px 16px;
-      display: block;
+      color: white;
+      padding: 10px 16px;
       text-decoration: none;
       font-size: 17px;
-      font-family: "Montserrat", sans-serif;
+      display: block;
     }
 
     .w3-sidebar a:hover {
       background-color: #5b798e;
-      color: #ffffff;
     }
 
-    /* Main Content Area */
+    /* Main Content Styling */
     .content-wrapper {
-        margin-left: 250px; /* Sidebar width */
-        margin-top: 70px; /* Adjust for the height of the top bar */
-        padding: 20px;
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: center; /* Center content horizontally */
-        background-color: white;
-        box-sizing: border-box;
+      margin-left: 250px;
+      margin-top: 40px;
+      padding: 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     .image-container {
-        width: 80%; /* Adjust image container width */
-        background-color: white;
-        padding: 20px; /* White space around the image */
-        border-radius: 10px;
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-        display: flex; /* Flexbox for the container */
-        align-items: center; /* Center image vertically */
-        justify-content: center; /* Center image horizontally */
-        margin-bottom: 20px; /* Add space below the image */
+      width: 70%;
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
     }
 
     .image-container img {
-        max-width: 100%;
-        height: auto;
-        display: block;
+      max-width: 100%;
+      height: auto;
+      border-radius: 5px;
     }
-
     .table-container {
-        width: 100%;
-    }
+  width: 100%;
+  
+  margin-top: 0; /* Ensure no margin at the top */
+  padding-top: 0;
+}
+    /* Footer Styling */
+.footer {
+  background-color: #2b5876;
+  color: white;
+  text-align: right;
+  padding: 5px 20px; /* Add left padding to align with content */
+  width: calc(100% - 250px); /* Adjust width to match content area */
+  margin-left: 250px; /* Align with sidebar content */
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  font-family: "Roboto", sans-serif;
+  font-size: 12px;
+  box-sizing: border-box;
+}
 
-    /* Full-width Footer Styling */
-    .footer {
-      background-color: #2b5876;
-      color: white;
-      text-align: center;
-      padding: 10px;
-      width: calc(100% - 250px); /* Full width minus sidebar width */
-      left: 250px;
-      position: relative; /* Ensure it stays below content */
-      font-family: "Roboto", sans-serif;
-    }
 
-    /* Responsive Sidebar */
+    /* Responsive Design */
     @media (max-width: 768px) {
       .w3-sidebar {
         width: 100%;
@@ -131,7 +134,7 @@
       }
       .content-wrapper {
         margin-left: 0;
-        margin-top: 70px; /* Adjust for the height of the top bar */
+        margin-top: 40px;
       }
       .footer {
         width: 100%;
@@ -147,72 +150,69 @@
 
 <body>
 
-  <!-- Sidebar/menu -->
-  <nav class="w3-sidebar w3-bar-block" id="mySidebar">
-    <div class="w3-container w3-padding-16">
-      <i onclick="w3_close()" class="fa fa-remove w3-hide-large w3-button w3-display-topright"></i>
-      <div class="logo-container" style="text-align: center; margin-bottom: 20px;">
+  <!-- Sidebar -->
+  <nav class="w3-sidebar w3-bar-block">
+    <div class="w3-container">
+      <div style="text-align: center; margin-bottom: 20px;">
         {% load static %}
-        <img src="{% static 'qa-logo.png' %}" alt="Logo" style="width:100px;">
+        <img src="{% static 'qa-logo.png' %}" alt="QA Techlab Logo" style="width: 100px;">
       </div>
-      <h3 class="w3-wide"><b>QA - Techlab</b></h3>
+      <h3>QA - Techlab</h3>
     </div>
-    <div class="w3-padding-64 w3-large">
-      <a href="/" class="w3-bar-item w3-button">Home</a>
-      <a onclick="myAccFunc()" href="javascript:void(0)" class="w3-button w3-block w3-left-align" id="myBtn">Backoffice Administration<i class="fa fa-caret-down"></i></a>
-        <div id="demoAcc" class="w3-bar-block w3-hide w3-padding-large w3-medium">
-          <a href="/inventory" class="w3-bar-item w3-button">Inventory Management</a>
-          <a onclick="orderMgmtFunc()" href="javascript:void(0)" class="w3-button w3-block w3-left-align" id="orderMgmtBtn">Order Management<i class="fa fa-caret-down"></i></a>
-          <div id="orderMgmtAcc" class="w3-bar-block w3-hide w3-padding-large w3-medium">
-            <a href="/ordermanagement/orders" class="w3-bar-item w3-button">Orders Overview</a>
-            <a href="/ordermanagement/create" class="w3-bar-item w3-button">Create New Order</a>
-            <a href="/ordermanagement/track" class="w3-bar-item w3-button">Track Orders</a>
-          </div>
-          <a href="/suppliers" class="w3-bar-item w3-button">Suppliers</a>
-          <a href="/sports_articles" class="w3-bar-item w3-button">All Sporting Goods</a>
-          <a href="/sports_articles/add" class="w3-bar-item w3-button">Add New Product</a>
-        </div>
+    <a href="/" class="w3-bar-item w3-button">Home</a>
+    <a onclick="toggleDropdown('backofficeDropdown')" href="javascript:void(0)" class="w3-bar-item w3-button">Backoffice Administration <i class="fa fa-caret-down"></i></a>
+    <div id="backofficeDropdown" class="w3-hide">
+      <a href="/inventory" class="w3-bar-item w3-button">Inventory Management</a>
+      <a onclick="toggleDropdown('orderMgmtDropdown')" href="javascript:void(0)" class="w3-bar-item w3-button">Order Management <i class="fa fa-caret-down"></i></a>
+      <div id="orderMgmtDropdown" class="w3-hide">
+        <a href="/ordermanagement/orders" class="w3-bar-item w3-button">Orders Overview</a>
+        <a href="/ordermanagement/create" class="w3-bar-item w3-button">Create New Order</a>
+        <a href="/ordermanagement/track" class="w3-bar-item w3-button">Track Orders</a>
+      </div>
+      <a href="/suppliers" class="w3-bar-item w3-button">Suppliers</a>
+    </div>
+    <a onclick="toggleDropdown('sportsGoodsDropdown')" href="javascript:void(0)" class="w3-bar-item w3-button">Sporting Goods <i class="fa fa-caret-down"></i></a>
+    <div id="sportsGoodsDropdown" class="w3-hide">
+      <a href="/sports_articles" class="w3-bar-item w3-button">All Sporting Goods</a>
+      <a href="/sports_articles/add" class="w3-bar-item w3-button">Add Sporting Goods</a>
     </div>
   </nav>
 
-  <!-- Top bar -->
+  <!-- Top Bar -->
   <div class="top-bar">
-    <div></div>
-    <button class="login-button" onclick="window.location.href='/login';">Login</button>
+    {% if request.session.access_token %}
+      <button onclick="window.location.href='/logout/';">Logout</button>
+    {% else %}
+      <button onclick="window.location.href='/login/';">Login</button>
+      <button onclick="window.location.href='/register/';">Register</button>
+    {% endif %}
   </div>
 
+  <!-- Main Content -->
   <div class="content-wrapper">
     {% if request.path == '/' %}
-        <div class="image-container">
-            <img src="{% static 'QA-techlab_dall-e.webp' %}" alt="QA-Techlab Home Image">
-        </div>
+      <div class="image-container">
+        <img src="{% static 'QA-techlab_dall-e.webp' %}" alt="QA-Techlab Home">
+      </div>
     {% endif %}
-    <div class="table-container">
-        {% block content %}{% endblock %}
+    <div>
+      {% block content %}{% endblock %}
     </div>
-</div>
+  </div>
 
-  <!-- Full-width Footer -->
+  <!-- Footer -->
   <footer class="footer">
-    <p>Made by David Winckler</p>
+    <p>Copyright © Techlab - Quality Accelerators</p>
+
   </footer>
 
   <script>
-    function myAccFunc() {
-      var x = document.getElementById("demoAcc");
-      if (x.className.indexOf("w3-show") == -1) {
-        x.className += " w3-show";
+    function toggleDropdown(id) {
+      var element = document.getElementById(id);
+      if (element.classList.contains("w3-show")) {
+        element.classList.remove("w3-show");
       } else {
-        x.className = x.className.replace(" w3-show", "");
-      }
-    }
-
-    function orderMgmtFunc() {
-      var x = document.getElementById("orderMgmtAcc");
-      if (x.className.indexOf("w3-show") == -1) {
-        x.className += " w3-show";
-      } else {
-        x.className = x.className.replace(" w3-show", "");
+        element.classList.add("w3-show");
       }
     }
   </script>

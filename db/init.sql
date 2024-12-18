@@ -1295,6 +1295,27 @@ INSERT INTO `vat_percentage` (`type`, `from_date`, `to_date`, `percent`) VALUES
 -- Indexen voor geëxporteerde tabellen
 --
 
+DROP TABLE IF EXISTS `users`;
+CREATE TABLE IF NOT EXISTS `users` (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `username` varchar(50) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `password_hash` varchar(255) NOT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `username` (`username`),
+  UNIQUE KEY `email` (`email`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+--
+-- Gegevens worden geëxporteerd voor tabel `users`
+--
+
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `created_at`) VALUES
+(1, 'Simi', 'user@example.com', '$2b$12$Ve4/BETQHT3lFClFYTMIHOBvDG897b1fkqYL2nFaDdFN83DYxTPXC', '2024-12-10 21:23:17'),
+(2, 'QA-techlab', 'QA-techlab@qualityaccelerators.nl', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2024-12-18 09:53:25');
+COMMIT;
+
 --
 -- Indexen voor tabel `booking`
 --

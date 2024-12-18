@@ -1,29 +1,47 @@
 from datetime import datetime
-from fastapi import FastAPI, HTTPException, Request, Depends, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi import FastAPI, HTTPException, Request, Depends, status, APIRouter
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.responses import HTMLResponse
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
+from starlette.middleware.base import BaseHTTPMiddleware
 from models.supplierdetails import LeverancierBase, LeverancierDetail, LeverancierCreate
 from models.orderdetails import BestellingBase, BestellingDetail, BestellingDetailBase, BestellingDetailCreate, BestellingDetailUpdate, BestellingDetails, BestellingDetailsArt
 from models.deliverydetails import SuccessfulDelivery, SuccessfulDeliveryBase
 from models.sportarticlesDetails import SportsArticle
 from models.goodsReceiptModel import GoodsReceiptBase
 from models.inventoryModel import InventoryOverview
+from models.User import RegisterUser
 from utils.db import DatabaseConnection
+from utils.dependencies import get_current_user
 from services.leveranciers import Leveranciers
 from services.bestellingen import Bestellingen
 from services.sportArtikelen import SportsArticlesService
 from services.delivery import Delivery
 from services.goodsReceipts import GoodsReceipts
 from services.inventory import Inventory
+from utils.jwt_utils import create_access_token, verify_access_token
 from pydantic import BaseModel
-import uvicorn
+from passlib.context import CryptContext
+from sqlalchemy.orm import Session
 from loguru import logger
+import uvicorn
 
+# Error Response Model
 class ErrorResponse(BaseModel):
     detail: str
 
-## in de toekomst kunnen we meer scenarios toevoegen.
+# Authentication Middleware
+class AuthenticationMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        token = request.headers.get("Authorization")
+        if token:
+            token = token.split(" ")[1]  # Remove "Bearer" prefix
+            verify_access_token(token)
+        response = await call_next(request)
+        return response
+
+# FastAPI App Initialization
 app = FastAPI(
     title="Welcome to the Quality Accelerators API playground",
     responses={
@@ -36,38 +54,20 @@ app = FastAPI(
     }
 )
 
+router = APIRouter()
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
-## Todo token logica toevoegen dit is een dummy
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+# Middleware Configuration
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(AuthenticationMiddleware)
 
-# Mock function voor token
-def verify_token(token: str = Depends(oauth2_scheme)):
-    if token != "expected_token":
-        logger.warning("Unauthorized access attempt")
-        raise HTTPException(status_code=401, detail="Invalid or expired token")
+# OAuth2 Scheme for Token Extraction
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="users/login")
 
-# Generieke exception 
-def raise_http_exception(status_code: int, detail: str):
-    logger.error(f"Error {status_code}: {detail}")
-    raise HTTPException(status_code=status_code, detail=detail)
+# Password Hashing Context
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# Custom error handling
-@app.exception_handler(Exception)
-async def generic_exception_handler(request: Request, exc: Exception):
-    logger.exception("Unexpected error")
-    return JSONResponse(
-        status_code=500,
-        content={"detail": "An unexpected error occurred. Please try again later."},
-    )
-
+# Dependency: Database Session
 async def get_db():
     db = DatabaseConnection()
     try:
@@ -75,12 +75,19 @@ async def get_db():
     finally:
         db.close()
 
+# Custom Error Handling
+@app.exception_handler(Exception)
+async def generic_exception_handler(request: Request, exc: Exception):
+    logger.exception("Unexpected error occurred")
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "An unexpected error occurred. Please try again later."},
+    )
 
-# Example Dependency for Authorization
-async def get_current_user(token: str):
-    if not token:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized access")
-    return token
+# Helper Function: Raise HTTP Exception
+def raise_http_exception(status_code: int, detail: str):
+    logger.error(f"Error {status_code}: {detail}")
+    raise HTTPException(status_code=status_code, detail=detail)
 
 class routes:
     @app.get("/suppliers", description="Get all suppliers", tags=["suppliers"])
@@ -446,9 +453,101 @@ class routes:
         except Exception as e:
             logger.exception("Failed to retrieve inventory")
             raise_http_exception(500, "Failed to retrieve inventory")
+    
+        # Dependency: Verify Token
+    async def verify_token(token: str = Depends(oauth2_scheme)):
+        try:
+            username = verify_access_token(token)
+            return username
+        except HTTPException as e:
+            logger.warning(f"Unauthorized access attempt: {e.detail}")
+            raise
+
+    @app.post("/users/register", tags=["users"])
+    def register_user(user: RegisterUser, db: DatabaseConnection = Depends(get_db)):
+        try:
+            cursor = db.get_cursor()
+            if cursor is None:
+                raise HTTPException(status_code=500, detail="Database connection error")
+            
+            # Check if username or email already exists
+            cursor.execute("SELECT COUNT(*) FROM users WHERE username = %s", (user.username,))
+            if cursor.fetchone()[0] > 0:
+                raise HTTPException(status_code=400, detail="Username already exists")
+            
+            cursor.execute("SELECT COUNT(*) FROM users WHERE email = %s", (user.email,))
+            if cursor.fetchone()[0] > 0:
+                raise HTTPException(status_code=400, detail="Email already exists")
+
+            # Insert the new user
+            hashed_password = pwd_context.hash(user.password)
+            cursor.execute(
+                "INSERT INTO users (username, email, password_hash) VALUES (%s, %s, %s)",
+                (user.username, user.email, hashed_password)
+            )
+            db.connection.commit()
+            return {"message": "User registered successfully"}
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Failed to register user: {e}")
+        finally:
+            if cursor:
+                cursor.close()
+
+
+    @app.post("/users/login", tags=["users"])
+    def login_user(form_data: OAuth2PasswordRequestForm = Depends(), db: DatabaseConnection = Depends(get_db)):
+        cursor = db.get_cursor()
+        if cursor is None:
+            raise HTTPException(status_code=500, detail="Database connection error")
+
+        try:
+            # Fetch user by username
+            cursor.execute("SELECT id, username, password_hash FROM users WHERE username = %s", (form_data.username,))
+            user = cursor.fetchone()
+
+            if not user or not pwd_context.verify(form_data.password, user[2]):
+                raise HTTPException(status_code=401, detail="Invalid username or password")
+
+            # Generate a JWT token
+            token = create_access_token(data={"sub": user[1]})
+            return {"access_token": token, "token_type": "bearer"}
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Failed to login: {e}")
+        finally:
+            cursor.close()
+
+    @app.get("/users/me", tags=["users"])
+    def read_users_me(current_user: str = Depends(verify_access_token)):
+        return {"username": current_user}
+
+
+    # @router.get("/secure-page", response_class=HTMLResponse, tags=["secure"])
+    # async def secure_page(current_user: dict = Depends(get_current_user)):
+    #     html_content = f"""
+    #     <html>
+    #         <head><title>Secure Page</title></head>
+    #         <body>
+    #             <h1>Welcome {current_user['username']}!</h1>
+    #             <p>You have access to this secure page.</p>
+    #         </body>
+    #     </html>
+    #     """
+    #     return HTMLResponse(content=html_content)
+
+    async def get_current_user(token: str = Depends(oauth2_scheme)):
+        username = verify_access_token(token)  # Your token validation logic
+        return {"username": username}
+
+    # @app.get("/secure-data")
+    # async def secure_data_endpoint(current_user: dict = Depends(get_current_user)):
+    #     return {"message": "This is secure data", "username": current_user["username"]}
+    
+    @router.get("/secure-data", tags=["secure"])
+    async def secure_data(current_user: dict = Depends(get_current_user)):
+        return {"message": "This is secure data", "username": current_user}
 
     @app.get("/")
     async def root():
         return {"message": "Welcome to the Quality Accelerators API playground"}
     
-    uvicorn.run(app, host='0.0.0.0', port=8000, log_level="debug")
+uvicorn.run(app, host='0.0.0.0', port=8000, log_level="debug")

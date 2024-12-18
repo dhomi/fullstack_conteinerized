@@ -9,6 +9,8 @@ COPY . .
 
 # Install the required packages
 RUN pip install --no-cache-dir -r /middleware-fastapi/requirements.txt
+RUN pip install pydantic[email]
+RUN pip install python-multipart
 
 # Set environment variable
 ENV FLASK_APP=fastApi
