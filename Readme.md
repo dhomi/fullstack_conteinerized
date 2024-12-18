@@ -16,6 +16,7 @@ Target Directory: c:\[..]\Techlab
 ->Clone
 
 Open een powerShell venster met administrator rechten
+
 ![powerShellScreenshot](image.png)
 
 
