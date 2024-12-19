@@ -4,32 +4,40 @@
 
 This repository is an ongoing CI/CD project with fullstack technology examples in an containerized environment. 
 
-## How-To
-Follow the instructions below. 
-
-### Installation
+## Installatie
 Preconditions:
-- [Docker Desktop](https://docs.docker.com/desktop/install/windows-install/) installed
-- [NodeJS](https://nodejs.org/en/download/package-manager) installed
-- Act is a very handy tool for local running, see <https://nektosact.com>
 
-### Start the container
-```docker-compose up --build```
-- After "docker-compose" go to dashboard at http://localhost:4000/
-- At the end of the build you will also see the Local IP and the Network IP
+MAC: [Install Brew](https://docs.brew.sh/Installation)
 
-### K8s (Kubernetes) opzet
-maak de namespace aan: kubectl create namespace techlab
-doe een 'kubectl apply -f deployment.yaml -n techlab' om het Techlab binnen K8s te installeren
-check dat alle pods draaien: kubectl -n techlab get pods
+WINDOWS: installeer Git (https://git-scm.com/downloads)
+GIT Gui starten -> Clone Existing Repository ->
+Source Location: https://github.com/dhomi/fullstack_conteinerized.git
+Target Directory: c:\[..]\Techlab 
+->Clone
 
-port forward middleware:  kubectl port-forward -n techlab svc/middleware-fastapi 8000:8000
-port forward frontend: kubectl port-forward svc/frontend-django -n techlab 8001:8001
+Open een powerShell venster met administrator rechten
+
+![powerShellScreenshot](image.png)
+
+
+Daarna,
+
+MAC: in shell: ./install.sh
+
+Windows: in powerShell (met admin rechten): .\install.cmd
+
+### Opstarten
+MAC: in shell: ./startup.sh
+Windows: in powerShell (met admin rechten): .\startup.cmd
+
+  voor MAC:
+  Open een git-shell (of andere linux terminal)
+  check dat startup.sh  executable is, anders handmatig zelf doen:  chmod +x startup.sh
 
 ### Chaos testing
-...vanuit gaande dat de docker runt, kubernetes ook en kubectl apply is uitgevoerd...
-start de chaos dashboard:  kubectl port-forward -n chaos-mesh svc/chaos-dashboard 2333:2333
-ga naar het dashboard:  http://127.0.0.1:2333/
+dashboard is dus hier te zien: http://localhost:2333/
+
+#### chaos uitvoeren
 via UI/dashboard: Selecteer de techlab namespace, en de grafana app. 
 Maak een experiment door POD KIlL en Submit deze allemaal 
 
@@ -40,6 +48,15 @@ kubectl apply -f ./kill_grafana_pod.yaml
 
 check de grafana pod in de docker ui. hij moet exited zijn, en binnen enkele seconden een nieuwe pod is running.
 
+#### manuele installatie en opstartprocedure:
+https://chaos-mesh.org/docs/production-installation-using-helm/
+of doe: 
+- kubectl create ns chaos-mesh
+- helm install chaos-mesh chaos-mesh/chaos-mesh -n=chaos-mesh --version 2.7.0
+- helm upgrade chaos-mesh chaos-mesh/chaos-mesh -n=chaos-mesh --version 2.7.0 --set dashboard.securityMode=false
+
+kubectl port-forward -n chaos-mesh svc/chaos-dashboard 2333:2333
+
 ### Monitor
 Grafana is a monitoring tool at http://localhost:4000
 
@@ -47,8 +64,9 @@ Grafana is a monitoring tool at http://localhost:4000
 - Grafana gets data from InfluxDB:8086, and Influx gets data every few seconds from Telegram scraper (on backend number)
 
 ### Fetch Local IP address
-```ipconfig | grep IPv4 | awk 'END{print}'```  
 
+MAC: ```ipconfig | grep IPv4 | awk 'END{print}'```  
+Windows: gitbash  
 
 ### View the Front- and Backend 
 - Frontend is located at http://localhost:3000/
@@ -68,27 +86,13 @@ Navigate to folder "jmeter" and start "act"
 ```cd jmeter
 act
 ```
-
-## Testing CRUD operations
-
-### Read (GET) all items / returns status: 200
-GET http://localhost:8000
-
-### Read (GET) a specific item by ID / returns status: 200
-GET http://localhost:8000/6
-
-### Create (POST) a new joke / returns status: 201
-POST http://localhost:8000
-- Body: {"item": "POST nieuwe mop" }
-
-### Update (PUT) an item by ID / returns status: 200
-PUT http://localhost:8000/6
-- Body: { "item": "PUT update" }
-
-### Delete (DELETE) an item by ID / returns status: 204
-DELETE http://localhost:8000/6
+### als de containers niet lukken
+Start the container: docker-compose up --build
+- After "docker-compose" go to dashboard at http://localhost:4000/
+- At the end of the build you will also see the Local IP and the Network IP
 
 ## TODO
 - Chaos testing: https://github.com/chaos-mesh/chaos-mesh
 - Create an architectural picture to explain what and how this project works
 - Extra README instructions
+- Wait time or time sleep when you execute the startup.sh. when you start the first time the script it doesnt wait till the pod is deployed with the status running. It will throw an error.
