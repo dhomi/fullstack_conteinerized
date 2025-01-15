@@ -47,7 +47,9 @@ CLI:
 'kubectl apply -f chaos/podFailure_middleware_35s.yaml'
 
 check de middleware het niet doet, wacht dan 35 seconden en dan zou de k8 de betreffende pod weer id lucht moeten laten draaien
-todo: de experiment met de hand deleten/archiveren in chaos-dashboard
+
+Experiment deleten met: 
+'kubectl delete -f chaos/podFailure_middleware_35s.yaml'
 
 #### manuele installatie en opstartprocedure:
 https://chaos-mesh.org/docs/production-installation-using-helm/
