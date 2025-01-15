@@ -5,12 +5,16 @@
 Dit project bevat een API, gebouwd met de Python-bibliotheek FastAPI, die een RESTful-interface biedt voor interactie met een MySQL-database. De database bevat gegevens over sportartikelen, klanten, leveranciers en bestellingen. Deze API ondersteunt momenteel alleen **GET**-verzoeken op een aantal tabellen; uitbreiding naar volledige CRUD-functionaliteit is gepland.
 
 ## Inhoud
-1. [Project Status en To-Do's](#project-status-en-to-dos)
-2. [Database Uitleg](#database-uitleg)
-3. [Backend Configuratie](#backend-configuratie)
-4. [Frontend Configuratie](#frontend-configuratie)
-5. [API Endpoints](#api-endpoints)
-6. [Vereisten en Installatie](#vereisten-en-installatie)
+- [QA - Techlab](#qa---techlab)
+  - [Overzicht](#overzicht)
+  - [Inhoud](#inhoud)
+  - [Project Status en To-Do's](#project-status-en-to-dos)
+  - [Database Uitleg](#database-uitleg)
+  - [Backend Configuratie](#backend-configuratie)
+  - [Frontend Configuratie](#frontend-configuratie)
+  - [API Endpoints](#api-endpoints)
+    - [Beschikbare Endpoints](#beschikbare-endpoints)
+  - [Vereisten en Installatie](#vereisten-en-installatie)
 
 ---
 
@@ -23,6 +27,9 @@ Dit project bevat een API, gebouwd met de Python-bibliotheek FastAPI, die een RE
 
 - **Database**:
   - Enkele tabellen en gegevens, zoals prijzen, zijn aangepast ten opzichte van de originele database en worden nog geoptimaliseerd.
+  - er zijn 99 users met de volgende Username en wachtwoord, bv User027 met ww: Techlab
+    - username:   Userxxx 
+    - wachtwoord: Techlab
 
 ## Database Uitleg
 
