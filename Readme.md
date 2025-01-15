@@ -43,10 +43,11 @@ Maak een experiment door POD KIlL en Submit deze allemaal
 
 CLI:
 ...zorg dat de betreffende name van een chaos experiment eerst ge-archived is in de experiments dashboard van de chaos mesh...
-cd chaos/
-kubectl apply -f ./kill_grafana_pod.yaml
 
-check de grafana pod in de docker ui. hij moet exited zijn, en binnen enkele seconden een nieuwe pod is running.
+'kubectl apply -f chaos/podFailure_middleware_35s.yaml'
+
+check de middleware het niet doet, wacht dan 35 seconden en dan zou de k8 de betreffende pod weer id lucht moeten laten draaien
+todo: de experiment met de hand deleten/archiveren in chaos-dashboard
 
 #### manuele installatie en opstartprocedure:
 https://chaos-mesh.org/docs/production-installation-using-helm/

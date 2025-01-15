@@ -2,15 +2,13 @@ kind: PodChaos
 apiVersion: chaos-mesh.org/v1alpha1
 metadata:
   namespace: techlab
-  name: tl011
+  name: v01
 spec:
   selector:
     namespaces:
       - techlab
     labelSelectors:
       io.kompose.service: middleware-fastapi
-    annotationSelectors:
-      kompose.cmd: komposeconvert
   mode: all
   action: pod-failure
   duration: 35s
