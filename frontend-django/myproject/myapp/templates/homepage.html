@@ -102,30 +102,22 @@
       height: auto;
       border-radius: 5px;
     }
-    .table-container {
-  width: 100%;
-  
-  margin-top: 0; /* Ensure no margin at the top */
-  padding-top: 0;
-}
-    /* Footer Styling */
-.footer {
-  background-color: #2b5876;
-  color: white;
-  text-align: right;
-  padding: 5px 20px; /* Add left padding to align with content */
-  width: calc(100% - 250px); /* Adjust width to match content area */
-  margin-left: 250px; /* Align with sidebar content */
-  position: fixed;
-  bottom: 0;
-  right: 0;
-  font-family: "Roboto", sans-serif;
-  font-size: 12px;
-  box-sizing: border-box;
-}
 
+    .footer {
+      background-color: #2b5876;
+      color: white;
+      text-align: right;
+      padding: 5px 20px;
+      width: calc(100% - 250px);
+      margin-left: 250px;
+      position: fixed;
+      bottom: 0;
+      right: 0;
+      font-family: "Roboto", sans-serif;
+      font-size: 12px;
+      box-sizing: border-box;
+    }
 
-    /* Responsive Design */
     @media (max-width: 768px) {
       .w3-sidebar {
         width: 100%;
@@ -149,40 +141,61 @@
 </head>
 
 <body>
-
   <!-- Sidebar -->
+  
   <nav class="w3-sidebar w3-bar-block">
+    
     <div class="w3-container">
       <div style="text-align: center; margin-bottom: 20px;">
         {% load static %}
         <a href="/">
-        <img src="{% static 'qa-logo.png' %}" alt="QA Techlab Logo" style="width: 100px;">
-      </a>
+          <img src="{% static 'qa-logo.png' %}" alt="QA Techlab Logo" style="width: 100px;">
+        </a>
       </div>
       <h3>QA - Techlab</h3>
     </div>
+    
     <a href="/" class="w3-bar-item w3-button">Home</a>
-    <a onclick="toggleDropdown('backofficeDropdown')" href="javascript:void(0)" class="w3-bar-item w3-button">Backoffice Administration <i class="fa fa-caret-down"></i></a>
-    <div id="backofficeDropdown" class="w3-hide">
-      <a href="/inventory" class="w3-bar-item w3-button">Inventory Management</a>
-      <a onclick="toggleDropdown('orderMgmtDropdown')" href="javascript:void(0)" class="w3-bar-item w3-button">Order Management <i class="fa fa-caret-down"></i></a>
-      <div id="orderMgmtDropdown" class="w3-hide">
-        <a href="/ordermanagement/orders" class="w3-bar-item w3-button">Orders Overview</a>
-        <a href="/ordermanagement/create" class="w3-bar-item w3-button">Create New Order</a>
-        <a href="/ordermanagement/track" class="w3-bar-item w3-button">Track Orders</a>
+    {% if request.session.access_token %}
+
+    <!-- Conditional Backoffice Menu -->
+    {% if request.session.role == "admin" %}
+      <a onclick="toggleDropdown('backofficeDropdown')" href="javascript:void(0)" class="w3-bar-item w3-button">
+        Backoffice Administration <i class="fa fa-caret-down"></i>
+      </a>
+      <div id="backofficeDropdown" class="w3-hide">
+        <a href="/inventory" class="w3-bar-item w3-button">Inventory Management</a>
+        <a onclick="toggleDropdown('orderMgmtDropdown')" href="javascript:void(0)" class="w3-bar-item w3-button">
+          Order Management <i class="fa fa-caret-down"></i>
+        </a>
+        <div id="orderMgmtDropdown" class="w3-hide">
+          <a href="/ordermanagement/orders" class="w3-bar-item w3-button">Orders Overview</a>
+          <a href="/ordermanagement/create" class="w3-bar-item w3-button">Create New Order</a>
+          <a href="/ordermanagement/track" class="w3-bar-item w3-button">Track Orders</a>
+        </div>
+        <a href="/suppliers" class="w3-bar-item w3-button">Suppliers</a>
       </div>
-      <a href="/suppliers" class="w3-bar-item w3-button">Suppliers</a>
-    </div>
-    <a onclick="toggleDropdown('sportsGoodsDropdown')" href="javascript:void(0)" class="w3-bar-item w3-button">Sporting Goods <i class="fa fa-caret-down"></i></a>
+    {% endif %}
+
+    <!-- Sporting Goods Menu -->
+    <a onclick="toggleDropdown('sportsGoodsDropdown')" href="javascript:void(0)" class="w3-bar-item w3-button">
+      Sporting Goods <i class="fa fa-caret-down"></i>
+    </a>
     <div id="sportsGoodsDropdown" class="w3-hide">
       <a href="/sports_articles" class="w3-bar-item w3-button">All Sporting Goods</a>
       <a href="/sports_articles/add" class="w3-bar-item w3-button">Add Sporting Goods</a>
     </div>
+    {% endif %}
   </nav>
+ 
 
   <!-- Top Bar -->
   <div class="top-bar">
     {% if request.session.access_token %}
+      <span class="user-info">
+        Logged in as: <strong>{{ request.session.username }}</strong>
+        (<em>{{ request.session.role }}</em>)
+      </span>
       <button onclick="window.location.href='/logout/';">Logout</button>
     {% else %}
       <button onclick="window.location.href='/login/';">Login</button>
@@ -205,7 +218,6 @@
   <!-- Footer -->
   <footer class="footer">
     <p>Copyright © Techlab - Quality Accelerators</p>
-
   </footer>
 
   <script>

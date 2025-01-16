@@ -1,11 +1,13 @@
 import requests
 import json
+import jwt
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.messages import get_messages
 from django.contrib.auth import logout
 from django.conf import settings
 from django.http import HttpResponseNotFound
+from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 from .utils import login_required 
 
 
@@ -174,6 +176,62 @@ def sportartikelen(request):
         return render(request, 'error.html', {'message': f"An unexpected error occurred: {str(e)}"})
 
 @login_required
+def add_sportartikel(request):
+    """
+    Handle adding a new sporting article.
+    """
+    token = request.session.get("access_token")
+    if not token:
+        messages.error(request, "You need to log in to perform this action.")
+        return redirect("login")
+
+    if request.method == "POST":
+        # Gather data from the POST request
+        article_data = {
+            "article_name": request.POST.get("article_name"),
+            "category": request.POST.get("category"),
+            "size": request.POST.get("size"),
+            "color": request.POST.get("color"),
+            "price": request.POST.get("price"),
+            "stock_quantity": request.POST.get("stock_quantity"),
+            "stock_min": request.POST.get("stock_min"),
+            "vat_type": request.POST.get("vat_type"),
+        }
+
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json"
+        }
+
+        try:
+            # Send POST request to middleware to add the article
+            response = requests.post(
+                f"http://middleware-fastapi:8000/sports_articles/",
+                headers=headers,
+                json=article_data,
+                timeout=5
+            )
+
+            if response.status_code == 201:
+                messages.success(request, "Sport article added successfully.")
+                return redirect("sportartikelen")  # Redirect to the list of articles
+            elif response.status_code == 400:
+                error_message = response.json().get("detail", "Invalid data provided.")
+                messages.error(request, f"Failed to add article: {error_message}")
+            else:
+                messages.error(request, "An unexpected error occurred while adding the article.")
+        except requests.exceptions.RequestException as e:
+            # Handle network-related errors
+            messages.error(request, f"Error connecting to the server: {str(e)}")
+        except Exception as e:
+            # Generic error handling
+            messages.error(request, f"An unexpected error occurred: {str(e)}")
+
+    # Render the form page
+    return render(request, "add_sportsarticle.html")
+
+
+@login_required
 def orderdetailsArt(request, artcode):
     token = request.session.get("access_token")
     if not token:
@@ -216,26 +274,40 @@ def login_view(request):
         username = request.POST.get("username")
         password = request.POST.get("password")
         response = requests.post(
-            "http://middleware-fastapi:8000/users/login",
+            f"http://middleware-fastapi:8000/users/login",
             data={"username": username, "password": password},
         )
 
         if response.status_code == 200:
-            token = response.json().get("access_token")
-            request.session["access_token"] = token
-            print(f"Session set: {request.session['access_token']}")
-            messages.success(request, "Login successful!")
-            return redirect("/")  # Redirect to homepage
+            token_data = response.json()
+            access_token = token_data["access_token"]
+            print(f"Access Token Received: {access_token}")  # Debug
+
+            try:
+                decoded_token = jwt.decode(
+                    access_token,
+                    settings.SECRET_KEY,
+                    algorithms=["HS256"],
+                )
+                print(f"Decoded Token: {decoded_token}")  # Debug
+
+                request.session["access_token"] = access_token
+                request.session["username"] = decoded_token.get("sub")
+                request.session["role"] = decoded_token.get("role")
+                messages.success(request, "Login successful!")
+                return redirect("/")
+            except jwt.ExpiredSignatureError:
+                messages.error(request, "Token has expired. Please log in again.")
+                return redirect("login")
+            except jwt.InvalidTokenError:
+                messages.error(request, "Invalid token. Please log in again.")
+                return redirect("login")
         else:
             messages.error(request, "Invalid username or password")
             return redirect("login")
 
-    # Consume any leftover messages to ensure they don't persist
-    storage = get_messages(request)
-    for _ in storage:  # This will mark messages as read
-        pass
-
     return render(request, "login.html")
+
 
 @login_required
 def secure_view(request):
@@ -265,9 +337,11 @@ def secure_view(request):
         return redirect("login")
 
 def logout_view(request):
-    request.session.flush()  # Clear session data
-    messages.success(request, "You have successfully logged out.")
-    return redirect("/")
+    # Clear the session data
+    request.session.flush()
+    messages.success(request, "You have been successfully logged out.")
+    return redirect("login")  # Redirect to the login page
+
 
 def register_view(request):
     if request.method == "POST":

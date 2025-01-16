@@ -4,7 +4,7 @@ from fastapi import HTTPException, Depends
 from fastapi.security import OAuth2PasswordBearer
 
 # Configuration for JWT
-SECRET_KEY = "QA-Techlab-1337"  # Change this to a secure, random value
+SECRET_KEY = "django-insecure-x3my1lu5-hcc@uf8w&9-le8q=v(da!2peq^u3za%i1(szdf%kx"  # Change this to a secure, random value
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
@@ -12,12 +12,21 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="users/login")
 
 # Function to create a JWT token
-def create_access_token(data: dict):
+# def create_access_token(data: dict):
+#     to_encode = data.copy()
+#     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+#     to_encode.update({"exp": expire})
+#     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+#     return encoded_jwt
+
+def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    print(f"Generated Token: {encoded_jwt}")  # Debugging token
     return encoded_jwt
+
 
 # Function to verify a JWT token
 def verify_access_token(token: str):

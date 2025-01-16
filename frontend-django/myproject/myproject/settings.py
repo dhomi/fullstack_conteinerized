@@ -50,9 +50,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
-    # Custom middleware
-    'myapp.middleware.auth_middleware.AuthenticationMiddleware',  # Correct path to middleware
+    'myapp.middleware.auth_middleware.RoleBasedAuthenticationMiddleware',  # Add this middleware
 ] 
 
 SESSION_ENGINE = "django.contrib.sessions.backends.db"  # Store session data in the database

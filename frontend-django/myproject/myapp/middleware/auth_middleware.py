@@ -1,27 +1,37 @@
 from django.shortcuts import redirect
 from django.urls import reverse
 
-class AuthenticationMiddleware:
+class RoleBasedAuthenticationMiddleware:
     """
-    Middleware to restrict access to certain pages for unauthenticated users
-    using a session-stored access token.
+    Middleware to handle role-based access control.
     """
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
-        # Paths that are accessible without authentication
         allowed_paths = [
             reverse("homePage"),
             reverse("login"),
             reverse("register"),
+            reverse("logout"),
         ]
 
-        # Check if access token exists in the session
+        # Get access token and role from the session
         access_token = request.session.get("access_token")
+        role = request.session.get("role")
 
-        # Allow access to permitted paths, otherwise redirect to login
+        # Debug: Print the access token and role for logging
+        print(f"Access Token: {access_token}, Role: {role}, Path: {request.path}")
+
         if not access_token and request.path not in allowed_paths:
-            return redirect("login")  # Redirect to the login page
+            # Redirect to login if the user is not authenticated
+            return redirect("login")
 
+        if role == "customer" and request.path not in allowed_paths + [
+            reverse("sportartikelen"),
+            reverse("sportartikeldetails", kwargs={"artcode": 1}),  # Example dynamic URL
+        ]:
+            # Redirect customers to the homepage if they access unauthorized pages
+            return redirect("homePage")
+        
         return self.get_response(request)

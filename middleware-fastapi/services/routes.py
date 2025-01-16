@@ -390,22 +390,6 @@ class routes:
         except Exception as e:
             logger.exception("Failed to delete bestelling details")
             raise_http_exception(500, "Failed to delete bestelling details")
-
-    # @app.get("/sports_articles/{article_code}", response_model=SportsArticle)
-    # def read_sports_article(article_code: int):
-    #     return SportsArticlesService.get_article(article_code)
-
-    # @app.post("/sports_articles", response_model=SportsArticle)
-    # def create_sports_article(article: SportsArticle):
-    #     return SportsArticlesService.create_article(article)
-
-    # @app.put("/sports_articles/{article_code}", response_model=SportsArticle)
-    # def update_sports_article(article_code: int, article: SportsArticle):
-    #     return SportsArticlesService.update_article(article_code, article)
-
-    # @app.delete("/sports_articles/{article_code}", response_model=dict)
-    # def delete_sports_article(article_code: int):
-    #     return SportsArticlesService.delete_article(article_code)
     
     @app.get("/sports_articles", tags=["sportarticles"])
     async def get_sportarticles():
@@ -420,6 +404,79 @@ class routes:
         sArticles = SportsArticlesService(db)
         result = sArticles.get_article(article_code)
         return [{"article_code": r[0], "article_name": r[1], "category": r[2], "size": r[3], "color": r[4], "price": r[5], "stock_quantity": r[6], "stock_min": r[7], "vat_type": r[8]} for r in result]
+
+    @app.post("/sports_articles", tags=["sportarticles"])
+    async def add_sport_article(
+        article: SportsArticle, 
+        db: DatabaseConnection = Depends(get_db)
+    ):
+        """
+        Endpoint to add a new sport article.
+        """
+        try:
+            # Use the service to add the article
+            add_article_service = SportsArticlesService(db)
+            result = add_article_service.add_new_article(
+                article_name=article.article_name,
+                category=article.category,
+                size=article.size,
+                color=article.color,
+                price=article.price,
+                stock_quantity=article.stock_quantity,
+                stock_min=article.stock_min,
+                vat_type=article.vat_type,
+            )
+            if "error" in result:
+                raise HTTPException(status_code=400, detail=result["error"])
+            return {"message": "Article added successfully", "article": result}
+        except Exception as e:
+            logger.exception("Failed to create sport article")
+            raise HTTPException(status_code=500, detail="Failed to create sport article")
+
+    @app.put("/sports_articles/{article_code}", tags=["sportarticles"])
+    async def update_sports_article(
+        article_code: int,
+        article: SportsArticle,
+        db: DatabaseConnection = Depends(get_db)
+    ):
+        """
+        Updates the details of a sports article by its article_code.
+        """
+        try:
+            sports_article_service = SportsArticlesService(db)
+            result = sports_article_service.update_article(
+                article_code,
+                article.article_name,
+                article.category,
+                article.size,
+                article.color,
+                article.price,
+                article.stock_quantity,
+                article.stock_min,
+                article.vat_type
+            )
+            if "error" in result:
+                raise_http_exception(400, result["error"])
+            return {"message": "Sports article updated successfully"}
+        except Exception as e:
+            logger.exception("Failed to update sports article")
+            raise_http_exception(500, "Failed to update sports article")
+
+
+    @app.delete("/sports_articles/{article_code}", tags=["sportarticles"])
+    async def delete_sports_article(article_code: int, db: DatabaseConnection = Depends(get_db)):
+        """
+        Deletes a sports article by its article_code.
+        """
+        try:
+            sports_article_service = SportsArticlesService(db)
+            result = sports_article_service.delete_article(article_code)
+            if "error" in result:
+                raise_http_exception(400, result["error"])
+            return {"message": "Sports article deleted successfully"}
+        except Exception as e:
+            logger.exception("Failed to delete sports article")
+            raise_http_exception(500, "Failed to delete sports article")
 
     @app.get("/successful_deliveries", description="Get all successful deliveries", tags=["deliveries"])
     async def get_successful_deliveries():
@@ -502,19 +559,28 @@ class routes:
 
         try:
             # Fetch user by username
-            cursor.execute("SELECT id, username, password_hash FROM users WHERE username = %s", (form_data.username,))
+            cursor.execute("SELECT id, username, password_hash, role FROM users WHERE username = %s", (form_data.username,))
             user = cursor.fetchone()
 
             if not user or not pwd_context.verify(form_data.password, user[2]):
                 raise HTTPException(status_code=401, detail="Invalid username or password")
 
-            # Generate a JWT token
-            token = create_access_token(data={"sub": user[1]})
-            return {"access_token": token, "token_type": "bearer"}
+            # Generate a JWT token with role information
+            token_data = {"sub": user[1], "role": user[3]}  # Include the role in the token payload
+            token = create_access_token(data=token_data)
+
+            # Return access token and user role
+            return {
+                "access_token": token,
+                "token_type": "bearer",
+                "username": user[1],
+                "role": user[3]
+            }
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Failed to login: {e}")
         finally:
             cursor.close()
+
 
     @app.get("/users/me", tags=["users"])
     def read_users_me(current_user: str = Depends(verify_access_token)):

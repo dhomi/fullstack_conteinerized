@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: db
--- Gegenereerd op: 01 dec 2024 om 13:54
--- Serverversie: 11.6.2-MariaDB-ubu2404
--- PHP-versie: 8.2.8
+-- Generation Time: Jan 16, 2025 at 06:56 PM
+-- Server version: 11.6.2-MariaDB-ubu2404
+-- PHP Version: 8.2.27
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -112,7 +112,7 @@ DELIMITER ;
 -- --------------------------------------------------------
 
 --
--- Tabelstructuur voor tabel `booking`
+-- Table structure for table `booking`
 --
 
 DROP TABLE IF EXISTS `booking`;
@@ -126,12 +126,7 @@ CREATE TABLE `booking` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
--- Tabel leegmaken voor invoegen `booking`
---
-
-TRUNCATE TABLE `booking`;
---
--- Gegevens worden geëxporteerd voor tabel `booking`
+-- Dumping data for table `booking`
 --
 
 INSERT INTO `booking` (`booking_number`, `booking_date`, `amount`, `customer_code`, `supplier_code`, `status`) VALUES
@@ -164,7 +159,7 @@ INSERT INTO `booking` (`booking_number`, `booking_date`, `amount`, `customer_cod
 -- --------------------------------------------------------
 
 --
--- Tabelstructuur voor tabel `booking_line`
+-- Table structure for table `booking_line`
 --
 
 DROP TABLE IF EXISTS `booking_line`;
@@ -177,12 +172,7 @@ CREATE TABLE `booking_line` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
--- Tabel leegmaken voor invoegen `booking_line`
---
-
-TRUNCATE TABLE `booking_line`;
---
--- Gegevens worden geëxporteerd voor tabel `booking_line`
+-- Dumping data for table `booking_line`
 --
 
 INSERT INTO `booking_line` (`booking_number`, `sequence_number`, `amount`, `order_number`, `article_code`) VALUES
@@ -250,7 +240,7 @@ DELIMITER ;
 -- --------------------------------------------------------
 
 --
--- Tabelstructuur voor tabel `customers`
+-- Table structure for table `customers`
 --
 
 DROP TABLE IF EXISTS `customers`;
@@ -267,12 +257,7 @@ CREATE TABLE `customers` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
--- Tabel leegmaken voor invoegen `customers`
---
-
-TRUNCATE TABLE `customers`;
---
--- Gegevens worden geëxporteerd voor tabel `customers`
+-- Dumping data for table `customers`
 --
 
 INSERT INTO `customers` (`customer_code`, `customer_name`, `address`, `postal_code`, `phone`, `city`, `status`, `credit_limit`, `balance`) VALUES
@@ -284,7 +269,7 @@ INSERT INTO `customers` (`customer_code`, `customer_name`, `address`, `postal_co
 -- --------------------------------------------------------
 
 --
--- Tabelstructuur voor tabel `delivery`
+-- Table structure for table `delivery`
 --
 
 DROP TABLE IF EXISTS `delivery`;
@@ -297,12 +282,7 @@ CREATE TABLE `delivery` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
--- Tabel leegmaken voor invoegen `delivery`
---
-
-TRUNCATE TABLE `delivery`;
---
--- Gegevens worden geëxporteerd voor tabel `delivery`
+-- Dumping data for table `delivery`
 --
 
 INSERT INTO `delivery` (`purchase_number`, `article_code`, `delivery_date`, `quantity`, `invoice_number`) VALUES
@@ -335,7 +315,7 @@ INSERT INTO `delivery` (`purchase_number`, `article_code`, `delivery_date`, `qua
 -- --------------------------------------------------------
 
 --
--- Tabelstructuur voor tabel `goods_receipt`
+-- Table structure for table `goods_receipt`
 --
 
 DROP TABLE IF EXISTS `goods_receipt`;
@@ -351,12 +331,7 @@ CREATE TABLE `goods_receipt` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 --
--- Tabel leegmaken voor invoegen `goods_receipt`
---
-
-TRUNCATE TABLE `goods_receipt`;
---
--- Gegevens worden geëxporteerd voor tabel `goods_receipt`
+-- Dumping data for table `goods_receipt`
 --
 
 INSERT INTO `goods_receipt` (`receipt_id`, `order_number`, `article_code`, `receipt_date`, `receipt_quantity`, `status`, `booking_number`, `sequence_number`) VALUES
@@ -413,7 +388,7 @@ DELIMITER ;
 -- --------------------------------------------------------
 
 --
--- Tabelstructuur voor tabel `invoice`
+-- Table structure for table `invoice`
 --
 
 DROP TABLE IF EXISTS `invoice`;
@@ -426,12 +401,7 @@ CREATE TABLE `invoice` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
--- Tabel leegmaken voor invoegen `invoice`
---
-
-TRUNCATE TABLE `invoice`;
---
--- Gegevens worden geëxporteerd voor tabel `invoice`
+-- Dumping data for table `invoice`
 --
 
 INSERT INTO `invoice` (`invoice_number`, `invoice_date`, `status`, `booking_number`, `sequence_number`) VALUES
@@ -449,7 +419,7 @@ INSERT INTO `invoice` (`invoice_number`, `invoice_date`, `status`, `booking_numb
 -- --------------------------------------------------------
 
 --
--- Tabelstructuur voor tabel `orders`
+-- Table structure for table `orders`
 --
 
 DROP TABLE IF EXISTS `orders`;
@@ -464,12 +434,7 @@ CREATE TABLE `orders` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
--- Tabel leegmaken voor invoegen `orders`
---
-
-TRUNCATE TABLE `orders`;
---
--- Gegevens worden geëxporteerd voor tabel `orders`
+-- Dumping data for table `orders`
 --
 
 INSERT INTO `orders` (`order_number`, `supplier_code`, `order_date`, `delivery_date`, `amount`, `status`, `status_description`) VALUES
@@ -530,7 +495,7 @@ DELIMITER ;
 -- --------------------------------------------------------
 
 --
--- Tabelstructuur voor tabel `order_lines`
+-- Table structure for table `order_lines`
 --
 
 DROP TABLE IF EXISTS `order_lines`;
@@ -542,12 +507,7 @@ CREATE TABLE `order_lines` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
--- Tabel leegmaken voor invoegen `order_lines`
---
-
-TRUNCATE TABLE `order_lines`;
---
--- Gegevens worden geëxporteerd voor tabel `order_lines`
+-- Dumping data for table `order_lines`
 --
 
 INSERT INTO `order_lines` (`order_number`, `article_code`, `quantity`, `order_price`) VALUES
@@ -631,7 +591,7 @@ DELIMITER ;
 -- --------------------------------------------------------
 
 --
--- Tabelstructuur voor tabel `purchases`
+-- Table structure for table `purchases`
 --
 
 DROP TABLE IF EXISTS `purchases`;
@@ -642,12 +602,7 @@ CREATE TABLE `purchases` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
--- Tabel leegmaken voor invoegen `purchases`
---
-
-TRUNCATE TABLE `purchases`;
---
--- Gegevens worden geëxporteerd voor tabel `purchases`
+-- Dumping data for table `purchases`
 --
 
 INSERT INTO `purchases` (`purchase_number`, `customer_code`, `purchase_date`) VALUES
@@ -665,7 +620,7 @@ INSERT INTO `purchases` (`purchase_number`, `customer_code`, `purchase_date`) VA
 -- --------------------------------------------------------
 
 --
--- Tabelstructuur voor tabel `purchase_line`
+-- Table structure for table `purchase_line`
 --
 
 DROP TABLE IF EXISTS `purchase_line`;
@@ -677,12 +632,7 @@ CREATE TABLE `purchase_line` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
--- Tabel leegmaken voor invoegen `purchase_line`
---
-
-TRUNCATE TABLE `purchase_line`;
---
--- Gegevens worden geëxporteerd voor tabel `purchase_line`
+-- Dumping data for table `purchase_line`
 --
 
 INSERT INTO `purchase_line` (`purchase_number`, `article_code`, `quantity`, `purchase_price`) VALUES
@@ -726,7 +676,7 @@ INSERT INTO `purchase_line` (`purchase_number`, `article_code`, `quantity`, `pur
 -- --------------------------------------------------------
 
 --
--- Tabelstructuur voor tabel `quotations`
+-- Table structure for table `quotations`
 --
 
 DROP TABLE IF EXISTS `quotations`;
@@ -740,12 +690,7 @@ CREATE TABLE `quotations` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
 
 --
--- Tabel leegmaken voor invoegen `quotations`
---
-
-TRUNCATE TABLE `quotations`;
---
--- Gegevens worden geëxporteerd voor tabel `quotations`
+-- Dumping data for table `quotations`
 --
 
 INSERT INTO `quotations` (`quotation_id`, `supplier_code`, `article_code`, `supplier_article_code`, `delivery_time`, `quotation_price`) VALUES
@@ -969,7 +914,7 @@ INSERT INTO `quotations` (`quotation_id`, `supplier_code`, `article_code`, `supp
 -- --------------------------------------------------------
 
 --
--- Tabelstructuur voor tabel `sports_articles`
+-- Table structure for table `sports_articles`
 --
 
 DROP TABLE IF EXISTS `sports_articles`;
@@ -982,227 +927,223 @@ CREATE TABLE `sports_articles` (
   `price` decimal(6,2) DEFAULT NULL,
   `stock_quantity` int(11) DEFAULT NULL,
   `stock_min` int(11) DEFAULT NULL,
-  `VAT_type` char(1) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+  `VAT_type` char(1) NOT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp()
+) ;
 
 --
--- Tabel leegmaken voor invoegen `sports_articles`
+-- Dumping data for table `sports_articles`
 --
 
-TRUNCATE TABLE `sports_articles`;
---
--- Gegevens worden geëxporteerd voor tabel `sports_articles`
---
-
-INSERT INTO `sports_articles` (`article_code`, `article_name`, `category`, `size`, `color`, `price`, `stock_quantity`, `stock_min`, `VAT_type`) VALUES
-(1, 'Premium Football', 'Ball', '5', 'White/Black', 30.00, 50, 10, 'h'),
-(2, 'Professional Tennis Racket', 'Racket', 'Standard', 'Black', 150.00, 20, 5, 'h'),
-(12, 'Advanced Basketball', 'Ball', '7', 'Orange', 25.00, 40, 10, 'h'),
-(13, 'Naam van Artikel 13', 'Categorie', 'Grootte', 'Kleur', 25.00, 30, 5, 'l'),
-(19, 'Table Tennis Paddle', 'Racket', 'Standard', 'Red/Black', 15.00, 60, 15, 'l'),
-(23, 'Volleyball Net', 'Accessory', 'Standard', 'White', 75.00, 100, 5, 'l'),
-(24, 'Naam van Artikel 24', 'Categorie', 'Grootte', 'Kleur', 20.00, 50, 10, 'h'),
-(27, 'Running Shoes', 'Footwear', '42', 'Black', 75.00, 50, 5, 'h'),
-(28, 'Product Name 28', 'Category', 'Size', 'Color', 10.00, 100, 10, 'h'),
-(31, 'Basketbalhoepel', 'Accessoire', 'Stand', 'Oranje', 60.00, 150, 50, 'h'),
-(35, 'Tafeltennisbat', 'Racket', 'Stand', 'Rood', 5.00, 100, 50, 'l'),
-(36, 'Schemershirt', 'Kleding', 'M', 'Blauw', 22.50, 155, 50, 'l'),
-(39, 'Voetbalschoenen', 'Schoenen', '42', 'Wit/Zwart', 65.00, 10, 50, 'h'),
-(42, 'BASEBALL GLOVE', 'SPORT', 'LILA', NULL, 90.00, 0, 50, 'h'),
-(47, 'PULL-UP BAR', 'FITNESS', 'ROOD', NULL, 50.00, 0, 50, 'h'),
-(50, 'SKEELERS', 'SKATEN', 'ZWART', NULL, 50.00, 200, 50, 'h'),
-(52, 'BOXING GLOVES', 'BOXING', 'ROOD', NULL, 150.00, 0, 50, 'h'),
-(54, 'HOCKEYSTICK', 'HOCKEY', 'ZWART', NULL, 75.00, 50, 50, 'h'),
-(56, 'Boksbandage', 'Accessoire', 'L', 'Rood', 7.50, 24, 50, 'l'),
-(61, 'TENNISRACKET', 'RACKET', 'BLAUW', NULL, 300.00, 10, 50, 'h'),
-(66, 'Product Name 66', 'Category', 'Size', 'Color', 6.10, 100, 10, 'h'),
-(67, 'Potentiometer', 'Electronics', 'Standard', 'Black', 15.00, 50, 5, 'h'),
-(68, 'MOUNTAINBIKE', 'FIETS', 'ROOD', NULL, 30.00, 37, 50, 'h'),
-(71, 'Sporttape', 'Accessoire', '5m', 'Wit', 2.50, 100, 50, 'l'),
-(74, 'SOCCER CLEATS', 'FOOTBALL', 'GEEL', NULL, 400.00, 200, 50, 'h'),
-(78, 'Hardloopschoenen', 'Schoenen', '43', 'Blauw', 75.00, 100, 50, 'h'),
-(80, 'RUGBYBAL', 'BAL', 'BRUIN', NULL, 200.00, 0, 50, 'l'),
-(82, 'WATERFLES', 'SPORT', 'WIT', NULL, 7.00, 0, 50, 'l'),
-(87, 'Gewichthefriem', 'Accessoire', 'M', 'Zwart', 12.00, 150, 50, 'l'),
-(89, 'LACROSSE STICK', 'SPORT', 'GEMEN', NULL, 100.00, 0, 50, 'l'),
-(95, 'JUMPBOOT', 'SPORT', 'LILA', NULL, 70.00, 200, 50, 'l'),
-(102, 'Unknown Article 102', 'CategoryX', 'SizeX', 'ColorX', 10.00, 135, 10, 'l'),
-(103, 'Basketbalschoenen', 'Schoenen', '45', 'Zwart/Rood', 90.00, 100, 50, 'h'),
-(104, 'WIELERHANDSCHOENEN', 'FIETS', 'ZWART', NULL, 400.00, 0, 50, 'l'),
-(105, 'Tennisballen (3-pack)', 'Bal', 'Stand', 'Geel', 8.00, 100, 50, 'h'),
-(108, 'Voetbal', 'Bal', '5', 'Rood/Zwart', 25.00, 10, 50, 'h'),
-(111, 'ICE SKATES', 'SKATING', 'ZWART', NULL, 400.00, 0, 50, 'h'),
-(112, 'DUMBBELLS SET', 'WEIGHTS', 'GRIJS', NULL, 350.00, 0, 50, 'h'),
-(117, 'JUMP ROPE', 'EXERCISE', '', NULL, 250.00, 0, 50, 'h'),
-(120, 'SPORTTAS', 'FITNESS', 'ZWART', NULL, 200.00, 0, 50, 'l'),
-(123, 'DUMBELLS', 'WEIGHTS', '', NULL, 500.00, 0, 50, 'h'),
-(124, 'GYMNASTICS RINGS', 'GYMNASTICS', '', NULL, 120.00, 0, 50, 'h'),
-(126, 'ZWEMBANDEN', 'WATERSPORT', 'GEEL', NULL, 350.00, 100, 50, 'l'),
-(127, 'ROLLER SKATES', 'SKATING', 'ZWART', NULL, 120.00, 0, 50, 'h'),
-(130, 'Sports Cap', 'Accessories', 'One Size', 'Blue', 15.00, 50, 10, 'l'),
-(133, 'FIELD HOCKEY BALL', 'FIELD HOCKEY', 'WIT', NULL, 15.00, 0, 50, 'l'),
-(135, 'EQUESTRIAN HELMET', 'EQUESTRIAN', 'ZWART', NULL, 300.00, 0, 50, 'h'),
-(137, 'ROLLER SKATES', 'SKATING', 'ROZE', NULL, 150.00, 0, 50, 'l'),
-(140, 'VOLLEYBALL NET', 'VOLLEYBALL', 'WIT', NULL, 250.00, 0, 50, 'h'),
-(143, 'Badmintonshuttle', 'Accessoire', 'Stand', 'Wit', 1.50, 25, 50, 'l'),
-(144, 'CAMPING TENT', 'CAMPING', 'GROEN', NULL, 500.00, 0, 50, 'h'),
-(147, 'Resistance Bands (set)', 'Accessoire', 'Stand', 'Multicolor', 10.00, 100, 50, 'l'),
-(153, 'SPRINGTOUW', 'FITNESS', 'GROEN', NULL, 200.00, 0, 50, 'l'),
-(155, 'MARTIAL ARTS MAT', 'MARTIAL ARTS', 'BLAUW', NULL, 400.00, 0, 50, 'h'),
-(157, 'Zwemvliezen', 'Accessoire', 'M', 'Blauw', 25.00, 800, 50, 'h'),
-(159, 'TREADMILL', 'FITNESS', 'ZWART', NULL, 2500.00, 0, 50, 'h'),
-(162, 'PULL-UP BAR', 'FITNESS', 'ROOD', NULL, 50.00, 0, 50, 'h'),
-(163, 'WEIGHTED VEST', 'FITNESS', 'ZWART', NULL, 150.00, 0, 50, 'h'),
-(164, 'TENNIS RACKET', 'SPORT', 'WIT', NULL, 70.00, 0, 50, 'l'),
-(165, 'DIVE MASK', 'DIVING', 'BLAUW', NULL, 120.00, 0, 50, 'l'),
-(167, 'FRISBEE', 'OUTDOOR', 'ROOD', NULL, 25.00, 0, 50, 'l'),
-(169, 'TENNISTAS', 'TENNIS', 'BLAUW', NULL, 120.00, 0, 50, 'h'),
-(170, 'GOLF CLUB', 'SPORT', 'ZWART', NULL, 100.00, 0, 50, 'h'),
-(172, 'TABLE TENNIS PADDLE', 'TABLE TENNIS', 'ROOD', NULL, 45.00, 0, 50, 'l'),
-(175, 'TENNIS RACKET', 'SPORT', 'WIT', NULL, 70.00, 0, 50, 'l'),
-(178, 'Product Name 178', 'Category', 'Size', 'Color', 3.40, 100, 10, 'h'),
-(180, 'LOOPBAND', 'FITNESS', 'ZWART', NULL, 20.00, 0, 50, 'h'),
-(184, 'RUGBY BALL', 'SPORT', 'BLAUW', NULL, 50.00, 0, 50, 'l'),
-(190, 'WATERFLES', 'SPORT', 'WIT', NULL, 7.00, 0, 50, 'l'),
-(193, 'CUE STICK', 'BILLIARDS', 'BRUIN', NULL, 180.00, 0, 50, 'h'),
-(195, 'DUIKBRIL', 'ZWEMMEN', 'ZWART', NULL, 300.00, 0, 50, 'l'),
-(197, 'BILLIARD BALLS SET', 'BILLIARDS', 'MULTI', NULL, 200.00, 0, 50, 'l'),
-(200, 'FIETSBAND', 'FIETS', 'ZWART', NULL, 100.00, 0, 50, 'l'),
-(203, 'DIVING FINS', 'DIVING', 'BLAUW', NULL, 100.00, 0, 50, 'l'),
-(205, 'FLUITJE', 'VOETBAL', 'GROEN', NULL, 500.00, 0, 50, 'l'),
-(207, 'RESISTANCE BAND', 'FITNESS', 'GEMEN', NULL, 50.00, 0, 50, 'l'),
-(209, 'VOETBAL', 'BAL', 'Size', 'Color', 0.00, 3, 10, 'h'),
-(210, 'YOGABAL', 'YOGA', 'PAARS', NULL, 120.00, 0, 50, 'l'),
-(211, 'SWIMMING GOGGLES', 'SWIMMING', 'BLAUW', NULL, 75.00, 0, 50, 'l'),
-(212, 'BASEBALL GLOVE', 'SPORT', 'LILA', NULL, 90.00, 0, 50, 'h'),
-(214, 'JAVELIN', 'TRACK AND FIELD', '', NULL, 150.00, 0, 50, 'h'),
-(215, 'ICE HOCKEY STICK', 'ICE HOCKEY', 'ZWART', NULL, 180.00, 0, 50, 'h'),
-(218, 'ARCHERY TARGET', 'ARCHERY', '', NULL, 300.00, 0, 50, 'l'),
-(220, 'CLIMBING HARNESS', 'CLIMBING', '', NULL, 175.00, 0, 50, 'h'),
-(224, 'Sportsokken', 'Kleding', 'M', 'Zwart', 5.00, 100, 50, 'l'),
-(225, 'SKIPPING ROPE', 'FITNESS', 'ROOD', NULL, 75.00, 0, 50, 'l'),
-(228, 'Springtouw', 'Fitness', '2.5m', 'Rood', 8.00, 10, 50, 'l'),
-(232, 'FENCING MASK', 'FENCING', 'ZWART', NULL, 180.00, 0, 50, 'h'),
-(234, 'ZWEMBAD', 'WATERSPORT', 'BLAUW', NULL, 25.00, 0, 50, 'h'),
-(237, 'PICKLEBALL PADDLE', 'PICKLEBALL', 'BLAUW', NULL, 50.00, 0, 50, 'l'),
-(239, 'BOWLING BALL', 'BOWLING', 'ZWART', NULL, 100.00, 0, 50, 'l'),
-(242, 'Water Bottle', 'Hydration', '500ml', 'Transparent', 5.00, 200, 50, 'l'),
-(245, 'ARCHERY GLOVES', 'ARCHERY', 'BRUIN', NULL, 75.00, 0, 50, 'l'),
-(253, 'Golfbal', 'Bal', 'Stand', 'Wit', 1.25, 100, 50, 'l'),
-(255, 'BASKETBAL', 'Bal', 'Size', 'Color', 0.00, 0, 10, 'h'),
-(257, 'BALANSBOARD', 'Fitness', 'Standard', 'Black', 15.00, 50, 5, 'h'),
-(258, 'BICYCLE HELMET', 'CYCLING', 'BLAUW', NULL, 80.00, 0, 50, 'l'),
-(260, 'HIKING SHOES', 'HIKING', 'BRUIN', NULL, 400.00, 0, 50, 'h'),
-(261, 'MMA GLOVES', 'MARTIAL ARTS', 'ZWART', NULL, 65.00, 0, 50, 'l'),
-(262, 'HULAHOEP', 'Fitness', 'Size', 'Color', 10.00, 0, 10, 'h'),
-(263, 'Kettlebell', 'Fitness', '10kg', 'Zwart', 35.00, 100, 50, 'h'),
-(266, 'MOUNTAINBIKE', 'FIETS', 'ROOD', NULL, 30.00, 0, 50, 'h'),
-(269, 'JUMP ROPE', 'FITNESS', 'GEEL', NULL, 15.00, 0, 50, 'l'),
-(273, 'BEACH VOLLEYBALL', 'VOLLEYBALL', 'GEEL', NULL, 30.00, 0, 50, 'l'),
-(274, 'KARATE UNIFORM', 'MARTIAL ARTS', 'WIT', NULL, 120.00, 0, 50, 'l'),
-(276, 'ROLLERBLADES', 'SKATING', 'ZWART', NULL, 275.00, 0, 50, 'h'),
-(281, 'Product Name 281', 'Category', 'Size', 'Color', 0.00, 0, 10, 'h'),
-(282, 'HIKING BACKPACK', 'HIKING', 'GROEN', NULL, 500.00, 0, 50, 'h'),
-(283, 'RUGBY BALL', 'SPORT', 'BLAUW', NULL, 50.00, 0, 50, 'l'),
-(285, 'VOETBALDOEL', 'VOETBAL', 'WIT', NULL, 10.00, 0, 50, 'h'),
-(286, 'Mountain Bike Helmet', 'Cycling', 'M', 'Red', 75.00, 30, 5, 'h'),
-(289, 'YOGA MAT', 'YOGA', 'GROEN', NULL, 45.00, 0, 50, 'l'),
-(291, 'DARTBOARD', 'DARTS', '', NULL, 125.00, 0, 50, 'l'),
-(292, 'PARALLEL BARS', 'GYMNASTICS', '', NULL, 1500.00, 0, 50, 'h'),
-(294, 'HORSE SADDLE', 'EQUESTRIAN', 'BRUIN', NULL, 800.00, 0, 50, 'h'),
-(296, 'GIPSKRUIS', 'SPORT', 'WIT', NULL, 50.00, 0, 50, 'l'),
-(297, 'Sports Gloves', 'Accessories', 'L', 'Black', 25.00, 100, 20, 'l'),
-(298, 'ARCHERY BOW', 'ARCHERY', 'ZWART', NULL, 550.00, 0, 50, 'h'),
-(300, 'EXERCISE MAT', 'YOGA', '', NULL, 50.00, 0, 50, 'l'),
-(302, 'FITNESS TOWEL', 'FITNESS', 'WIT', NULL, 25.00, 0, 50, 'l'),
-(306, 'MOUNTAIN BIKE', 'CYCLING', 'ZWART', NULL, 3500.00, 0, 50, 'h'),
-(307, 'FOOTBALL GLOVES', 'FOOTBALL', 'ZWART', NULL, 90.00, 0, 50, 'l'),
-(308, 'SCUBA WETSUIT', 'DIVING', 'ZWART', NULL, 300.00, 0, 50, 'h'),
-(309, 'SLEDGE HAMMER', 'FITNESS', 'ZWART', NULL, 100.00, 0, 50, 'h'),
-(311, 'Trampoline', 'Accessoire', '2m', 'Groen', 200.00, 150, 50, 'h'),
-(312, 'SPORT DRINK BOTTLE', 'HYDRATION', 'GEEL', NULL, 200.00, 0, 50, 'l'),
-(314, 'TENNISBAL', 'Category', 'Size', 'Color', 10.00, 250, 10, 'h'),
-(315, 'BASEBALL CAP', 'BASEBALL', 'BLAUW', NULL, 25.00, 0, 50, 'l'),
-(316, 'LACROSSE STICK', 'SPORT', 'GEMEN', NULL, 100.00, 0, 50, 'l'),
-(319, 'Voetbalhandschoenen', 'Accessoire', 'Stand', 'Zwart', 12.50, 100, 50, 'l'),
-(320, 'SWIM GOGGLES', 'SWIMMING', 'WIT', NULL, 300.00, 0, 50, 'l'),
-(327, 'HEADELASTIC', 'TRAINING', 'GEMEN', NULL, 30.00, 0, 50, 'l'),
-(332, 'GOLF CLUB', 'SPORT', 'ZWART', NULL, 100.00, 0, 50, 'h'),
-(334, 'RUNNING TIGHTS', 'RUNNING', 'ZWART', NULL, 80.00, 0, 50, 'l'),
-(335, 'FOOTBALL', 'BAL', 'ROZE', NULL, 150.00, 0, 50, 'l'),
-(341, 'FIELD HOCKEY STICK', 'FIELD HOCKEY', 'BRUIN', NULL, 130.00, 0, 50, 'h'),
-(345, 'BOWLING PINS SET', 'BOWLING', 'WIT', NULL, 120.00, 0, 50, 'l'),
-(348, 'TENNIS SHIRT', 'TENNIS', 'WIT', NULL, 100.00, 0, 50, 'l'),
-(350, 'JUDO UNIFORM', 'MARTIAL ARTS', 'WIT', NULL, 100.00, 0, 50, 'l'),
-(351, 'Yoga Mat', 'Yoga', 'Standard', 'Purple', 20.00, 150, 30, 'l'),
-(354, 'SKI GOGGLES', 'SKIING', 'GRIJS', NULL, 120.00, 0, 50, 'l'),
-(355, 'Product Name 355', 'Category', 'Size', 'Color', 1.05, 100, 10, 'h'),
-(361, 'RESISTANCE BAND', 'FITNESS', 'GEMEN', NULL, 50.00, 0, 50, 'l'),
-(362, 'Yoga Block', '23x15', 'Paars', NULL, 10.00, 40, 50, 'l'),
-(363, 'SUPBOARD', 'WATERSPORT', 'BLAUW', NULL, 30.00, 0, 50, 'h'),
-(364, 'HARTSLAGMETER', 'FITNESS', 'ZWART', NULL, 150.00, 0, 50, 'l'),
-(365, 'TREADMILL', 'FITNESS', '', NULL, 30.00, 785, 50, 'l'),
-(367, 'BASKETBALL HOOP', 'SPORT', 'GROEN', NULL, 50.00, 0, 50, 'h'),
-(369, 'WEIGHT LIFTING BELT', 'FITNESS', 'ZWART', NULL, 75.00, 0, 50, 'l'),
-(371, 'SCUBA TANK', 'DIVING', '', NULL, 800.00, 0, 50, 'h'),
-(372, 'HEADELASTIC', 'TRAINING', 'GEMEN', NULL, 30.00, 0, 50, 'l'),
-(374, 'TENNIS BALLS', 'TENNIS', 'GEEL', NULL, 10.00, 0, 50, 'l'),
-(378, 'SOCCER GOAL NET', 'FOOTBALL', 'WIT', NULL, 250.00, 0, 50, 'h'),
-(380, 'Squashbal', 'Bal', 'Stand', 'Blauw', 2.00, 125, 50, 'l'),
-(383, 'FITNESSMAT', 'FITNESS', 'GROEN', NULL, 75.00, 0, 50, 'l'),
-(384, 'Springtouw', 'Fitness', '3m', 'Rood', 7.50, 100, 50, 'l'),
-(386, 'PULL BUOY', 'SWIMMING', 'BLAUW', NULL, 45.00, 0, 50, 'l'),
-(387, 'SQUASH RACKET', 'SQUASH', 'ZWART', NULL, 90.00, 0, 50, 'l'),
-(388, 'BALLET LEOTARD', 'DANCE', 'ZWART', NULL, 50.00, 0, 50, 'l'),
-(390, 'PINGPONGBAL', 'TAFELTENNIS', 'WIT', NULL, 1000.00, 0, 50, 'l'),
-(391, 'Hockeybal', 'Bal', 'Stand', 'Geel', 5.50, 10, 50, 'h'),
-(394, 'TREADMILL', 'FITNESS', '', NULL, 30.00, 0, 50, 'l'),
-(397, 'SPORT DRINK BOTTLE', 'Category', 'Size', 'Color', 20.00, 35, 10, 'l'),
-(398, 'Tennisracket', 'Racket', 'Stand', 'Zwart', 45.00, 10, 50, 'h'),
-(399, 'WEIGHT BENCH', 'FITNESS', 'ZWART', NULL, 700.00, 0, 50, 'h'),
-(401, 'FOLDING BIKE', 'CYCLING', 'ZWART', NULL, 2500.00, 0, 50, 'l'),
-(408, 'FIETSHELM', 'FIETS', 'BLAUW', NULL, 175.00, 0, 50, 'h'),
-(410, 'BALLET SHOES', 'DANCE', 'ROZE', NULL, 80.00, 0, 50, 'l'),
-(419, 'SWIMMING CAP', 'SWIMMING', 'BLAUW', NULL, 30.00, 0, 50, 'l'),
-(420, 'TENNIS BALLS', 'Category', 'Size', 'Color', 0.00, 0, 10, 'h'),
-(421, 'RUNNING WATER BOTTLE', 'RUNNING', 'GRIJS', NULL, 20.00, 0, 50, 'l'),
-(422, 'Tennissokken', 'Kleding', 'M', 'Wit', 3.50, 125, 50, 'l'),
-(425, 'BADMINTONRACKET', 'RACKET', 'ROOD', NULL, 85.00, 7, 50, 'l'),
-(426, 'Fitnessmat', 'Fitness', '180x6', 'Blauw', 15.00, 500, 50, 'l'),
-(427, 'EXERCISE MAT', 'YOGA', '', NULL, 50.00, 0, 50, 'l'),
-(428, 'SWIM GOGGLES', 'SWIMMING', 'WIT', NULL, 300.00, 0, 50, 'l'),
-(432, 'BALANCE TRAINER', 'FITNESS', 'BLAUW', NULL, 200.00, 0, 50, 'h'),
-(433, 'SPEED LADDER', 'FITNESS', 'GEEL', NULL, 50.00, 0, 50, 'l'),
-(434, 'Basketbal', 'Bal', '7', 'Oranje', 28.00, 50, 50, 'h'),
-(437, 'Product Name 437', 'Category', 'Size', 'Color', 1.30, 100, 10, 'h'),
-(438, 'Voetbalshirt', 'Kleding', 'L', 'Rood', 30.00, 100, 50, 'h'),
-(441, 'WRESTLING SHOES', 'WRESTLING', 'ROOD', NULL, 250.00, 0, 50, 'h'),
-(450, 'BOXING BAG', 'BOXING', '', NULL, 600.00, 0, 50, 'h'),
-(452, 'INLINE SKATES', 'SKATING', 'ZWART', NULL, 300.00, 0, 50, 'h'),
-(453, 'FENCING FOIL', 'FENCING', 'GRIJS', NULL, 180.00, 0, 50, 'h'),
-(455, 'Handbal', 'Bal', 'Stand', 'Gemengd', 20.00, 300, 50, 'h'),
-(457, 'KITESURF BOARD', 'KITESURFING', 'BLAUW', NULL, 750.00, 0, 50, 'h'),
-(458, 'BASEBALL MITT', 'BASEBALL', 'BRUIN', NULL, 150.00, 0, 50, 'h'),
-(462, 'TENNIS BALLS', 'Category', 'Size', 'Color', 1.25, 0, 40, 'h'),
-(466, 'BIKE LOCK', 'CYCLING', 'ZWART', NULL, 40.00, 0, 50, 'l'),
-(467, 'Sports T-shirt', 'Kleding', 'L', 'Geel', 20.00, 300, 50, 'l'),
-(468, 'BOKSHANDSCHOENEN', 'BOKSEN', 'ROOD', NULL, 150.00, 100, 50, 'h'),
-(469, 'FOOTBALL', 'BAL', 'ROZE', NULL, 150.00, 0, 50, 'l'),
-(470, 'GIPSKRUIS', 'SPORT', 'WIT', NULL, 50.00, 115, 50, 'l'),
-(471, 'SOCCER CLEATS', 'FOOTBALL', 'GEEL', NULL, 400.00, 0, 50, 'h'),
-(477, 'BADMINTON NET', 'BADMINTON', 'WIT', NULL, 150.00, 0, 50, 'l'),
-(478, 'Dumbbell', 'Fitness', '5kg', 'Zwart', 15.00, 171, 50, 'h'),
-(481, 'SURFBOARD', 'SURFING', 'WIT', NULL, 600.00, 0, 50, 'h'),
-(486, 'BIKE HELMET', 'CYCLING', 'ROOD', NULL, 120.00, 0, 50, 'l'),
-(489, 'ROWING MACHINE', 'FITNESS', 'GRIJS', NULL, 1500.00, 0, 50, 'h'),
-(493, 'TRIATHLON WETSUIT', 'Running', 'Size', 'Color', 30.00, 0, 40, 'l'),
-(497, 'PULL-UP BAR', 'FITNESS', 'ZWART', NULL, 120.00, 0, 50, 'l'),
-(498, 'JUMP ROPE', 'EXERCISE', '', NULL, 250.00, 0, 50, 'h');
+INSERT INTO `sports_articles` (`article_code`, `article_name`, `category`, `size`, `color`, `price`, `stock_quantity`, `stock_min`, `VAT_type`, `created_at`) VALUES
+(1, 'Premium Football', 'Ball', '5', 'White/Black', 30.00, 50, 10, 'h', '2025-01-16 13:26:13'),
+(2, 'Professional Tennis Racket', 'Racket', 'Standard', 'Black', 150.00, 20, 5, 'h', '2025-01-16 13:26:13'),
+(12, 'Advanced Basketball', 'Ball', '7', 'Orange', 25.00, 40, 10, 'h', '2025-01-16 13:26:13'),
+(13, 'Naam van Artikel 13', 'Categorie', 'Grootte', 'Kleur', 25.00, 30, 5, 'l', '2025-01-16 13:26:13'),
+(19, 'Table Tennis Paddle', 'Racket', 'Standard', 'Red/Black', 15.00, 60, 15, 'l', '2025-01-16 13:26:13'),
+(23, 'Volleyball Net', 'Accessory', 'Standard', 'White', 75.00, 100, 5, 'l', '2025-01-16 13:26:13'),
+(24, 'Naam van Artikel 24', 'Categorie', 'Grootte', 'Kleur', 20.00, 50, 10, 'h', '2025-01-16 13:26:13'),
+(27, 'Running Shoes', 'Footwear', '42', 'Black', 75.00, 50, 5, 'h', '2025-01-16 13:26:13'),
+(28, 'Product Name 28', 'Category', 'Size', 'Color', 10.00, 100, 10, 'h', '2025-01-16 13:26:13'),
+(31, 'Basketbalhoepel', 'Accessoire', 'Stand', 'Oranje', 60.00, 150, 50, 'h', '2025-01-16 13:26:13'),
+(35, 'Tafeltennisbat', 'Racket', 'Stand', 'Rood', 5.00, 100, 50, 'l', '2025-01-16 13:26:13'),
+(36, 'Schemershirt', 'Kleding', 'M', 'Blauw', 22.50, 155, 50, 'l', '2025-01-16 13:26:13'),
+(39, 'Voetbalschoenen', 'Schoenen', '42', 'Wit/Zwart', 65.00, 10, 50, 'h', '2025-01-16 13:26:13'),
+(42, 'BASEBALL GLOVE', 'SPORT', 'LILA', NULL, 90.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(47, 'PULL-UP BAR', 'FITNESS', 'ROOD', NULL, 50.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(50, 'SKEELERS', 'SKATEN', 'ZWART', NULL, 50.00, 200, 50, 'h', '2025-01-16 13:26:13'),
+(52, 'BOXING GLOVES', 'BOXING', 'ROOD', NULL, 150.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(54, 'HOCKEYSTICK', 'HOCKEY', 'ZWART', NULL, 75.00, 50, 50, 'h', '2025-01-16 13:26:13'),
+(56, 'Boksbandage', 'Accessoire', 'L', 'Rood', 7.50, 24, 50, 'l', '2025-01-16 13:26:13'),
+(61, 'TENNISRACKET', 'RACKET', 'BLAUW', NULL, 300.00, 10, 50, 'h', '2025-01-16 13:26:13'),
+(66, 'Product Name 66', 'Category', 'Size', 'Color', 6.10, 100, 10, 'h', '2025-01-16 13:26:13'),
+(67, 'Potentiometer', 'Electronics', 'Standard', 'Black', 15.00, 50, 5, 'h', '2025-01-16 13:26:13'),
+(68, 'MOUNTAINBIKE', 'FIETS', 'ROOD', NULL, 30.00, 37, 50, 'h', '2025-01-16 13:26:13'),
+(71, 'Sporttape', 'Accessoire', '5m', 'Wit', 2.50, 100, 50, 'l', '2025-01-16 13:26:13'),
+(74, 'SOCCER CLEATS', 'FOOTBALL', 'GEEL', NULL, 400.00, 200, 50, 'h', '2025-01-16 13:26:13'),
+(78, 'Hardloopschoenen', 'Schoenen', '43', 'Blauw', 75.00, 100, 50, 'h', '2025-01-16 13:26:13'),
+(80, 'RUGBYBAL', 'BAL', 'BRUIN', NULL, 200.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(82, 'WATERFLES', 'SPORT', 'WIT', NULL, 7.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(87, 'Gewichthefriem', 'Accessoire', 'M', 'Zwart', 12.00, 150, 50, 'l', '2025-01-16 13:26:13'),
+(89, 'LACROSSE STICK', 'SPORT', 'GEMEN', NULL, 100.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(95, 'JUMPBOOT', 'SPORT', 'LILA', NULL, 70.00, 200, 50, 'l', '2025-01-16 13:26:13'),
+(102, 'Unknown Article 102', 'CategoryX', 'SizeX', 'ColorX', 10.00, 135, 10, 'l', '2025-01-16 13:26:13'),
+(103, 'Basketbalschoenen', 'Schoenen', '45', 'Zwart/Rood', 90.00, 100, 50, 'h', '2025-01-16 13:26:13'),
+(104, 'WIELERHANDSCHOENEN', 'FIETS', 'ZWART', NULL, 400.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(105, 'Tennisballen (3-pack)', 'Bal', 'Stand', 'Geel', 8.00, 100, 50, 'h', '2025-01-16 13:26:13'),
+(108, 'Voetbal', 'Bal', '5', 'Rood/Zwart', 25.00, 10, 50, 'h', '2025-01-16 13:26:13'),
+(111, 'ICE SKATES', 'SKATING', 'ZWART', NULL, 400.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(112, 'DUMBBELLS SET', 'WEIGHTS', 'GRIJS', NULL, 350.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(117, 'JUMP ROPE', 'EXERCISE', '', NULL, 250.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(120, 'SPORTTAS', 'FITNESS', 'ZWART', NULL, 200.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(123, 'DUMBELLS', 'WEIGHTS', '', NULL, 500.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(124, 'GYMNASTICS RINGS', 'GYMNASTICS', '', NULL, 120.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(126, 'ZWEMBANDEN', 'WATERSPORT', 'GEEL', NULL, 350.00, 100, 50, 'l', '2025-01-16 13:26:13'),
+(127, 'ROLLER SKATES', 'SKATING', 'ZWART', NULL, 120.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(130, 'Sports Cap', 'Accessories', 'One Size', 'Blue', 15.00, 50, 10, 'l', '2025-01-16 13:26:13'),
+(133, 'FIELD HOCKEY BALL', 'FIELD HOCKEY', 'WIT', NULL, 15.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(135, 'EQUESTRIAN HELMET', 'EQUESTRIAN', 'ZWART', NULL, 300.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(137, 'ROLLER SKATES', 'SKATING', 'ROZE', NULL, 150.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(140, 'VOLLEYBALL NET', 'VOLLEYBALL', 'WIT', NULL, 250.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(143, 'Badmintonshuttle', 'Accessoire', 'Stand', 'Wit', 1.50, 25, 50, 'l', '2025-01-16 13:26:13'),
+(144, 'CAMPING TENT', 'CAMPING', 'GROEN', NULL, 500.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(147, 'Resistance Bands (set)', 'Accessoire', 'Stand', 'Multicolor', 10.00, 100, 50, 'l', '2025-01-16 13:26:13'),
+(153, 'SPRINGTOUW', 'FITNESS', 'GROEN', NULL, 200.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(155, 'MARTIAL ARTS MAT', 'MARTIAL ARTS', 'BLAUW', NULL, 400.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(157, 'Zwemvliezen', 'Accessoire', 'M', 'Blauw', 25.00, 800, 50, 'h', '2025-01-16 13:26:13'),
+(159, 'TREADMILL', 'FITNESS', 'ZWART', NULL, 2500.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(162, 'PULL-UP BAR', 'FITNESS', 'ROOD', NULL, 50.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(163, 'WEIGHTED VEST', 'FITNESS', 'ZWART', NULL, 150.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(164, 'TENNIS RACKET', 'SPORT', 'WIT', NULL, 70.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(165, 'DIVE MASK', 'DIVING', 'BLAUW', NULL, 120.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(167, 'FRISBEE', 'OUTDOOR', 'ROOD', NULL, 25.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(169, 'TENNISTAS', 'TENNIS', 'BLAUW', NULL, 120.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(170, 'GOLF CLUB', 'SPORT', 'ZWART', NULL, 100.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(172, 'TABLE TENNIS PADDLE', 'TABLE TENNIS', 'ROOD', NULL, 45.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(175, 'TENNIS RACKET', 'SPORT', 'WIT', NULL, 70.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(178, 'Product Name 178', 'Category', 'Size', 'Color', 3.40, 100, 10, 'h', '2025-01-16 13:26:13'),
+(180, 'LOOPBAND', 'FITNESS', 'ZWART', NULL, 20.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(184, 'RUGBY BALL', 'SPORT', 'BLAUW', NULL, 50.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(190, 'WATERFLES', 'SPORT', 'WIT', NULL, 7.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(193, 'CUE STICK', 'BILLIARDS', 'BRUIN', NULL, 180.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(195, 'DUIKBRIL', 'ZWEMMEN', 'ZWART', NULL, 300.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(197, 'BILLIARD BALLS SET', 'BILLIARDS', 'MULTI', NULL, 200.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(200, 'FIETSBAND', 'FIETS', 'ZWART', NULL, 100.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(203, 'DIVING FINS', 'DIVING', 'BLAUW', NULL, 100.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(205, 'FLUITJE', 'VOETBAL', 'GROEN', NULL, 500.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(207, 'RESISTANCE BAND', 'FITNESS', 'GEMEN', NULL, 50.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(209, 'VOETBAL', 'BAL', 'Size', 'Color', 0.00, 3, 10, 'h', '2025-01-16 13:26:13'),
+(210, 'YOGABAL', 'YOGA', 'PAARS', NULL, 120.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(211, 'SWIMMING GOGGLES', 'SWIMMING', 'BLAUW', NULL, 75.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(212, 'BASEBALL GLOVE', 'SPORT', 'LILA', NULL, 90.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(214, 'JAVELIN', 'TRACK AND FIELD', '', NULL, 150.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(215, 'ICE HOCKEY STICK', 'ICE HOCKEY', 'ZWART', NULL, 180.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(218, 'ARCHERY TARGET', 'ARCHERY', '', NULL, 300.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(220, 'CLIMBING HARNESS', 'CLIMBING', '', NULL, 175.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(224, 'Sportsokken', 'Kleding', 'M', 'Zwart', 5.00, 100, 50, 'l', '2025-01-16 13:26:13'),
+(225, 'SKIPPING ROPE', 'FITNESS', 'ROOD', NULL, 75.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(228, 'Springtouw', 'Fitness', '2.5m', 'Rood', 8.00, 10, 50, 'l', '2025-01-16 13:26:13'),
+(232, 'FENCING MASK', 'FENCING', 'ZWART', NULL, 180.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(234, 'ZWEMBAD', 'WATERSPORT', 'BLAUW', NULL, 25.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(237, 'PICKLEBALL PADDLE', 'PICKLEBALL', 'BLAUW', NULL, 50.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(239, 'BOWLING BALL', 'BOWLING', 'ZWART', NULL, 100.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(242, 'Water Bottle', 'Hydration', '500ml', 'Transparent', 5.00, 200, 50, 'l', '2025-01-16 13:26:13'),
+(245, 'ARCHERY GLOVES', 'ARCHERY', 'BRUIN', NULL, 75.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(253, 'Golfbal', 'Bal', 'Stand', 'Wit', 1.25, 100, 50, 'l', '2025-01-16 13:26:13'),
+(255, 'BASKETBAL', 'Bal', 'Size', 'Color', 0.00, 0, 10, 'h', '2025-01-16 13:26:13'),
+(257, 'BALANSBOARD', 'Fitness', 'Standard', 'Black', 15.00, 50, 5, 'h', '2025-01-16 13:26:13'),
+(258, 'BICYCLE HELMET', 'CYCLING', 'BLAUW', NULL, 80.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(260, 'HIKING SHOES', 'HIKING', 'BRUIN', NULL, 400.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(261, 'MMA GLOVES', 'MARTIAL ARTS', 'ZWART', NULL, 65.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(262, 'HULAHOEP', 'Fitness', 'Size', 'Color', 10.00, 0, 10, 'h', '2025-01-16 13:26:13'),
+(263, 'Kettlebell', 'Fitness', '10kg', 'Zwart', 35.00, 100, 50, 'h', '2025-01-16 13:26:13'),
+(266, 'MOUNTAINBIKE', 'FIETS', 'ROOD', NULL, 30.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(269, 'JUMP ROPE', 'FITNESS', 'GEEL', NULL, 15.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(273, 'BEACH VOLLEYBALL', 'VOLLEYBALL', 'GEEL', NULL, 30.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(274, 'KARATE UNIFORM', 'MARTIAL ARTS', 'WIT', NULL, 120.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(276, 'ROLLERBLADES', 'SKATING', 'ZWART', NULL, 275.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(281, 'Product Name 281', 'Category', 'Size', 'Color', 0.00, 0, 10, 'h', '2025-01-16 13:26:13'),
+(282, 'HIKING BACKPACK', 'HIKING', 'GROEN', NULL, 500.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(283, 'RUGBY BALL', 'SPORT', 'BLAUW', NULL, 50.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(285, 'VOETBALDOEL', 'VOETBAL', 'WIT', NULL, 10.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(286, 'Mountain Bike Helmet', 'Cycling', 'M', 'Red', 75.00, 30, 5, 'h', '2025-01-16 13:26:13'),
+(289, 'YOGA MAT', 'YOGA', 'GROEN', NULL, 45.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(291, 'DARTBOARD', 'DARTS', '', NULL, 125.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(292, 'PARALLEL BARS', 'GYMNASTICS', '', NULL, 1500.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(294, 'HORSE SADDLE', 'EQUESTRIAN', 'BRUIN', NULL, 800.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(296, 'GIPSKRUIS', 'SPORT', 'WIT', NULL, 50.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(297, 'Sports Gloves', 'Accessories', 'L', 'Black', 25.00, 100, 20, 'l', '2025-01-16 13:26:13'),
+(298, 'ARCHERY BOW', 'ARCHERY', 'ZWART', NULL, 550.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(300, 'EXERCISE MAT', 'YOGA', '', NULL, 50.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(302, 'FITNESS TOWEL', 'FITNESS', 'WIT', NULL, 25.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(306, 'MOUNTAIN BIKE', 'CYCLING', 'ZWART', NULL, 3500.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(307, 'FOOTBALL GLOVES', 'FOOTBALL', 'ZWART', NULL, 90.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(308, 'SCUBA WETSUIT', 'DIVING', 'ZWART', NULL, 300.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(309, 'SLEDGE HAMMER', 'FITNESS', 'ZWART', NULL, 100.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(311, 'Trampoline', 'Accessoire', '2m', 'Groen', 200.00, 150, 50, 'h', '2025-01-16 13:26:13'),
+(312, 'SPORT DRINK BOTTLE', 'HYDRATION', 'GEEL', NULL, 200.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(314, 'TENNISBAL', 'Category', 'Size', 'Color', 10.00, 250, 10, 'h', '2025-01-16 13:26:13'),
+(315, 'BASEBALL CAP', 'BASEBALL', 'BLAUW', NULL, 25.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(316, 'LACROSSE STICK', 'SPORT', 'GEMEN', NULL, 100.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(319, 'Voetbalhandschoenen', 'Accessoire', 'Stand', 'Zwart', 12.50, 100, 50, 'l', '2025-01-16 13:26:13'),
+(320, 'SWIM GOGGLES', 'SWIMMING', 'WIT', NULL, 300.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(327, 'HEADELASTIC', 'TRAINING', 'GEMEN', NULL, 30.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(332, 'GOLF CLUB', 'SPORT', 'ZWART', NULL, 100.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(334, 'RUNNING TIGHTS', 'RUNNING', 'ZWART', NULL, 80.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(335, 'FOOTBALL', 'BAL', 'ROZE', NULL, 150.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(341, 'FIELD HOCKEY STICK', 'FIELD HOCKEY', 'BRUIN', NULL, 130.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(345, 'BOWLING PINS SET', 'BOWLING', 'WIT', NULL, 120.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(348, 'TENNIS SHIRT', 'TENNIS', 'WIT', NULL, 100.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(350, 'JUDO UNIFORM', 'MARTIAL ARTS', 'WIT', NULL, 100.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(351, 'Yoga Mat', 'Yoga', 'Standard', 'Purple', 20.00, 150, 30, 'l', '2025-01-16 13:26:13'),
+(354, 'SKI GOGGLES', 'SKIING', 'GRIJS', NULL, 120.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(355, 'Product Name 355', 'Category', 'Size', 'Color', 1.05, 100, 10, 'h', '2025-01-16 13:26:13'),
+(361, 'RESISTANCE BAND', 'FITNESS', 'GEMEN', NULL, 50.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(362, 'Yoga Block', '23x15', 'Paars', NULL, 10.00, 40, 50, 'l', '2025-01-16 13:26:13'),
+(363, 'SUPBOARD', 'WATERSPORT', 'BLAUW', NULL, 30.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(364, 'HARTSLAGMETER', 'FITNESS', 'ZWART', NULL, 150.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(365, 'TREADMILL', 'FITNESS', '', NULL, 30.00, 785, 50, 'l', '2025-01-16 13:26:13'),
+(367, 'BASKETBALL HOOP', 'SPORT', 'GROEN', NULL, 50.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(369, 'WEIGHT LIFTING BELT', 'FITNESS', 'ZWART', NULL, 75.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(371, 'SCUBA TANK', 'DIVING', '', NULL, 800.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(372, 'HEADELASTIC', 'TRAINING', 'GEMEN', NULL, 30.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(374, 'TENNIS BALLS', 'TENNIS', 'GEEL', NULL, 10.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(378, 'SOCCER GOAL NET', 'FOOTBALL', 'WIT', NULL, 250.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(380, 'Squashbal', 'Bal', 'Stand', 'Blauw', 2.00, 125, 50, 'l', '2025-01-16 13:26:13'),
+(383, 'FITNESSMAT', 'FITNESS', 'GROEN', NULL, 75.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(384, 'Springtouw', 'Fitness', '3m', 'Rood', 7.50, 100, 50, 'l', '2025-01-16 13:26:13'),
+(386, 'PULL BUOY', 'SWIMMING', 'BLAUW', NULL, 45.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(387, 'SQUASH RACKET', 'SQUASH', 'ZWART', NULL, 90.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(388, 'BALLET LEOTARD', 'DANCE', 'ZWART', NULL, 50.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(390, 'PINGPONGBAL', 'TAFELTENNIS', 'WIT', NULL, 1000.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(391, 'Hockeybal', 'Bal', 'Stand', 'Geel', 5.50, 10, 50, 'h', '2025-01-16 13:26:13'),
+(394, 'TREADMILL', 'FITNESS', '', NULL, 30.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(397, 'SPORT DRINK BOTTLE', 'Category', 'Size', 'Color', 20.00, 35, 10, 'l', '2025-01-16 13:26:13'),
+(398, 'Tennisracket', 'Racket', 'Stand', 'Zwart', 45.00, 10, 50, 'h', '2025-01-16 13:26:13'),
+(399, 'WEIGHT BENCH', 'FITNESS', 'ZWART', NULL, 700.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(401, 'FOLDING BIKE', 'CYCLING', 'ZWART', NULL, 2500.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(408, 'FIETSHELM', 'FIETS', 'BLAUW', NULL, 175.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(410, 'BALLET SHOES', 'DANCE', 'ROZE', NULL, 80.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(419, 'SWIMMING CAP', 'SWIMMING', 'BLAUW', NULL, 30.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(420, 'TENNIS BALLS', 'Category', 'Size', 'Color', 0.00, 0, 10, 'h', '2025-01-16 13:26:13'),
+(421, 'RUNNING WATER BOTTLE', 'RUNNING', 'GRIJS', NULL, 20.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(422, 'Tennissokken', 'Kleding', 'M', 'Wit', 3.50, 125, 50, 'l', '2025-01-16 13:26:13'),
+(425, 'BADMINTONRACKET', 'RACKET', 'ROOD', NULL, 85.00, 7, 50, 'l', '2025-01-16 13:26:13'),
+(426, 'Fitnessmat', 'Fitness', '180x6', 'Blauw', 15.00, 500, 50, 'l', '2025-01-16 13:26:13'),
+(427, 'EXERCISE MAT', 'YOGA', '', NULL, 50.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(428, 'SWIM GOGGLES', 'SWIMMING', 'WIT', NULL, 300.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(432, 'BALANCE TRAINER', 'FITNESS', 'BLAUW', NULL, 200.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(433, 'SPEED LADDER', 'FITNESS', 'GEEL', NULL, 50.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(434, 'Basketbal', 'Bal', '7', 'Oranje', 28.00, 50, 50, 'h', '2025-01-16 13:26:13'),
+(437, 'Product Name 437', 'Category', 'Size', 'Color', 1.30, 100, 10, 'h', '2025-01-16 13:26:13'),
+(438, 'Voetbalshirt', 'Kleding', 'L', 'Rood', 30.00, 100, 50, 'h', '2025-01-16 13:26:13'),
+(441, 'WRESTLING SHOES', 'WRESTLING', 'ROOD', NULL, 250.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(450, 'BOXING BAG', 'BOXING', '', NULL, 600.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(452, 'INLINE SKATES', 'SKATING', 'ZWART', NULL, 300.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(453, 'FENCING FOIL', 'FENCING', 'GRIJS', NULL, 180.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(455, 'Handbal', 'Bal', 'Stand', 'Gemengd', 20.00, 300, 50, 'h', '2025-01-16 13:26:13'),
+(457, 'KITESURF BOARD', 'KITESURFING', 'BLAUW', NULL, 750.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(458, 'BASEBALL MITT', 'BASEBALL', 'BRUIN', NULL, 150.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(462, 'TENNIS BALLS', 'Category', 'Size', 'Color', 1.25, 0, 40, 'h', '2025-01-16 13:26:13'),
+(466, 'BIKE LOCK', 'CYCLING', 'ZWART', NULL, 40.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(467, 'Sports T-shirt', 'Kleding', 'L', 'Geel', 20.00, 300, 50, 'l', '2025-01-16 13:26:13'),
+(468, 'BOKSHANDSCHOENEN', 'BOKSEN', 'ROOD', NULL, 150.00, 100, 50, 'h', '2025-01-16 13:26:13'),
+(469, 'FOOTBALL', 'BAL', 'ROZE', NULL, 150.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(470, 'GIPSKRUIS', 'SPORT', 'WIT', NULL, 50.00, 115, 50, 'l', '2025-01-16 13:26:13'),
+(471, 'SOCCER CLEATS', 'FOOTBALL', 'GEEL', NULL, 400.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(477, 'BADMINTON NET', 'BADMINTON', 'WIT', NULL, 150.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(478, 'Dumbbell', 'Fitness', '5kg', 'Zwart', 15.00, 171, 50, 'h', '2025-01-16 13:26:13'),
+(481, 'SURFBOARD', 'SURFING', 'WIT', NULL, 600.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(486, 'BIKE HELMET', 'CYCLING', 'ROOD', NULL, 120.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(489, 'ROWING MACHINE', 'FITNESS', 'GRIJS', NULL, 1500.00, 0, 50, 'h', '2025-01-16 13:26:13'),
+(493, 'TRIATHLON WETSUIT', 'Running', 'Size', 'Color', 30.00, 0, 40, 'l', '2025-01-16 13:26:13'),
+(497, 'PULL-UP BAR', 'FITNESS', 'ZWART', NULL, 120.00, 0, 50, 'l', '2025-01-16 13:26:13'),
+(498, 'JUMP ROPE', 'EXERCISE', '', NULL, 250.00, 0, 50, 'h', '2025-01-16 13:26:13');
 
 -- --------------------------------------------------------
 
 --
--- Tabelstructuur voor tabel `suppliers`
+-- Table structure for table `suppliers`
 --
 
 DROP TABLE IF EXISTS `suppliers`;
@@ -1214,12 +1155,7 @@ CREATE TABLE `suppliers` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
--- Tabel leegmaken voor invoegen `suppliers`
---
-
-TRUNCATE TABLE `suppliers`;
---
--- Gegevens worden geëxporteerd voor tabel `suppliers`
+-- Dumping data for table `suppliers`
 --
 
 INSERT INTO `suppliers` (`supplier_code`, `supplier_name`, `address`, `city`) VALUES
@@ -1238,7 +1174,130 @@ INSERT INTO `suppliers` (`supplier_code`, `supplier_name`, `address`, `city`) VA
 -- --------------------------------------------------------
 
 --
--- Tabelstructuur voor tabel `vat`
+-- Table structure for table `users`
+--
+
+DROP TABLE IF EXISTS `users`;
+CREATE TABLE `users` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `username` varchar(50) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `password_hash` varchar(255) NOT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `role` enum('admin','customer') DEFAULT 'customer'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `created_at`, `role`) VALUES
+(1, 'Simi', 'user@example.com', '$2b$12$Ve4/BETQHT3lFClFYTMIHOBvDG897b1fkqYL2nFaDdFN83DYxTPXC', '2024-12-10 21:23:17', 'admin'),
+(2, 'QA-techlab', 'QA-techlab@qualityaccelerators.nl', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2024-12-18 09:53:25', 'admin'),
+(3, 'User001', 'User001@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(4, 'User002', 'User002@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(5, 'User003', 'User003@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(6, 'User004', 'User004@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(7, 'User005', 'User005@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(8, 'User006', 'User006@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(9, 'User007', 'User007@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(10, 'User008', 'User008@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(11, 'User009', 'User009@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(12, 'User010', 'User010@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(13, 'User011', 'User011@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(14, 'User012', 'User012@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(15, 'User013', 'User013@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(16, 'User014', 'User014@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(17, 'User015', 'User015@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(18, 'User016', 'User016@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(19, 'User017', 'User017@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(20, 'User018', 'User018@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(21, 'User019', 'User019@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(22, 'User020', 'User020@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(23, 'User021', 'User021@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(24, 'User022', 'User022@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(25, 'User023', 'User023@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(26, 'User024', 'User024@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(27, 'User025', 'User025@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(28, 'User026', 'User026@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(29, 'User027', 'User027@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(30, 'User028', 'User028@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(31, 'User029', 'User029@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(32, 'User030', 'User030@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(33, 'User031', 'User031@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(34, 'User032', 'User032@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(35, 'User033', 'User033@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(36, 'User034', 'User034@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(37, 'User035', 'User035@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(38, 'User036', 'User036@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(39, 'User037', 'User037@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(40, 'User038', 'User038@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(41, 'User039', 'User039@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(42, 'User040', 'User040@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(43, 'User041', 'User041@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(44, 'User042', 'User042@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(45, 'User043', 'User043@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(46, 'User044', 'User044@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(47, 'User045', 'User045@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(48, 'User046', 'User046@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(49, 'User047', 'User047@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(50, 'User048', 'User048@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(51, 'User049', 'User049@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(52, 'User050', 'User050@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(53, 'User051', 'User051@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(54, 'User052', 'User052@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(55, 'User053', 'User053@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(56, 'User054', 'User054@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(57, 'User055', 'User055@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(58, 'User056', 'User056@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(59, 'User057', 'User057@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(60, 'User058', 'User058@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(61, 'User059', 'User059@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(62, 'User060', 'User060@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(63, 'User061', 'User061@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(64, 'User062', 'User062@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(65, 'User063', 'User063@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(66, 'User064', 'User064@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(67, 'User065', 'User065@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(68, 'User066', 'User066@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(69, 'User067', 'User067@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(70, 'User068', 'User068@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(71, 'User069', 'User069@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(72, 'User070', 'User070@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(73, 'User071', 'User071@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(74, 'User072', 'User072@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(75, 'User073', 'User073@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(76, 'User074', 'User074@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(77, 'User075', 'User075@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(78, 'User076', 'User076@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(79, 'User077', 'User077@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(80, 'User078', 'User078@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(81, 'User079', 'User079@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(82, 'User080', 'User080@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(83, 'User081', 'User081@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(84, 'User082', 'User082@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(85, 'User083', 'User083@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(86, 'User084', 'User084@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(87, 'User085', 'User085@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(88, 'User086', 'User086@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(89, 'User087', 'User087@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(90, 'User088', 'User088@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(91, 'User089', 'User089@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(92, 'User090', 'User090@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(93, 'User091', 'User091@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(94, 'User092', 'User092@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(95, 'User093', 'User093@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(96, 'User094', 'User094@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(97, 'User095', 'User095@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(98, 'User096', 'User096@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(99, 'User097', 'User097@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(100, 'User098', 'User098@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer'),
+(101, 'User099', 'User099@localhost', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2025-01-15 12:16:32', 'customer');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `vat`
 --
 
 DROP TABLE IF EXISTS `vat`;
@@ -1248,12 +1307,7 @@ CREATE TABLE `vat` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
--- Tabel leegmaken voor invoegen `vat`
---
-
-TRUNCATE TABLE `vat`;
---
--- Gegevens worden geëxporteerd voor tabel `vat`
+-- Dumping data for table `vat`
 --
 
 INSERT INTO `vat` (`type`, `description`) VALUES
@@ -1265,7 +1319,7 @@ INSERT INTO `vat` (`type`, `description`) VALUES
 -- --------------------------------------------------------
 
 --
--- Tabelstructuur voor tabel `vat_percentage`
+-- Table structure for table `vat_percentage`
 --
 
 DROP TABLE IF EXISTS `vat_percentage`;
@@ -1277,12 +1331,7 @@ CREATE TABLE `vat_percentage` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
--- Tabel leegmaken voor invoegen `vat_percentage`
---
-
-TRUNCATE TABLE `vat_percentage`;
---
--- Gegevens worden geëxporteerd voor tabel `vat_percentage`
+-- Dumping data for table `vat_percentage`
 --
 
 INSERT INTO `vat_percentage` (`type`, `from_date`, `to_date`, `percent`) VALUES
@@ -1292,134 +1341,11 @@ INSERT INTO `vat_percentage` (`type`, `from_date`, `to_date`, `percent`) VALUES
 ('l', '1998-01-02', NULL, 6.000);
 
 --
--- Indexen voor geëxporteerde tabellen
+-- Indexes for dumped tables
 --
 
-DROP TABLE IF EXISTS `users`;
-CREATE TABLE IF NOT EXISTS `users` (
-  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `username` varchar(50) NOT NULL,
-  `email` varchar(100) NOT NULL,
-  `password_hash` varchar(255) NOT NULL,
-  `created_at` timestamp NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `username` (`username`),
-  UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
-
 --
--- Gegevens worden geëxporteerd voor tabel `users`
---
-
-INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `created_at`) VALUES
-(1, 'Simi', 'user@example.com', '$2b$12$Ve4/BETQHT3lFClFYTMIHOBvDG897b1fkqYL2nFaDdFN83DYxTPXC', '2024-12-10 21:23:17'),
-(2, 'QA-techlab', 'QA-techlab@qualityaccelerators.nl', '$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe', '2024-12-18 09:53:25');
-COMMIT;
-
-INSERT INTO `users` (`username`, `email`, `password_hash`, `created_at`) VALUES
-('User001','User001@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User002','User002@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User003','User003@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User004','User004@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User005','User005@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User006','User006@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User007','User007@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User008','User008@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User009','User009@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User010','User010@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User011','User011@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User012','User012@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User013','User013@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User014','User014@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User015','User015@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User016','User016@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User017','User017@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User018','User018@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User019','User019@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User020','User020@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User021','User021@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User022','User022@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User023','User023@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User024','User024@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User025','User025@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User026','User026@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User027','User027@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User028','User028@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User029','User029@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User030','User030@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User031','User031@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User032','User032@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User033','User033@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User034','User034@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User035','User035@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User036','User036@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User037','User037@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User038','User038@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User039','User039@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User040','User040@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User041','User041@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User042','User042@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User043','User043@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User044','User044@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User045','User045@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User046','User046@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User047','User047@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User048','User048@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User049','User049@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User050','User050@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User051','User051@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User052','User052@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User053','User053@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User054','User054@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User055','User055@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User056','User056@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User057','User057@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User058','User058@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User059','User059@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User060','User060@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User061','User061@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User062','User062@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User063','User063@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User064','User064@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User065','User065@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User066','User066@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User067','User067@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User068','User068@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User069','User069@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User070','User070@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User071','User071@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User072','User072@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User073','User073@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User074','User074@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User075','User075@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User076','User076@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User077','User077@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User078','User078@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User079','User079@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User080','User080@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User081','User081@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User082','User082@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User083','User083@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User084','User084@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User085','User085@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User086','User086@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User087','User087@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User088','User088@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User089','User089@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User090','User090@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User091','User091@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User092','User092@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User093','User093@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User094','User094@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User095','User095@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User096','User096@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User097','User097@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User098','User098@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32'),
-('User099','User099@localhost','$2b$12$dWhFaBM.tgmNvNmuA98ZJei0D56cZTyFv.nC20Xh7/CNnrmDKgEMe','2025-01-15 12:16:32');
-COMMIT;
-
---
--- Indexen voor tabel `booking`
+-- Indexes for table `booking`
 --
 ALTER TABLE `booking`
   ADD PRIMARY KEY (`booking_number`),
@@ -1427,7 +1353,7 @@ ALTER TABLE `booking`
   ADD KEY `fk_booking_supplier` (`supplier_code`);
 
 --
--- Indexen voor tabel `booking_line`
+-- Indexes for table `booking_line`
 --
 ALTER TABLE `booking_line`
   ADD PRIMARY KEY (`booking_number`,`sequence_number`),
@@ -1437,20 +1363,20 @@ ALTER TABLE `booking_line`
   ADD KEY `idx_booking_number_sequence_number` (`booking_number`,`sequence_number`);
 
 --
--- Indexen voor tabel `customers`
+-- Indexes for table `customers`
 --
 ALTER TABLE `customers`
   ADD PRIMARY KEY (`customer_code`);
 
 --
--- Indexen voor tabel `delivery`
+-- Indexes for table `delivery`
 --
 ALTER TABLE `delivery`
   ADD PRIMARY KEY (`purchase_number`,`article_code`,`delivery_date`),
   ADD KEY `idx_delivery_invoice_number` (`invoice_number`);
 
 --
--- Indexen voor tabel `goods_receipt`
+-- Indexes for table `goods_receipt`
 --
 ALTER TABLE `goods_receipt`
   ADD PRIMARY KEY (`receipt_id`),
@@ -1458,112 +1384,132 @@ ALTER TABLE `goods_receipt`
   ADD KEY `idx_article_code` (`article_code`);
 
 --
--- Indexen voor tabel `invoice`
+-- Indexes for table `invoice`
 --
 ALTER TABLE `invoice`
   ADD PRIMARY KEY (`invoice_number`),
   ADD KEY `fk_invoice_booking_line` (`booking_number`,`sequence_number`);
 
 --
--- Indexen voor tabel `orders`
+-- Indexes for table `orders`
 --
 ALTER TABLE `orders`
   ADD PRIMARY KEY (`order_number`),
   ADD KEY `fk_orders_suppliers` (`supplier_code`);
 
 --
--- Indexen voor tabel `order_lines`
+-- Indexes for table `order_lines`
 --
 ALTER TABLE `order_lines`
   ADD PRIMARY KEY (`order_number`,`article_code`),
   ADD KEY `idx_order_lines_article_code` (`article_code`);
 
 --
--- Indexen voor tabel `purchases`
+-- Indexes for table `purchases`
 --
 ALTER TABLE `purchases`
   ADD PRIMARY KEY (`purchase_number`),
   ADD KEY `fk_purchases_customers` (`customer_code`);
 
 --
--- Indexen voor tabel `purchase_line`
+-- Indexes for table `purchase_line`
 --
 ALTER TABLE `purchase_line`
   ADD PRIMARY KEY (`purchase_number`,`article_code`),
   ADD KEY `idx_purchase_line_article_code` (`article_code`);
 
 --
--- Indexen voor tabel `quotations`
+-- Indexes for table `quotations`
 --
 ALTER TABLE `quotations`
   ADD PRIMARY KEY (`quotation_id`),
   ADD KEY `fk_quotations_article` (`article_code`);
 
 --
--- Indexen voor tabel `sports_articles`
+-- Indexes for table `sports_articles`
 --
 ALTER TABLE `sports_articles`
   ADD PRIMARY KEY (`article_code`),
   ADD KEY `fk_sports_articles_vat` (`VAT_type`);
 
 --
--- Indexen voor tabel `suppliers`
+-- Indexes for table `suppliers`
 --
 ALTER TABLE `suppliers`
   ADD PRIMARY KEY (`supplier_code`);
 
 --
--- Indexen voor tabel `vat`
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `username` (`username`),
+  ADD UNIQUE KEY `email` (`email`);
+
+--
+-- Indexes for table `vat`
 --
 ALTER TABLE `vat`
   ADD PRIMARY KEY (`type`);
 
 --
--- Indexen voor tabel `vat_percentage`
+-- Indexes for table `vat_percentage`
 --
 ALTER TABLE `vat_percentage`
   ADD PRIMARY KEY (`type`,`from_date`);
 
 --
--- AUTO_INCREMENT voor geëxporteerde tabellen
+-- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT voor een tabel `booking`
+-- AUTO_INCREMENT for table `booking`
 --
 ALTER TABLE `booking`
   MODIFY `booking_number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
--- AUTO_INCREMENT voor een tabel `goods_receipt`
+-- AUTO_INCREMENT for table `goods_receipt`
 --
 ALTER TABLE `goods_receipt`
   MODIFY `receipt_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=184;
 
 --
--- AUTO_INCREMENT voor een tabel `invoice`
+-- AUTO_INCREMENT for table `invoice`
 --
 ALTER TABLE `invoice`
   MODIFY `invoice_number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
--- AUTO_INCREMENT voor een tabel `orders`
+-- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
   MODIFY `order_number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=205;
 
 --
--- AUTO_INCREMENT voor een tabel `quotations`
+-- AUTO_INCREMENT for table `quotations`
 --
 ALTER TABLE `quotations`
   MODIFY `quotation_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=217;
 
 --
--- Beperkingen voor geëxporteerde tabellen
+-- AUTO_INCREMENT for table `sports_articles`
+--
+ALTER TABLE `sports_articles`
+  MODIFY `article_code` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `users`
+--
+ALTER TABLE `users`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=102;
+
+--
+-- Constraints for dumped tables
 --
 
 --
--- Beperkingen voor tabel `booking`
+-- Constraints for table `booking`
 --
 ALTER TABLE `booking`
   ADD CONSTRAINT `fk_booking_customer` FOREIGN KEY (`customer_code`) REFERENCES `customers` (`customer_code`),
