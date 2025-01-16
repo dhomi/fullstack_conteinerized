@@ -1,4 +1,4 @@
-![logo](src/qa.png)
+![logo](frontend-django/myproject/myapp/static/qa-logo.png)
 
 # Fullstack Containerized Project
 
@@ -40,3 +40,10 @@ Dashboard: [http://localhost:2333/](http://localhost:2333/)
 ## E2E Testing
 - cd e2e
 - act
+
+## URL's
+- Swagger: http://localhost:8000/docs#
+- Order manager: http://localhost:8001/ordermanagement
+- Chaos Testing: http://localhost:2333
+- Grafana: http://localhost:4000
+- Database: localhost:3306 (root:password)
