@@ -2,97 +2,33 @@
 
 # Fullstack Containerized Project
 
-This repository is an ongoing CI/CD project with fullstack technology examples in an containerized environment. 
+Dit repository is een CI/CD project met fullstack technologie in een containerized omgeving.
 
 ## Installatie
-Preconditions:
+### MAC:
+1. [Install Brew](https://docs.brew.sh/Installation)
+2. In shell: `./install.sh`
 
-MAC: [Install Brew](https://docs.brew.sh/Installation)
+### WINDOWS:
+1. Installeer [Git](https://git-scm.com/downloads)
+2. Clone repository: `https://github.com/dhomi/fullstack_conteinerized.git`
+3. Open PowerShell met admin rechten en voer uit: `.\install.cmd`
 
-WINDOWS: installeer Git (https://git-scm.com/downloads)
-GIT Gui starten -> Clone Existing Repository ->
-Source Location: https://github.com/dhomi/fullstack_conteinerized.git
-Target Directory: c:\[..]\Techlab 
-->Clone
+## Opstarten
+### MAC:
+1. In shell: `./startup.sh`
+2. Zorg dat `startup.sh` executable is: `chmod +x startup.sh`
 
-Open een powerShell venster met administrator rechten
+### WINDOWS:
+1. In PowerShell met admin rechten: `.\startup.cmd`
 
-![powerShellScreenshot](image.png)
+## Chaos Testing
+Dashboard: [http://localhost:2333/](http://localhost:2333/)
 
+### Via UI:
+1. Selecteer de techlab namespace en de grafana app.
+2. Maak een experiment door POD KILL en submit.
 
-Daarna,
-
-MAC: in shell: ./install.sh
-
-Windows: in powerShell (met admin rechten): .\install.cmd
-
-### Opstarten
-MAC: in shell: ./startup.sh
-Windows: in powerShell (met admin rechten): .\startup.cmd
-
-  voor MAC:
-  Open een git-shell (of andere linux terminal)
-  check dat startup.sh  executable is, anders handmatig zelf doen:  chmod +x startup.sh
-
-### Chaos testing
-dashboard is dus hier te zien: http://localhost:2333/
-
-#### chaos uitvoeren
-via UI/dashboard: Selecteer de techlab namespace, en de grafana app. 
-Maak een experiment door POD KIlL en Submit deze allemaal 
-
-CLI:
-...zorg dat de betreffende name van een chaos experiment eerst ge-archived is in de experiments dashboard van de chaos mesh...
-cd chaos/
-kubectl apply -f ./kill_grafana_pod.yaml
-
-check de grafana pod in de docker ui. hij moet exited zijn, en binnen enkele seconden een nieuwe pod is running.
-
-#### manuele installatie en opstartprocedure:
-https://chaos-mesh.org/docs/production-installation-using-helm/
-of doe: 
-- kubectl create ns chaos-mesh
-- helm install chaos-mesh chaos-mesh/chaos-mesh -n=chaos-mesh --version 2.7.0
-- helm upgrade chaos-mesh chaos-mesh/chaos-mesh -n=chaos-mesh --version 2.7.0 --set dashboard.securityMode=false
-
-kubectl port-forward -n chaos-mesh svc/chaos-dashboard 2333:2333
-
-### Monitor
-Grafana is a monitoring tool at http://localhost:4000
-
-- Monitoring dashboard is the 'TechLab backend monitor'
-- Grafana gets data from InfluxDB:8086, and Influx gets data every few seconds from Telegram scraper (on backend number)
-
-### Fetch Local IP address
-
-MAC: ```ipconfig | grep IPv4 | awk 'END{print}'```  
-Windows: gitbash  
-
-### View the Front- and Backend 
-- Frontend is located at http://localhost:3000/
-- The frontend gets the 'jokes' from the backend that runs on http://localhost:8000/
-- To stop the Docker container:
- ```docker-compose down```
-
-### E2E tests
-From the shell (or other CLI tool) navigate to folder "e2e" and run the test with "act"
-
-```cd e2e
-act
-```
-### JMeter
-Navigate to folder "jmeter" and start "act"
-
-```cd jmeter
-act
-```
-### als de containers niet lukken
-Start the container: docker-compose up --build
-- After "docker-compose" go to dashboard at http://localhost:4000/
-- At the end of the build you will also see the Local IP and the Network IP
-
-## TODO
-- Chaos testing: https://github.com/chaos-mesh/chaos-mesh
-- Create an architectural picture to explain what and how this project works
-- Extra README instructions
-- Wait time or time sleep when you execute the startup.sh. when you start the first time the script it doesnt wait till the pod is deployed with the status running. It will throw an error.
+### Via CLI:
+1. Archiveer bestaande chaos experimenten.
+2. Voer uit: `cd chaos/ && kubectl apply -f ./kill_grafana_pod.yaml`
