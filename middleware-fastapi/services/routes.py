@@ -409,7 +409,9 @@ class routes:
     async def add_sport_article(
         article: SportsArticle, 
         db: DatabaseConnection = Depends(get_db)
-    ):
+        
+    ):  
+        user: dict = Depends(get_current_user)
         """
         Endpoint to add a new sport article.
         """
@@ -428,7 +430,10 @@ class routes:
             )
             if "error" in result:
                 raise HTTPException(status_code=400, detail=result["error"])
+            elif user["role"] != "admin":
+                raise HTTPException(status_code=403, detail="Access forbidden")
             return {"message": "Article added successfully", "article": result}
+            
         except Exception as e:
             logger.exception("Failed to create sport article")
             raise HTTPException(status_code=500, detail="Failed to create sport article")

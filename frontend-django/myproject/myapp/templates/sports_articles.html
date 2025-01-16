@@ -22,10 +22,14 @@
                 <th>Size</th>
                 <th>Color</th>
                 <th>Price</th>
+                {% if request.session.role == 'admin' %}
                 <th>Stock Quantity</th>
                 <th>Stock Minimum</th>
                 <th>VAT Type</th>
                 <th>Actions</th>
+                {% elif request.session.role == 'customer' %}
+                <th>Add to Cart</th>
+                {% endif %}
             </tr>
         </thead>
         <tbody>
@@ -37,15 +41,19 @@
                     <td contenteditable="true" class="editable" data-field="size">{{ sportartikel.size }}</td>
                     <td contenteditable="true" class="editable" data-field="color">{{ sportartikel.color }}</td>
                     <td contenteditable="true" class="editable" data-field="price">{{ sportartikel.price }}</td>
+                    {% if request.session.role == 'admin' %}
                     <td contenteditable="true" class="editable" data-field="stock_quantity">{{ sportartikel.stock_quantity }}</td>
                     <td contenteditable="true" class="editable" data-field="stock_min">{{ sportartikel.stock_min }}</td>
                     <td contenteditable="true" class="editable" data-field="vat_type">{{ sportartikel.vat_type }}</td>
-                    <td>
-                        <div style="display: flex; gap: 2px;">
-                            <button class="btn btn-primary btn-sm" onclick="updateArticle({{ sportartikel.article_code }})">Update</button>
-                            <button class="btn btn-danger btn-sm" onclick="deleteArticle({{ sportartikel.article_code }})">Delete</button>
-                        </div>
+                    <td style="display: flex; gap: 2px; justify-content: center;">
+                        <button class="btn btn-primary btn-sm" onclick="updateArticle({{ sportartikel.article_code }})">Update</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteArticle({{ sportartikel.article_code }})">Delete</button>
                     </td>
+                    {% elif request.session.role == 'customer' %}
+                    <td>
+                        <button class="btn btn-success btn-sm" onclick="addToCart({{ sportartikel.article_code }})">Add to Cart</button>
+                    </td>
+                    {% endif %}
                 </tr>
             {% endfor %}
         </tbody>
@@ -109,6 +117,29 @@
                 }
             });
         }
+    }
+    // Function to add an article to the cart
+    function addToCart(articleCode) {
+        const token = "{{ request.session.access_token }}";
+        if (!token) {
+            alert('Please log in to add items to the cart.');
+            return;
+        }
+
+        $.ajax({
+            url: `/cart/add/`,
+            type: 'POST',
+            headers: { "Authorization": `Bearer ${token}` },
+            contentType: 'application/json',
+            data: JSON.stringify({ article_code: articleCode }),
+            success: function (response) {
+                alert('UnderConstruction, this function will be available in the future');
+                // Article added to cart successfully!
+            },
+            error: function (err) {
+                alert('Failed to add article to cart: ' + err.responseText);
+            }
+        });
     }
 </script>
 {% endblock %}

@@ -183,7 +183,9 @@
     </a>
     <div id="sportsGoodsDropdown" class="w3-hide">
       <a href="/sports_articles" class="w3-bar-item w3-button">All Sporting Goods</a>
-      <a href="/sports_articles/add" class="w3-bar-item w3-button">Add Sporting Goods</a>
+      {% if request.session.role == 'admin' %}
+        <a href="/sports_articles/add" class="w3-bar-item w3-button">Add Sporting Goods</a>
+        {% endif %}
     </div>
     {% endif %}
   </nav>

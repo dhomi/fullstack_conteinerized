@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: db
--- Generation Time: Jan 16, 2025 at 06:56 PM
+-- Generation Time: Jan 16, 2025 at 10:23 PM
 -- Server version: 11.6.2-MariaDB-ubu2404
 -- PHP Version: 8.2.27
 
@@ -236,6 +236,22 @@ CREATE TRIGGER `pre_insert_booking_line` BEFORE INSERT ON `booking_line` FOR EAC
 END
 $$
 DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cart`
+--
+
+DROP TABLE IF EXISTS `cart`;
+CREATE TABLE `cart` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `user_id` bigint(20) UNSIGNED NOT NULL,
+  `article_code` int(11) NOT NULL,
+  `quantity` int(11) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -929,7 +945,7 @@ CREATE TABLE `sports_articles` (
   `stock_min` int(11) DEFAULT NULL,
   `VAT_type` char(1) NOT NULL,
   `created_at` timestamp NULL DEFAULT current_timestamp()
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 --
 -- Dumping data for table `sports_articles`
@@ -1363,6 +1379,14 @@ ALTER TABLE `booking_line`
   ADD KEY `idx_booking_number_sequence_number` (`booking_number`,`sequence_number`);
 
 --
+-- Indexes for table `cart`
+--
+ALTER TABLE `cart`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `user_id` (`user_id`,`article_code`),
+  ADD KEY `article_code` (`article_code`);
+
+--
 -- Indexes for table `customers`
 --
 ALTER TABLE `customers`
@@ -1469,6 +1493,12 @@ ALTER TABLE `booking`
   MODIFY `booking_number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
+-- AUTO_INCREMENT for table `cart`
+--
+ALTER TABLE `cart`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `goods_receipt`
 --
 ALTER TABLE `goods_receipt`
@@ -1496,7 +1526,7 @@ ALTER TABLE `quotations`
 -- AUTO_INCREMENT for table `sports_articles`
 --
 ALTER TABLE `sports_articles`
-  MODIFY `article_code` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `article_code` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=499;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -1514,6 +1544,13 @@ ALTER TABLE `users`
 ALTER TABLE `booking`
   ADD CONSTRAINT `fk_booking_customer` FOREIGN KEY (`customer_code`) REFERENCES `customers` (`customer_code`),
   ADD CONSTRAINT `fk_booking_supplier` FOREIGN KEY (`supplier_code`) REFERENCES `suppliers` (`supplier_code`);
+
+--
+-- Constraints for table `cart`
+--
+ALTER TABLE `cart`
+  ADD CONSTRAINT `cart_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+  ADD CONSTRAINT `cart_ibfk_2` FOREIGN KEY (`article_code`) REFERENCES `sports_articles` (`article_code`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
