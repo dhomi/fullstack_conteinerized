@@ -22,6 +22,10 @@ Dit repository is een CI/CD project met fullstack technologie in een containeriz
 ### WINDOWS:
 1. In PowerShell met admin rechten: `.\startup.cmd`
 
+## JMeter Testing
+- cd jmeter
+- act
+
 ## Chaos Testing
 Dashboard: [http://localhost:2333/](http://localhost:2333/)
 
@@ -32,3 +36,7 @@ Dashboard: [http://localhost:2333/](http://localhost:2333/)
 ### Via CLI:
 1. Archiveer bestaande chaos experimenten.
 2. Voer uit: `cd chaos/ && kubectl apply -f ./kill_grafana_pod.yaml`
+
+## E2E Testing
+- cd e2e
+- act
