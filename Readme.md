@@ -11,8 +11,9 @@ Dit repository is een CI/CD project met fullstack technologie in een containeriz
 
 ### WINDOWS:
 1. Installeer [Git](https://git-scm.com/downloads)
-2. Clone repository: `https://github.com/dhomi/fullstack_conteinerized.git`
-3. Open PowerShell met admin rechten en voer uit: `.\install.cmd`
+2. Optioneel Git opties in de verkenner menu [TortoiseGit] (https://tortoisegit.org/download/)
+3. Clone repository: `https://github.com/dhomi/fullstack_conteinerized.git`
+4. Open PowerShell met admin rechten en voer uit: `.\install.cmd`
 
 ## Opstarten
 ### MAC:
