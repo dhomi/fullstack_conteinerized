@@ -72,10 +72,8 @@ MAC: ```ipconfig | grep IPv4 | awk 'END{print}'```
 Windows: gitbash  
 
 ### View the Front- and Backend 
-- Frontend is located at http://localhost:3000/
-- The frontend gets the 'jokes' from the backend that runs on http://localhost:8000/
-- To stop the Docker container:
- ```docker-compose down```
+- Frontend is located at http://localhost:8001/
+- Backend (Swagger) is located at http://localhost:8000/docs#/
 
 ### E2E tests
 From the shell (or other CLI tool) navigate to folder "e2e" and run the test with "act"
