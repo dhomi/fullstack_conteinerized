@@ -1,4 +1,4 @@
-![logo](src/qa.png)
+![logo](frontend-django/myproject/myapp/static/qa-logo.png)
 
 # Fullstack Containerized Project
 
