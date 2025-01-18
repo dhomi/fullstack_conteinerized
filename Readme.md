@@ -34,6 +34,10 @@ Windows: in powerShell (met admin rechten): .\startup.cmd
   Open een git-shell (of andere linux terminal)
   check dat startup.sh  executable is, anders handmatig zelf doen:  chmod +x startup.sh
 
+### Stoppen
+MAC: in shell: ./stop.sh
+Windows: in powerShell (met admin rechten): .\stop.cmd
+
 ### Chaos testing
 dashboard is dus hier te zien: http://localhost:2333/
 
