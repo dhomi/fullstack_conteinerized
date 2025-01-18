@@ -28,6 +28,7 @@ Windows: in powerShell (met admin rechten): .\install.cmd
 
 ### Opstarten
 MAC: in shell: ./startup.sh
+
 Windows: in powerShell (met admin rechten): .\startup.cmd
 
   voor MAC:
