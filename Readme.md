@@ -36,6 +36,7 @@ Windows: in powerShell (met admin rechten): .\startup.cmd
 
 ### Stoppen
 MAC: in shell: ./stop.sh
+
 Windows: in powerShell (met admin rechten): .\stop.cmd
 
 ### Chaos testing
