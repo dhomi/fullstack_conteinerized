@@ -25,8 +25,8 @@ helm repo add chaos-mesh https://charts.chaos-mesh.org
 helm install chaos-mesh chaos-mesh/chaos-mesh -n=chaos-mesh --version 2.7.0
 helm upgrade chaos-mesh chaos-mesh/chaos-mesh -n=chaos-mesh --version 2.7.0 --set dashboard.securityMode=false
 
-REM Wait for 2 minutes to ensure services are up
-timeout /t 120
+REM Wait for 1 minute to ensure services are up
+timeout /t 60
 
 REM Port forwarding
 start /b kubectl port-forward -n chaos-mesh svc/chaos-dashboard 2333:2333

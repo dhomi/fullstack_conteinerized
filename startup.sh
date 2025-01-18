@@ -16,7 +16,7 @@ helm upgrade chaos-mesh chaos-mesh/chaos-mesh -n=chaos-mesh --version 2.7.0 --se
 
 # todo: hier moet de terminal effe een tijd wachten totdat alles hierboven is uitgevoerd 
 # anders start de port forwarding maar de services is nog down...
-sleep 2m # Waits 2 minutes.
+sleep 1m # Waits 1 minute.
 
 # port forwarding
 kubectl port-forward -n chaos-mesh svc/chaos-dashboard 2333:2333 &
