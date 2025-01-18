@@ -14,11 +14,29 @@ IF %ERRORLEVEL% NEQ 0 (
     echo Helm is already installed.
 )
 
-REM Docker desktop
-choco install docker-desktop
+REM Check if Docker Desktop is installed
+docker --version > nul 2>&1
+if %errorlevel% neq 0 (
+    echo Docker Desktop is not installed. Installing...
+    choco install docker-desktop
+) else (
+    echo Docker Desktop is already installed.
+)
 
-REM Kubernetes tools
-choco install kubernetes-cli
+REM Check if Kubernetes CLI is installed
+kubectl version --client > nul 2>&1
+if %errorlevel% neq 0 (
+    echo Kubernetes CLI is not installed. Installing...
+    choco install kubernetes-cli
+) else (
+    echo Kubernetes CLI is already installed.
+)
 
-REM Act
-choco install act-cli
+REM Check if Act CLI is installed
+act --version > nul 2>&1
+if %errorlevel% neq 0 (
+    echo Act CLI is not installed. Installing...
+    choco install act-cli
+) else (
+    echo Act CLI is already installed.
+)
