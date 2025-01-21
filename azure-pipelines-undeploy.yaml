@@ -1,0 +1,52 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  kubernetesServiceConnection: '<your-service-connection-name>'
+  aksClusterName: '<your-aks-cluster-name>'
+  aksResourceGroup: '<your-resource-group-name>'
+  aksLocation: '<your-aks-location>'
+  namespace: 'default'
+
+stages:
+- stage: Undeploy
+  jobs:
+  - job: UndeployFromAKS
+    steps:
+    - task: Kubernetes@1
+      displayName: 'Undeploy from AKS'
+      inputs:
+        connectionType: 'Azure Resource Manager'
+        azureSubscriptionEndpoint: $(kubernetesServiceConnection)
+        azureResourceGroup: $(aksResourceGroup)
+        kubernetesCluster: $(aksClusterName)
+        namespace: $(namespace)
+        command: 'delete'
+        useConfigurationFile: true
+        configuration: '$(Pipeline.Workspace)/deployment.yaml'
+
+- stage: DeleteInfrastructure
+  dependsOn: Undeploy
+  jobs:
+  - job: DeleteAKS
+    steps:
+    - task: AzureCLI@2
+      displayName: 'Delete AKS Cluster'
+      inputs:
+        azureSubscription: $(kubernetesServiceConnection)
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          az aks delete --resource-group $(aksResourceGroup) --name $(aksClusterName) --yes --no-wait
+
+    - task: AzureCLI@2
+      displayName: 'Delete Resource Group'
+      inputs:
+        azureSubscription: $(kubernetesServiceConnection)
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          az group delete --name $(aksResourceGroup) --yes --no-wait

@@ -1,0 +1,61 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  kubernetesServiceConnection: '<your-service-connection-name>'
+  aksClusterName: '<your-aks-cluster-name>'
+  aksResourceGroup: '<your-resource-group-name>'
+  aksLocation: '<your-aks-location>'
+  namespace: 'default'
+
+stages:
+- stage: SetupInfrastructure
+  jobs:
+  - job: SetupAKS
+    steps:
+    - task: AzureCLI@2
+      displayName: 'Create Resource Group'
+      inputs:
+        azureSubscription: $(kubernetesServiceConnection)
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          az group create --name $(aksResourceGroup) --location $(aksLocation)
+
+    - task: AzureCLI@2
+      displayName: 'Create AKS Cluster'
+      inputs:
+        azureSubscription: $(kubernetesServiceConnection)
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          az aks create --resource-group $(aksResourceGroup) --name $(aksClusterName) --node-count 1 --enable-addons monitoring --generate-ssh-keys
+
+    - task: AzureCLI@2
+      displayName: 'Get AKS Credentials'
+      inputs:
+        azureSubscription: $(kubernetesServiceConnection)
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          az aks get-credentials --resource-group $(aksResourceGroup) --name $(aksClusterName)
+
+- stage: Deploy
+  dependsOn: SetupInfrastructure
+  jobs:
+  - job: DeployToAKS
+    steps:
+    - task: Kubernetes@1
+      displayName: 'Deploy to AKS'
+      inputs:
+        connectionType: 'Azure Resource Manager'
+        azureSubscriptionEndpoint: $(kubernetesServiceConnection)
+        azureResourceGroup: $(aksResourceGroup)
+        kubernetesCluster: $(aksClusterName)
+        namespace: $(namespace)
+        command: 'apply'
+        useConfigurationFile: true
+        configuration: '$(Pipeline.Workspace)/deployment.yaml'
