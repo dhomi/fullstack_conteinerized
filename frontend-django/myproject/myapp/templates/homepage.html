@@ -1,12 +1,19 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
   <title>{% block title %}QA - Techlab{% endblock %}</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- W3CSS and original styling -->
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Montserrat">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  
+  <!-- Bootstrap 5 CSS for Toasts (for messages) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
   <style>
     /* Page Styling */
     body {
@@ -34,8 +41,12 @@
       left: 250px;
       z-index: 1000;
     }
-
-    .top-bar button {
+    .top-bar form,
+    .top-bar a {
+      margin-left: 10px;
+    }
+    .top-bar button,
+    .top-bar a {
       background-color: #5b798e;
       color: white;
       border: none;
@@ -43,10 +54,10 @@
       border-radius: 5px;
       cursor: pointer;
       font-family: "Roboto", sans-serif;
-      margin-left: 10px;
+      text-decoration: none;
     }
-
-    .top-bar button:hover {
+    .top-bar button:hover,
+    .top-bar a:hover {
       background-color: #3d5973;
     }
 
@@ -62,7 +73,6 @@
       overflow-x: hidden;
       padding-top: 20px;
     }
-
     .w3-sidebar a {
       color: white;
       padding: 10px 16px;
@@ -70,20 +80,19 @@
       font-size: 17px;
       display: block;
     }
-
     .w3-sidebar a:hover {
       background-color: #5b798e;
     }
 
-    /* Main Content Styling */
+    /* Main Content Styling (restoring original alignment) */
     .content-wrapper {
       margin-left: 250px;
-      margin-top: 40px;
+      margin-top: 40px; /* restore 40px to fix image alignment */
       padding: 20px;
       flex: 1;
       display: flex;
       flex-direction: column;
-      align-items: center;
+      align-items: center; /* Center content horizontally */
     }
 
     .image-container {
@@ -96,7 +105,6 @@
       justify-content: center;
       margin-bottom: 20px;
     }
-
     .image-container img {
       max-width: 100%;
       height: auto;
@@ -137,73 +145,119 @@
         left: 0;
       }
     }
+
+    /* Dropdown Styling */
+    .w3-hide {
+      display: none;
+    }
+    .w3-show {
+      display: block;
+    }
   </style>
 </head>
 
 <body>
   <!-- Sidebar -->
-  
-  <nav class="w3-sidebar w3-bar-block">
-    
-    <div class="w3-container">
-      <div style="text-align: center; margin-bottom: 20px;">
-        {% load static %}
-        <a href="/">
-          <img src="{% static 'qa-logo.png' %}" alt="QA Techlab Logo" style="width: 100px;">
-        </a>
-      </div>
+  <nav id="sidebar" class="w3-sidebar w3-bar-block">
+    <div class="w3-container" style="text-align: center; margin-bottom: 20px;">
+      <a href="/">
+        <img src="{% static 'qa-logo.png' %}" alt="QA Techlab Logo" style="width: 100px;">
+      </a>
       <h3>QA - Techlab</h3>
     </div>
-    
-    <a href="/" class="w3-bar-item w3-button">Home</a>
-    {% if request.session.access_token %}
 
-    <!-- Conditional Backoffice Menu -->
-    {% if request.session.role == "admin" %}
-      <a onclick="toggleDropdown('backofficeDropdown')" href="javascript:void(0)" class="w3-bar-item w3-button">
-        Backoffice Administration <i class="fa fa-caret-down"></i>
-      </a>
-      <div id="backofficeDropdown" class="w3-hide">
-        <a href="/inventory" class="w3-bar-item w3-button">Inventory Management</a>
-        <a onclick="toggleDropdown('orderMgmtDropdown')" href="javascript:void(0)" class="w3-bar-item w3-button">
-          Order Management <i class="fa fa-caret-down"></i>
+    <!-- Always show Home link -->
+    <a href="/" class="w3-bar-item w3-button">Home</a>
+
+    <!-- Show the rest if the user is "logged in" via session token -->
+    {% if request.session.access_token %}
+      <!-- If role is admin, show backoffice items -->
+      {% if request.session.role == "admin" %}
+        <a onclick="toggleDropdown('backofficeDropdown')" href="javascript:void(0)" class="w3-bar-item w3-button">
+          Backoffice Administration <i class="fa fa-caret-down"></i>
         </a>
-        <div id="orderMgmtDropdown" class="w3-hide">
-          <a href="/ordermanagement/orders" class="w3-bar-item w3-button">Orders Overview</a>
-          <a href="/ordermanagement/create" class="w3-bar-item w3-button">Create New Order</a>
-          <a href="/ordermanagement/track" class="w3-bar-item w3-button">Track Orders</a>
+        <div id="backofficeDropdown" class="w3-hide">
+          <a href="/inventory/" class="w3-bar-item w3-button">Inventory Management</a>
+          <a onclick="toggleDropdown('orderMgmtDropdown')" href="javascript:void(0)" class="w3-bar-item w3-button">
+            Order Management <i class="fa fa-caret-down"></i>
+          </a>
+          <div id="orderMgmtDropdown" class="w3-hide">
+            <a href="/ordermanagement/orders/" class="w3-bar-item w3-button">Orders Overview</a>
+            <a href="/ordermanagement/create/" class="w3-bar-item w3-button">Create New Order</a>
+            <a href="/ordermanagement/track/" class="w3-bar-item w3-button">Track Orders</a>
+          </div>
+          <a href="/suppliers/" class="w3-bar-item w3-button">Suppliers</a>
         </div>
-        <a href="/suppliers" class="w3-bar-item w3-button">Suppliers</a>
+      {% endif %}
+      <!-- Everyone logged in can see sporting goods -->
+      <a onclick="toggleDropdown('sportsGoodsDropdown')" href="javascript:void(0)" class="w3-bar-item w3-button">
+        Sporting Goods <i class="fa fa-caret-down"></i>
+      </a>
+      <div id="sportsGoodsDropdown" class="w3-hide">
+        <a href="/sports_articles/" class="w3-bar-item w3-button">All Sporting Goods</a>
+        {% if request.session.role == "admin" %}
+          <a href="/sports_articles/add/" class="w3-bar-item w3-button">Add Sporting Goods</a>
+        {% endif %}
       </div>
     {% endif %}
-
-    <!-- Sporting Goods Menu -->
-    <a onclick="toggleDropdown('sportsGoodsDropdown')" href="javascript:void(0)" class="w3-bar-item w3-button">
-      Sporting Goods <i class="fa fa-caret-down"></i>
-    </a>
-    <div id="sportsGoodsDropdown" class="w3-hide">
-      <a href="/sports_articles" class="w3-bar-item w3-button">All Sporting Goods</a>
-      {% if request.session.role == 'admin' %}
-        <a href="/sports_articles/add" class="w3-bar-item w3-button">Add Sporting Goods</a>
-        {% endif %}
-    </div>
-    {% endif %}
   </nav>
- 
 
   <!-- Top Bar -->
   <div class="top-bar">
     {% if request.session.access_token %}
-      <span class="user-info">
-        Logged in as: <strong>{{ request.session.username }}</strong>
+      <!-- Logged in user info (non-Django approach) -->
+      <span>
+        Logged in as:
+        <strong>{{ request.session.username }}</strong>
         (<em>{{ request.session.role }}</em>)
       </span>
-      <button onclick="window.location.href='/logout/';">Logout</button>
+
+      <!-- Example: Show cart if you store a session-based cart total -->
+      <!-- If you do not store cart_total, remove or adjust this line -->
+      {% if request.session.role == "customer" %}
+      <a href="{% url 'cart' %}" style="margin-left: 20px; color: white;">
+        Cart (<span id="cart-count">0</span>)
+      </a>
+      {% endif %}
+
+      <!-- Logout form -->
+      <form action="{% url 'logout' %}" method="POST" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit">Logout</button>
+      </form>
     {% else %}
-      <button onclick="window.location.href='/login/';">Login</button>
-      <button onclick="window.location.href='/register/';">Register</button>
+      <!-- Not logged in => show login/register -->
+      <a href="{% url 'login' %}">Login</a>
+      <a href="{% url 'register' %}">Register</a>
     {% endif %}
   </div>
+
+  <!-- Toast Notifications for Messages -->
+  {% if messages %}
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+      {% for message in messages %}
+        <div 
+          class="toast align-items-center text-white bg-{{ message.tags }} show"
+          role="alert"
+          aria-live="assertive"
+          aria-atomic="true"
+          data-bs-delay="5000"
+        >
+          <div class="d-flex">
+            <div class="toast-body">
+              {{ message }}
+            </div>
+            <button 
+              type="button"
+              class="btn-close btn-close-white me-2 m-auto"
+              data-bs-dismiss="toast"
+              aria-label="Close"
+            ></button>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
 
   <!-- Main Content -->
   <div class="content-wrapper">
@@ -212,9 +266,7 @@
         <img src="{% static 'QA-techlab_dall-e.webp' %}" alt="QA-Techlab Home">
       </div>
     {% endif %}
-    <div>
-      {% block content %}{% endblock %}
-    </div>
+    {% block content %}{% endblock %}
   </div>
 
   <!-- Footer -->
@@ -222,15 +274,48 @@
     <p>Copyright © Techlab - Quality Accelerators</p>
   </footer>
 
+  <!-- Bootstrap JS for Toasts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- W3 Dropdown JS -->
   <script>
     function toggleDropdown(id) {
-      var element = document.getElementById(id);
-      if (element.classList.contains("w3-show")) {
-        element.classList.remove("w3-show");
-      } else {
-        element.classList.add("w3-show");
+      const element = document.getElementById(id);
+      if (element) {
+        element.classList.toggle("w3-show");
       }
     }
+
+    // Auto-show Toasts on page load
+    document.addEventListener('DOMContentLoaded', function () {
+      const toastElList = [].slice.call(document.querySelectorAll('.toast'));
+      toastElList.forEach(function (toastEl) {
+        const toast = new bootstrap.Toast(toastEl);
+        toast.show();
+      });
+    });
+
+    // Function to update cart count
+    
+  function updateCartCount() {
+    $.ajax({
+      url: "{% url 'cart_count' %}",
+      type: "GET",
+      success: function(response) {
+        // response.cart_count => number of items
+        $("#cart-count").text(response.cart_count);
+      },
+      error: function(err) {
+        console.error("Failed to retrieve cart count:", err);
+      }
+    });
+  }
+
+  // Optionally, call this on page load
+  $(document).ready(function() {
+    updateCartCount();
+  });
+
   </script>
 </body>
 </html>

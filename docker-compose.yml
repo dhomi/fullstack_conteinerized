@@ -1,3 +1,5 @@
+version: "3.8"
+
 services:
   db:
     image: daafinho/db:latest
@@ -6,10 +8,10 @@ services:
       context: ./backend-mariadb
       dockerfile: Dockerfile
     environment:
-      MYSQL_USER: QAuser                  # non-root user (optional)
-      MYSQL_PASSWORD: QApassword 
-      MYSQL_ROOT_PASSWORD: 'password'
-      MYSQL_DATABASE: 'QAsportarticles'
+      MYSQL_USER: QAuser
+      MYSQL_PASSWORD: QApassword
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: QAsportarticles
     ports:
       - "3306:3306"
     volumes:
@@ -48,39 +50,43 @@ services:
       - MYSQL_DATABASE=QAsportarticles
     networks:
       - backend
+    # Expose the hostname
+    extra_hosts:
+      - "middleware-fastapi:127.0.0.1"
 
-  frontend-django:
-    build:
-      context: ./frontend-django
-      dockerfile: Dockerfile
-    command: python ./frontend-django/myproject/manage.py runserver 0.0.0.0:8001
-    ports:
-      - "8001:8001"
-    depends_on:
-      - db
-    environment:
-      - MYSQL_HOST=db
-      - MYSQL_USER=QAuser
-      - MYSQL_PASSWORD=QApassword
-      - MYSQL_DATABASE=QAsportarticles
-    volumes:
-      - .:/frontend-django
-    networks:
-      - backend
+  # frontend-django:
+  #   build:
+  #     context: ./frontend-django
+  #     dockerfile: Dockerfile
+  #   command: python ./frontend-django/myproject/manage.py runserver 0.0.0.0:8001
+  #   ports:
+  #     - "8001:8001"
+  #   depends_on:
+  #     - db
+  #     - middleware-fastapi
+  #   environment:
+  #     - MYSQL_HOST=db
+  #     - MYSQL_USER=QAuser
+  #     - MYSQL_PASSWORD=QApassword
+  #     - MYSQL_DATABASE=QAsportarticles
+  #   volumes:
+  #     - .:/frontend-django
+  #   networks:
+  #     - backend
 
-  grafana:
-    build: ./grafana
-    ports:
-      - "4000:3000"
-    volumes:
-      - grafana-data:/var/lib/grafana
-      - ./grafana/provisioning/datasources/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
-    depends_on:
-      - db
-    networks:
-      - monitoring
+  # grafana:
+  #   build:
+  #     context: ./grafana
+  #   ports:
+  #     - "4000:3000"
+  #   volumes:
+  #     - grafana-data:/var/lib/grafana
+  #     - ./grafana/provisioning/datasources/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
+  #   depends_on:
+  #     - db
+  #   networks:
+  #     - monitoring
 
-# Networks
 networks:
   backend:
     driver: bridge

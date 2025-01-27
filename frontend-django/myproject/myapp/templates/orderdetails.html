@@ -1,4 +1,3 @@
-<!-- orderdetails.html -->
 {% extends 'homepage.html' %}
 
 {% block title %}Order Details{% endblock %}
@@ -32,16 +31,28 @@
             <tr>
                 <form class="update-order-form" data-order-number="{{ order.order_number }}">
                     {% csrf_token %}
-                    <td>{{ order.supplier_code }}</td>
-                    <td>{{ order.order_number }}</td>
-                    <td>{{ order.article_code }}</td>
+                    <td>
+                        {{ order.supplier_code }}
+                        <input type="hidden" name="supplier_code" value="{{ order.supplier_code }}">
+                    </td>
+                    <td>
+                        {{ order.order_number }}
+                        <input type="hidden" name="order_number" value="{{ order.order_number }}">
+                    </td>
+                    <td>
+                        {{ order.article_code }}
+                        <input type="hidden" name="article_code" value="{{ order.article_code }}">
+                    </td>
                     <td>{{ order.article_name }}</td>
                     <td>
                         <div class="form-group">
                             <input type="text" name="order_price" value="{{ order.order_price }}" class="form-control input-sm">
                         </div>
                     </td>
-                    <td>{{ order.order_date }}</td>
+                    <td>
+                        {{ order.order_date }}
+                        <input type="hidden" name="order_date" value="{{ order.order_date }}">
+                    </td>
                     <td>
                         <div class="form-group">
                             <input type="date" name="delivery_date" value="{{ order.delivery_date }}" class="form-control input-sm">
@@ -67,55 +78,74 @@
 </table>
 
 <div class="form-group">
-    <button type="button" class="btn btn-default"><a href="/ordermanagement/orders" style="text-decoration: none; color: inherit;">Back to All Orders</a></button>
-    <button type="button" class="btn btn-default"><a href="/suppliers" style="text-decoration: none; color: inherit;">Back to All Suppliers</a></button>
+    <button type="button" class="btn btn-default">
+        <a href="/ordermanagement/orders" style="text-decoration: none; color: inherit;">Back to All Orders</a>
+    </button>
+    <button type="button" class="btn btn-default">
+        <a href="/suppliers" style="text-decoration: none; color: inherit;">Back to All Suppliers</a>
+    </button>
 </div>
 
 <script>
-    $(document).ready(function(){
-        $('#myTable').dataTable();
+    // Get the CSRF token from Django's cookie
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
 
-        // Bind the form submit event to send AJAX request
-        $('form').on('submit', function(event) {
-            event.preventDefault();  // Prevent the form from submitting normally
+    $(document).ready(function () {
+        // Initialize DataTable if needed
+        $('#myTable').DataTable();
 
-            // Extract the values from the form fields
-            const orderNumber = $(this).find('input[name="order_number"]').val();
-            const supplierCode = $(this).find('input[name="supplier_code"]').val();
-            const orderPrice = $(this).find('input[name="order_price"]').val();
-            const orderDate = $(this).find('input[name="order_date"]').val();
-            const deliveryDate = $(this).find('input[name="delivery_date"]').val();
-            const status = $(this).find('select[name="status"]').val();
-            const status_description = $(this).find('select[name="status_descritpion"]').val();
+        // Handle form submissions
+        $('form.update-order-form').on('submit', function (event) {
+            event.preventDefault();
 
-            // Create the data object to send in the AJAX request
+            const formElement = $(this);
+            const orderNumber = formElement.data('order-number');
+
+            // Gather form fields
             const formData = {
-                order_number: orderNumber,
-                supplier_code: supplierCode,
-                order_date: orderDate,
-                delivery_date: deliveryDate,
-                amount: orderPrice,
-                status: status,
-                status_description: status_description
+                supplier_code: formElement.find('input[name="supplier_code"]').val(),
+                order_number: formElement.find('input[name="order_number"]').val(),
+                article_code: formElement.find('input[name="article_code"]').val(),
+                order_price: formElement.find('input[name="order_price"]').val(),
+                order_date: formElement.find('input[name="order_date"]').val(),
+                delivery_date: formElement.find('input[name="delivery_date"]').val(),
+                status: formElement.find('select[name="status"]').val()
             };
 
-            // Make the AJAX request
+            // Make the PUT request to Django's update endpoint
             $.ajax({
-                url: `http://localhost:8000/orders/${orderNumber}/`,  // Make sure this matches your API URL
+                url: `/ordermanagement/orders/${orderNumber}/`,
                 type: 'PUT',
                 contentType: 'application/json',
-                data: JSON.stringify(formData),  // Convert form data to JSON string
+                headers: {
+                  'X-CSRFToken': csrftoken // Include CSRF token in request header
+                },
+                data: JSON.stringify(formData),
                 success: function(response) {
                     alert('Order updated successfully!');
+                    console.log("Response:", response);
                 },
-                error: function(xhr, status, error) {
-                    console.error('Error:', xhr.responseText);
-                    alert('Error updating order: ' + xhr.responseText);
+                error: function(err) {
+                    alert('Error updating order: ' + err.responseText);
+                    console.error(err);
                 }
             });
         });
     });
 </script>
-
-
 {% endblock %}

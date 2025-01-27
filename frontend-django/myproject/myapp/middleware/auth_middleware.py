@@ -1,3 +1,5 @@
+# myapp/middleware/auth_middleware.py
+
 from django.shortcuts import redirect
 from django.urls import reverse
 
@@ -19,19 +21,23 @@ class RoleBasedAuthenticationMiddleware:
         # Get access token and role from the session
         access_token = request.session.get("access_token")
         role = request.session.get("role")
-
-        # Debug: Print the access token and role for logging
-        print(f"Access Token: {access_token}, Role: {role}, Path: {request.path}")
-
+        
+        # If not logged in and trying to access a restricted path, redirect to login
         if not access_token and request.path not in allowed_paths:
-            # Redirect to login if the user is not authenticated
             return redirect("login")
 
-        if role == "customer" and request.path not in allowed_paths + [
-            reverse("sportartikelen"),
-            reverse("sportartikeldetails", kwargs={"artcode": 1}),  # Example dynamic URL
-        ]:
-            # Redirect customers to the homepage if they access unauthorized pages
-            return redirect("homePage")
+        # Example role-based check
+        if role == "customer":
+            # Let them access home, login, logout, register, 'sportartikelen', etc.
+            allowed_for_customer = allowed_paths + [
+                reverse("sportartikelen")]
+            
+            if request.path.startswith("/cart/"):
+                return self.get_response(request)
+            
+            if request.path not in allowed_for_customer:
+                return redirect("homePage")
         
+        # If role is admin or something else, you can put more conditions
+
         return self.get_response(request)

@@ -14,7 +14,7 @@ class Bestellingen:
             cursor = self.db.get_cursor()
             query = """
                 SELECT order_number, supplier_code, order_date, delivery_date, amount, status, status_description
-                FROM orders
+                FROM QAsportarticles.orders
                 WHERE supplier_code = %s
             """
             # self.db.cursor.execute(query, (suppliercode,))
@@ -49,14 +49,6 @@ class Bestellingen:
         except Exception as e:
             print(f"Error adding new order: {e}")
             raise 
-
-    def update_orders(self, best_nr: int, levcode: int, besteldat: str, leverdat: str, bedrag: float, status: str):
-        cursor = self.db.get_cursor()
-        query = "UPDATE QAsportarticles.orders SET supplier_code = %s, order_date = %s, delivery_date = %s, amount = %s, status = %s WHERE order_number=%s"
-        best_data = (levcode, besteldat, leverdat, bedrag, status, best_nr)
-        cursor.execute(query, best_data)
-        self.db.connection.commit()
-        return {"message": "Order updated successfully."}
     
     def delete_orders(self, best_nr):
         cursor = self.db.get_cursor()
@@ -76,7 +68,6 @@ class Bestellingen:
                     br.order_price, 
                     b.order_date, 
                     b.delivery_date, 
-                    b.amount, 
                     b.status
                 FROM 
                     QAsportarticles.order_lines br
@@ -96,4 +87,57 @@ class Bestellingen:
         query = "SELECT * from QAsportarticles.order_lines where article_code = '%s'" %(artcode)
         cursor.execute(query)
         result = cursor.fetchall()
-        return result      
+        return result
+    
+    def update_order_details(
+        self,
+        ordernr: int,
+        supplier_code: int,
+        order_number: int,
+        article_code: int,
+        article_name: str,
+        order_price: float,
+        order_date: str,
+        delivery_date: str,
+        status: str,
+    ):
+        cursor = self.db.get_cursor()
+
+        try:
+            # Update the orders table
+            orders_query = """
+                UPDATE QAsportarticles.orders
+                SET supplier_code = %s, order_date = %s, delivery_date = %s, status = %s
+                WHERE order_number = %s
+            """
+            orders_data = (supplier_code, order_date, delivery_date, status, ordernr)
+            cursor.execute(orders_query, orders_data)
+
+            # Update the order_lines table
+            order_lines_query = """
+                UPDATE QAsportarticles.order_lines
+                SET article_code = %s, order_price = %s
+                WHERE order_number = %s AND article_code = %s
+            """
+            order_lines_data = (article_code, order_price, ordernr, article_code)
+            cursor.execute(order_lines_query, order_lines_data)
+
+            # Update the sports_articles table (if needed, for article_name)
+            sports_articles_query = """
+                UPDATE QAsportarticles.sports_articles
+                SET article_name = %s
+                WHERE article_code = %s
+            """
+            sports_articles_data = (article_name, article_code)
+            cursor.execute(sports_articles_query, sports_articles_data)
+
+            # Commit changes
+            self.db.connection.commit()
+            return {"message": "Order details updated successfully."}
+
+        except Exception as e:
+            self.db.connection.rollback()  # Rollback in case of error
+            raise e
+
+        finally:
+            cursor.close()

@@ -1,6 +1,7 @@
 from datetime import datetime
 from fastapi import FastAPI, HTTPException, Request, Depends, status, APIRouter
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.openapi.models import OAuthFlows as OAuthFlowsModel, OAuthFlowPassword
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm, OAuth2
 from fastapi.responses import HTMLResponse
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
@@ -11,35 +12,33 @@ from models.deliverydetails import SuccessfulDelivery, SuccessfulDeliveryBase
 from models.sportarticlesDetails import SportsArticle
 from models.goodsReceiptModel import GoodsReceiptBase
 from models.inventoryModel import InventoryOverview
+from models.cartDetails import CartItem, CartRequest, CartResponse, CartCountResponse
 from models.User import RegisterUser
 from utils.db import DatabaseConnection
 from utils.dependencies import get_current_user
+from middleware.authentication_middleware import AuthenticationMiddleware
+from services.cart import Cart
 from services.leveranciers import Leveranciers
 from services.bestellingen import Bestellingen
 from services.sportArtikelen import SportsArticlesService
 from services.delivery import Delivery
 from services.goodsReceipts import GoodsReceipts
 from services.inventory import Inventory
+from typing import Dict
+from utils.OAuthToPassword import OAuth2PasswordBearerWithCookie
 from utils.jwt_utils import create_access_token, verify_access_token
 from pydantic import BaseModel
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from loguru import logger
+from typing import Optional
 import uvicorn
 
 # Error Response Model
 class ErrorResponse(BaseModel):
     detail: str
 
-# Authentication Middleware
-class AuthenticationMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request, call_next):
-        token = request.headers.get("Authorization")
-        if token:
-            token = token.split(" ")[1]  # Remove "Bearer" prefix
-            verify_access_token(token)
-        response = await call_next(request)
-        return response
+oauth2_scheme = OAuth2PasswordBearerWithCookie(tokenUrl="users/login")
 
 # FastAPI App Initialization
 app = FastAPI(
@@ -55,17 +54,17 @@ app = FastAPI(
 )
 
 router = APIRouter()
-
-
-# Middleware Configuration
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
-app.add_middleware(AuthenticationMiddleware)
-
-# OAuth2 Scheme for Token Extraction
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="users/login")
-
 # Password Hashing Context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+hashed = pwd_context.hash("password")
+print(pwd_context.verify("password", hashed))
+
+# Middleware Configuration
+app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:8001"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(AuthenticationMiddleware)
+
+# Include routers
+app.include_router(router)
 
 # Dependency: Database Session
 async def get_db():
@@ -90,8 +89,9 @@ def raise_http_exception(status_code: int, detail: str):
     raise HTTPException(status_code=status_code, detail=detail)
 
 class routes:
-    @app.get("/suppliers", description="Get all suppliers", tags=["suppliers"])
-    async def get_leveranciers(db: DatabaseConnection = Depends(get_db)):
+    # Supplier Endpoints
+    @app.get("/suppliers/", tags=["suppliers"])
+    async def get_suppliers(db: DatabaseConnection = Depends(get_db), current_user: dict = Depends(get_current_user)):
         try:
             leveranciers = Leveranciers(db)
             result = leveranciers.get_levs()
@@ -103,7 +103,8 @@ class routes:
             raise_http_exception(500, "Failed to retrieve suppliers")
 
     @app.get("/suppliers/{suppliercode}", tags=["suppliers"])
-    async def get_leverancier(suppliercode: int, db: DatabaseConnection = Depends(get_db)):
+    async def get_leverancier(suppliercode: int, db: DatabaseConnection = Depends(get_db),
+        current_user: dict = Depends(get_current_user)):
         try:
             leveranciers = Leveranciers(db)
             result = leveranciers.get_lev(suppliercode)
@@ -120,11 +121,15 @@ class routes:
             raise_http_exception(500, "Failed to retrieve supplier")
 
     @app.post("/suppliers/", tags=["suppliers"])
-    async def create_leverancier(leverancier: LeverancierCreate):
+    async def create_supplier(
+        leverancier: LeverancierCreate,
+        db: DatabaseConnection = Depends(get_db),
+        current_user: dict = Depends(get_current_user)
+    ):
+        if current_user["role"] != "admin":
+            raise HTTPException(status_code=403, detail="Access forbidden")
         try:
-            db = DatabaseConnection()
             lev = Leveranciers(db)
-            # Pass individual attributes from the LeverancierCreate model to add_lev
             result = lev.add_lev(leverancier.supplier_code, leverancier.supplier_name, leverancier.address, leverancier.city)
             if "error" in result:
                 raise_http_exception(400, result["error"])
@@ -133,27 +138,14 @@ class routes:
             logger.exception("Failed to create supplier")
             raise_http_exception(500, "Failed to create supplier")
 
-
-    @app.put("/suppliers/{suppliercode}", tags=["suppliers"])
-    async def update_leverancier(supplier_code: str, leverancier: LeverancierBase, db: DatabaseConnection = Depends(get_db)):
-        try:
-            lev = Leveranciers(db)
-            # Pass individual attributes
-            result = lev.update_lev(
-                supplier_code, 
-                leverancier.supplier_name, 
-                leverancier.address, 
-                leverancier.city
-            )
-            if "error" in result:
-                raise_http_exception(400, result["error"])
-            return result
-        except Exception as e:
-            logger.exception("Failed to update supplier")
-            raise_http_exception(500, "Failed to update supplier")
-
     @app.delete("/suppliers/{suppliercode}", tags=["suppliers"])
-    async def delete_leverancier(suppliercode: str, db: DatabaseConnection = Depends(get_db)):
+    async def delete_supplier(
+        suppliercode: str,
+        db: DatabaseConnection = Depends(get_db),
+        current_user: dict = Depends(get_current_user)
+    ):
+        if current_user["role"] != "admin":
+            raise HTTPException(status_code=403, detail="Access forbidden")
         try:
             lev = Leveranciers(db)
             result = lev.delete_lev(suppliercode)
@@ -164,8 +156,9 @@ class routes:
             logger.exception("Failed to delete supplier")
             raise_http_exception(500, "Failed to delete supplier")
 
-    @app.get("/orders", tags=["orders"])
-    async def get_bestellingen(db: DatabaseConnection = Depends(get_db)):
+    @app.get("/orders/", tags=["orders"])
+    async def get_bestellingen(db: DatabaseConnection = Depends(get_db),
+        current_user: dict = Depends(get_current_user)):
         try:
             bestellingen = Bestellingen(db)
             result = bestellingen.get_all_orders()
@@ -180,7 +173,8 @@ class routes:
             raise_http_exception(500, "Failed to retrieve orders")
 
     @app.get("/orders/{suppliercode}", tags=["orders"])
-    async def get_bestelling(suppliercode: int, db: DatabaseConnection = Depends(get_db)):
+    async def get_bestelling(suppliercode: int, db: DatabaseConnection = Depends(get_db),
+        current_user: dict = Depends(get_current_user)):
         try:
             bestellingen = Bestellingen(db)
             results = bestellingen.get_order(suppliercode)  # Assuming this returns a list of orders
@@ -208,7 +202,8 @@ class routes:
 
     
     @app.get("/trackorder/{order_number}", tags=["trackorder"])
-    async def track_orders(order_number: int, db: DatabaseConnection = Depends(get_db)):
+    async def track_orders(order_number: int, db: DatabaseConnection = Depends(get_db),
+        current_user: dict = Depends(get_current_user)):
         try:
             bestellingen = Bestellingen(db)
             result = bestellingen.track_order(order_number)
@@ -227,7 +222,8 @@ class routes:
             raise_http_exception(500, "Failed to retrieve order")
 
     @app.post("/orders/", tags=["orders"])
-    async def create_bestelling(bestelling: BestellingDetailCreate, db: DatabaseConnection = Depends(get_db)):
+    async def create_bestelling(bestelling: BestellingDetailCreate, db: DatabaseConnection = Depends(get_db),
+        current_user: dict = Depends(get_current_user)):
         try:
         # Convert the dates to correct format if they aren't
             try:
@@ -260,7 +256,8 @@ class routes:
             raise HTTPException(status_code=500, detail="Failed to create bestelling")
 
     @app.put("/orders/{ordernr}", tags=["orders"])
-    async def update_bestelling(ordernr: str, bestelling: BestellingBase, db: DatabaseConnection = Depends(get_db)):
+    async def update_bestelling(ordernr: str, bestelling: BestellingBase, db: DatabaseConnection = Depends(get_db),
+        current_user: dict = Depends(get_current_user)):
         try:
             best = Bestellingen(db)
             result = best.update_orders(
@@ -279,7 +276,8 @@ class routes:
             raise_http_exception(500, "Failed to update bestelling")
 
     @app.delete("/orders/{ordernr}", tags=["orders"])
-    async def delete_bestelling(ordernr: str, db: DatabaseConnection = Depends(get_db)):
+    async def delete_bestelling(ordernr: str, db: DatabaseConnection = Depends(get_db),
+        current_user: dict = Depends(get_current_user)):
         try:
             best = Bestellingen(db)
             result = best.delete_orders(ordernr)
@@ -291,7 +289,8 @@ class routes:
             raise_http_exception(500, "Failed to delete bestelling")
 
     @app.get("/orderdetails/{ordernr}", tags=["order details"])
-    async def get_bestellingdetails(ordernr: int, db: DatabaseConnection = Depends(get_db), skip: int = 0, limit: int = 100):
+    async def get_bestellingdetails(ordernr: int, db: DatabaseConnection = Depends(get_db),
+        current_user: dict = Depends(get_current_user), skip: int = 0, limit: int = 100):
         try:
             bestDetails = Bestellingen(db)
             results = bestDetails.get_orderlines(ordernr)
@@ -316,7 +315,8 @@ class routes:
             raise_http_exception(500, "Failed to retrieve bestelling details")
 
     @app.get("/orderdetailsArt/{artcode}", tags=["orderdetails with artcode"])
-    async def get_orderdetails_artcode(artcode: int, db: DatabaseConnection = Depends(get_db)):
+    async def get_orderdetails_artcode(artcode: int, db: DatabaseConnection = Depends(get_db),
+        current_user: dict = Depends(get_current_user)):
         try:
             bestDetails = Bestellingen(db)
             results = bestDetails.get_orderlinewithArtcode(artcode)
@@ -336,8 +336,9 @@ class routes:
             logger.exception("Failed to retrieve bestelling details by artcode")
             raise_http_exception(500, "Failed to retrieve bestelling details by artcode")
 
-    @app.post("/orderdetails", tags=["order details"])
-    async def create_bestellingdetails(bestellingdetails: BestellingDetails, db: DatabaseConnection = Depends(get_db)):
+    @app.post("/orderdetails/", tags=["order details"])
+    async def create_bestellingdetails(bestellingdetails: BestellingDetails, db: DatabaseConnection = Depends(get_db),
+        current_user: dict = Depends(get_current_user)):
         try:
             bestDetails = Bestellingen(db)
             result = bestDetails.add_neworders(
@@ -358,10 +359,15 @@ class routes:
             raise_http_exception(500, "Failed to create bestelling details")
 
     @app.put("/orderdetails/{ordernr}", tags=["order details"])
-    async def update_bestellingdetails(ordernr: int, bestellingdetails: BestellingDetails, db: DatabaseConnection = Depends(get_db)):
+    async def update_bestellingdetails(
+        ordernr: int,
+        bestellingdetails: BestellingDetails,
+        db: DatabaseConnection = Depends(get_db),
+        current_user: dict = Depends(get_current_user)
+    ):
         try:
             bestDetails = Bestellingen(db)
-            result = bestDetails.update_orders(
+            result = bestDetails.update_order_details(
                 ordernr,
                 bestellingdetails.supplier_code,
                 bestellingdetails.order_number,
@@ -374,13 +380,14 @@ class routes:
             )
             if "error" in result:
                 raise_http_exception(400, result["error"])
-            return bestellingdetails
+            return {"message": "Order details updated successfully"}
         except Exception as e:
             logger.exception("Failed to update bestelling details")
             raise_http_exception(500, "Failed to update bestelling details")
 
     @app.delete("/orderdetails/{ordernr}", tags=["order details"])
-    async def delete_bestellingdetails(ordernr: int, db: DatabaseConnection = Depends(get_db)):
+    async def delete_bestellingdetails(ordernr: int, db: DatabaseConnection = Depends(get_db),
+        current_user: dict = Depends(get_current_user)):
         try:
             bestDetails = Bestellingen(db)
             result = bestDetails.delete_orders(ordernr)
@@ -391,12 +398,21 @@ class routes:
             logger.exception("Failed to delete bestelling details")
             raise_http_exception(500, "Failed to delete bestelling details")
     
-    @app.get("/sports_articles", tags=["sportarticles"])
-    async def get_sportarticles():
-        db = DatabaseConnection()
-        sArticles = SportsArticlesService(db)
-        result = sArticles.get_all_articles()
-        return [{"article_code": r[0], "article_name": r[1], "category": r[2], "size": r[3], "color": r[4], "price": r[5], "stock_quantity": r[6], "stock_min": r[7], "vat_type": r[8]} for r in result]
+    # Sports Articles Endpoints
+    @app.get("/sports_articles/", tags=["sportarticles"])
+    async def get_sports_articles(db: DatabaseConnection = Depends(get_db), current_user: dict = Depends(get_current_user)):
+        try:
+            sArticles = SportsArticlesService(db)
+            result = sArticles.get_all_articles()
+            return [
+                {
+                    "article_code": r[0], "article_name": r[1], "category": r[2], "size": r[3],
+                    "color": r[4], "price": r[5], "stock_quantity": r[6], "stock_min": r[7], "vat_type": r[8]
+                } for r in result
+            ]
+        except Exception as e:
+            logger.exception("Failed to retrieve sports articles")
+            raise HTTPException(status_code=500, detail="Failed to retrieve sports articles")
 
     @app.get("/sports_articles/{article_code}", tags=["sportarticles"])
     async def get_plant(article_code: int):
@@ -405,35 +421,24 @@ class routes:
         result = sArticles.get_article(article_code)
         return [{"article_code": r[0], "article_name": r[1], "category": r[2], "size": r[3], "color": r[4], "price": r[5], "stock_quantity": r[6], "stock_min": r[7], "vat_type": r[8]} for r in result]
 
-    @app.post("/sports_articles", tags=["sportarticles"])
-    async def add_sport_article(
-        article: SportsArticle, 
-        db: DatabaseConnection = Depends(get_db)
-        
-    ):  
-        user: dict = Depends(get_current_user)
-        """
-        Endpoint to add a new sport article.
-        """
+    @app.post("/sports_articles/", tags=["sportarticles"])
+    async def add_sports_article(
+        article: SportsArticle,
+        db: DatabaseConnection = Depends(get_db),
+        current_user: dict = Depends(get_current_user)
+    ):
+        if current_user["role"] != "admin":
+            raise HTTPException(status_code=403, detail="Access forbidden")
         try:
-            # Use the service to add the article
             add_article_service = SportsArticlesService(db)
             result = add_article_service.add_new_article(
-                article_name=article.article_name,
-                category=article.category,
-                size=article.size,
-                color=article.color,
-                price=article.price,
-                stock_quantity=article.stock_quantity,
-                stock_min=article.stock_min,
-                vat_type=article.vat_type,
+                article_name=article.article_name, category=article.category, size=article.size,
+                color=article.color, price=article.price, stock_quantity=article.stock_quantity,
+                stock_min=article.stock_min, vat_type=article.vat_type
             )
             if "error" in result:
                 raise HTTPException(status_code=400, detail=result["error"])
-            elif user["role"] != "admin":
-                raise HTTPException(status_code=403, detail="Access forbidden")
             return {"message": "Article added successfully", "article": result}
-            
         except Exception as e:
             logger.exception("Failed to create sport article")
             raise HTTPException(status_code=500, detail="Failed to create sport article")
@@ -442,23 +447,16 @@ class routes:
     async def update_sports_article(
         article_code: int,
         article: SportsArticle,
-        db: DatabaseConnection = Depends(get_db)
+        db: DatabaseConnection = Depends(get_db),
+        current_user: dict = Depends(get_current_user)
     ):
-        """
-        Updates the details of a sports article by its article_code.
-        """
+        if current_user["role"] != "admin":
+            raise HTTPException(status_code=403, detail="Access forbidden")
         try:
             sports_article_service = SportsArticlesService(db)
             result = sports_article_service.update_article(
-                article_code,
-                article.article_name,
-                article.category,
-                article.size,
-                article.color,
-                article.price,
-                article.stock_quantity,
-                article.stock_min,
-                article.vat_type
+                article_code, article.article_name, article.category, article.size,
+                article.color, article.price, article.stock_quantity, article.stock_min, article.vat_type
             )
             if "error" in result:
                 raise_http_exception(400, result["error"])
@@ -467,12 +465,14 @@ class routes:
             logger.exception("Failed to update sports article")
             raise_http_exception(500, "Failed to update sports article")
 
-
     @app.delete("/sports_articles/{article_code}", tags=["sportarticles"])
-    async def delete_sports_article(article_code: int, db: DatabaseConnection = Depends(get_db)):
-        """
-        Deletes a sports article by its article_code.
-        """
+    async def delete_sports_article(
+        article_code: int,
+        db: DatabaseConnection = Depends(get_db),
+        current_user: dict = Depends(get_current_user)
+    ):
+        if current_user["role"] != "admin":
+            raise HTTPException(status_code=403, detail="Access forbidden")
         try:
             sports_article_service = SportsArticlesService(db)
             result = sports_article_service.delete_article(article_code)
@@ -483,17 +483,9 @@ class routes:
             logger.exception("Failed to delete sports article")
             raise_http_exception(500, "Failed to delete sports article")
 
-    @app.get("/successful_deliveries", description="Get all successful deliveries", tags=["deliveries"])
-    async def get_successful_deliveries():
-        db = DatabaseConnection()
-        successful_deliveries = Delivery(db)
-        result = successful_deliveries.get_delivery()
-        if not result:
-            raise HTTPException(status_code=400, detail="successful deliveries not found")
-        return [{"ordernr": r[0], "artcode": r[1], "delivery_date": r[2], "amount_received": r[3], "status": r[4], "external_invoice_nr": r[5], "serial_number": r[6]} for r in result]
-
-    @app.get("/goodsReceipts", tags=["goodreceipts"])
-    async def get_goodsReceipts(db: DatabaseConnection = Depends(get_db)):
+    @app.get("/goodsReceipts/", tags=["goodreceipts"])
+    async def get_goodsReceipts(db: DatabaseConnection = Depends(get_db),
+        current_user: dict = Depends(get_current_user)):
         try:
             goodsReceipts = GoodsReceipts(db)
             results = goodsReceipts.get_goodsReceipts()
@@ -504,8 +496,9 @@ class routes:
             logger.exception("Failed to retrieve good receipts")
             raise_http_exception(500, "Failed to retrieve good receipts")
 
-    @app.get("/inventory", tags=["inventory"])
-    async def get_inventory(db: DatabaseConnection = Depends(get_db)):
+    @app.get("/inventory/", tags=["inventory"])
+    async def get_inventory(db: DatabaseConnection = Depends(get_db),
+        current_user: dict = Depends(get_current_user)):
         try:
             invent = Inventory(db)
             results = invent.get_inventory_from_db()
@@ -527,95 +520,270 @@ class routes:
 
     @app.post("/users/register", tags=["users"])
     def register_user(user: RegisterUser, db: DatabaseConnection = Depends(get_db)):
+        cursor = None  # Initialize cursor to avoid UnboundLocalError
         try:
             cursor = db.get_cursor()
             if cursor is None:
+                logger.error("Database connection error: cursor is None")
                 raise HTTPException(status_code=500, detail="Database connection error")
             
             # Check if username or email already exists
             cursor.execute("SELECT COUNT(*) FROM users WHERE username = %s", (user.username,))
             if cursor.fetchone()[0] > 0:
+                logger.warning(f"Registration failed: Username '{user.username}' already exists")
                 raise HTTPException(status_code=400, detail="Username already exists")
             
             cursor.execute("SELECT COUNT(*) FROM users WHERE email = %s", (user.email,))
             if cursor.fetchone()[0] > 0:
+                logger.warning(f"Registration failed: Email '{user.email}' already exists")
                 raise HTTPException(status_code=400, detail="Email already exists")
 
             # Insert the new user
             hashed_password = pwd_context.hash(user.password)
+            
+            # **Potential Issue:** If the 'users' table has a 'role' column that is NOT NULL, you need to include it in the INSERT statement.
             cursor.execute(
-                "INSERT INTO users (username, email, password_hash) VALUES (%s, %s, %s)",
-                (user.username, user.email, hashed_password)
+                "INSERT INTO users (username, email, password_hash, role) VALUES (%s, %s, %s, %s)",
+                (user.username, user.email, hashed_password, user.role)
             )
             db.connection.commit()
+            logger.info(f"User '{user.username}' registered successfully")
             return {"message": "User registered successfully"}
+        except HTTPException as he:
+            # Re-raise HTTPExceptions to let FastAPI handle them
+            raise he
         except Exception as e:
+            logger.exception(f"Failed to register user '{user.username}': {e}")
             raise HTTPException(status_code=500, detail=f"Failed to register user: {e}")
         finally:
             if cursor:
                 cursor.close()
 
-
     @app.post("/users/login", tags=["users"])
     def login_user(form_data: OAuth2PasswordRequestForm = Depends(), db: DatabaseConnection = Depends(get_db)):
+        """
+        User login endpoint. Validates user credentials and returns a JWT token.
+
+        Args:
+            form_data (OAuth2PasswordRequestForm): The username and password form.
+            db (DatabaseConnection): Database connection dependency.
+
+        Returns:
+            dict: Access token, token type, and user information.
+        """
         cursor = db.get_cursor()
         if cursor is None:
+            logger.error("Database connection error")
             raise HTTPException(status_code=500, detail="Database connection error")
 
         try:
             # Fetch user by username
-            cursor.execute("SELECT id, username, password_hash, role FROM users WHERE username = %s", (form_data.username,))
+            logger.debug(f"Fetching user with username: {form_data.username}")
+            cursor.execute("SELECT user_id, username, password_hash, role FROM users WHERE username = %s", (form_data.username,))
             user = cursor.fetchone()
 
-            if not user or not pwd_context.verify(form_data.password, user[2]):
+            if not user:
+                logger.warning(f"Login failed: User '{form_data.username}' not found")
                 raise HTTPException(status_code=401, detail="Invalid username or password")
 
-            # Generate a JWT token with role information
-            token_data = {"sub": user[1], "role": user[3]}  # Include the role in the token payload
+            # Verify password
+            try:
+                if not pwd_context.verify(form_data.password, user[2]):
+                    logger.warning(f"Login failed: Incorrect password for user '{form_data.username}'")
+                    raise HTTPException(status_code=401, detail="Invalid username or password")
+            except AttributeError as e:
+                logger.error(f"Password verification failed due to bcrypt error: {str(e)}")
+                raise HTTPException(status_code=500, detail="Password verification error. Please contact support.")
+
+            # Validate role
+            valid_roles = {"admin", "customer"}
+            if user[3] not in valid_roles:
+                logger.warning(f"Invalid role '{user[3]}' for user '{form_data.username}'")
+                raise HTTPException(status_code=403, detail="User role is invalid")
+
+            # Generate a JWT token
+            logger.debug(f"Generating JWT token for user: {form_data.username}")
+            token_data = {"user_id": user[0], "sub": user[1], "role": user[3]}
             token = create_access_token(data=token_data)
 
-            # Return access token and user role
+            # Successful login log
+            logger.info(f"User '{form_data.username}' logged in successfully")
+
+            # Return access token and user information
             return {
                 "access_token": token,
                 "token_type": "bearer",
-                "username": user[1],
-                "role": user[3]
+                "user": {
+                    "user_id": user[0],
+                    "username": user[1],
+                    "role": user[3]
+                }
             }
+
+        except HTTPException as http_exc:
+            # Handle HTTP exceptions specifically
+            logger.error(f"HTTP exception occurred: {http_exc.detail}")
+            raise http_exc
+
         except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Failed to login: {e}")
+            # Log unexpected errors and raise generic HTTPException
+            logger.exception(f"Unexpected error during login: {str(e)}")
+            raise HTTPException(status_code=500, detail="Failed to login. Please try again later.")
+        
         finally:
             cursor.close()
 
 
     @app.get("/users/me", tags=["users"])
-    def read_users_me(current_user: str = Depends(verify_access_token)):
-        return {"username": current_user}
-
-
-    # @router.get("/secure-page", response_class=HTMLResponse, tags=["secure"])
-    # async def secure_page(current_user: dict = Depends(get_current_user)):
-    #     html_content = f"""
-    #     <html>
-    #         <head><title>Secure Page</title></head>
-    #         <body>
-    #             <h1>Welcome {current_user['username']}!</h1>
-    #             <p>You have access to this secure page.</p>
-    #         </body>
-    #     </html>
-    #     """
-    #     return HTMLResponse(content=html_content)
-
-    async def get_current_user(token: str = Depends(oauth2_scheme)):
-        username = verify_access_token(token)  # Your token validation logic
-        return {"username": username}
-
-    # @app.get("/secure-data")
-    # async def secure_data_endpoint(current_user: dict = Depends(get_current_user)):
-    #     return {"message": "This is secure data", "username": current_user["username"]}
+    async def read_users_me(current_user: dict = Depends(get_current_user)):
+        """
+        Fetch the currently authenticated user's details.
+        """
+        return {
+            "user_id": current_user["user_id"],
+            "username": current_user["username"],
+            "role": current_user["role"],
+        }
     
-    @router.get("/secure-data", tags=["secure"])
+    @router.get("/profile/", tags=["users"])
+    async def get_user_profile(current_user: dict = Depends(get_current_user)):
+        """
+        Example endpoint to demonstrate usage of get_current_user.
+        """
+        return {
+            "message": "User profile fetched successfully",
+            "user": current_user
+        }
+
+    # async def get_current_user(token: str = Depends(oauth2_scheme)):
+    #     username = verify_access_token(token)  # Your token validation logic
+    #     return {"username": username}
+    
+    @app.get("/secure-data/", dependencies=[Depends(get_current_user)], tags=["secure"])
     async def secure_data(current_user: dict = Depends(get_current_user)):
-        return {"message": "This is secure data", "username": current_user}
+        return {"message": "This is secure data", "username": current_user["username"]}
+
+    @app.get("/docs/", tags=["docs"])
+    async def open_docs():
+        return {"message": "This endpoint does not require authentication"}
+    
+    @app.post("/cart/add/", tags=["cart"])
+    async def add_to_cart(
+        cart_item: CartRequest,  # This is a Pydantic model with article_code, quantity (optional).
+        db: DatabaseConnection = Depends(get_db),
+        current_user: dict = Depends(get_current_user)
+    ):
+        """
+        Adds (or increments) an item in the user's cart table.
+        If the item already exists, increment quantity by 1 (or cart_item.quantity if provided).
+        """
+        try:
+            user_id = current_user["user_id"]
+            cart_service = Cart(db)
+            quantity_to_add = cart_item.quantity if cart_item.quantity else 1
+            cart_service.add_to_cart(user_id, cart_item.article_code, quantity_to_add)
+            return {"message": "Item added to cart successfully"}
+        except Exception as e:
+            logger.exception("Failed to add item to cart")
+            raise_http_exception(500, f"Failed to add item to cart: {str(e)}")
+
+
+    @app.get("/cart/", response_model=CartResponse, tags=["cart"])
+    async def get_cart_items(
+        db: DatabaseConnection = Depends(get_db), 
+        current_user: dict = Depends(get_current_user)
+    ):
+        """
+        Returns all cart items for the current user.
+        Example 'CartResponse' with items and total_price.
+        """
+        try:
+            user_id = current_user["user_id"]
+            cart_service = Cart(db)
+            results = cart_service.get_cart_items(user_id)
+
+            if not results:
+                return CartResponse(message="Cart is empty", items=[], total_price=0.0)
+
+            total_price = sum(item[4] for item in results)  # assuming item[4] is per-line total
+            items = [
+                CartItem(
+                    article_code=item[0],
+                    article_name=item[1],
+                    price=item[2],
+                    quantity=item[3],
+                    total_price=item[4],
+                )
+                for item in results
+            ]
+            return CartResponse(
+                message="Cart retrieved successfully", 
+                items=items, 
+                total_price=total_price
+            )
+        except Exception as e:
+            logger.exception("Failed to retrieve cart items")
+            raise_http_exception(500, f"Failed to retrieve cart items: {str(e)}")
+
+
+    @app.put("/cart/update/", tags=["cart"])
+    async def update_cart_item(
+        cart_item: dict,
+        db: DatabaseConnection = Depends(get_db),
+        current_user: dict = Depends(get_current_user)
+    ):
+        """
+        Update the quantity of a specific item in the cart.
+        Expects cart_item like: {"article_code": 123, "quantity": 5}
+        """
+        try:
+            user_id = current_user["user_id"]
+            article_code = cart_item.get("article_code")
+            quantity = cart_item.get("quantity")
+
+            if not article_code or not quantity or quantity <= 0:
+                raise_http_exception(400, "Invalid request data")
+
+            cart_service = Cart(db)
+            cart_service.update_cart_item(user_id, article_code, quantity)
+            return {"message": "Cart item updated successfully"}
+        except Exception as e:
+            logger.exception("Failed to update cart item")
+            raise_http_exception(500, f"Failed to update cart item: {str(e)}")
+
+
+    @app.delete("/cart/delete/{article_code}", tags=["cart"])
+    async def delete_cart_item(
+        article_code: int,
+        db: DatabaseConnection = Depends(get_db),
+        current_user: dict = Depends(get_current_user)
+    ):
+        """
+        Deletes a specific item from the cart entirely.
+        """
+        try:
+            user_id = current_user["user_id"]
+            cart_service = Cart(db)
+            cart_service.delete_cart_item(user_id, article_code)
+            return {"message": "Cart item deleted successfully"}
+        except Exception as e:
+            logger.exception("Failed to delete cart item")
+            raise_http_exception(500, f"Failed to delete cart item: {str(e)}")
+
+
+    @app.get("/cart/debug", tags=["cart"])
+    async def debug_cart(current_user: dict = Depends(get_current_user)):
+        return {"user": current_user}
+
+    @app.get("/cart/count/", response_model=CartCountResponse, tags=["cart"])
+    def get_cart_count(
+        db: DatabaseConnection = Depends(get_db),
+        current_user: dict = Depends(get_current_user)
+    ):
+        user_id = current_user["user_id"]
+        cart_service = Cart(db)
+        total_quantity = cart_service.get_total_cart_quantity(user_id)
+        return {"cart_count": total_quantity}
 
     @app.get("/")
     async def root():

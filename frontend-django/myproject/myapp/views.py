@@ -1,192 +1,173 @@
 import requests
 import json
 import jwt
+import logging
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.contrib.messages import get_messages
-from django.contrib.auth import logout
+from django.http import JsonResponse, HttpResponseNotFound
 from django.conf import settings
-from django.http import HttpResponseNotFound
+from django.views.decorators.http import require_POST, require_http_methods
+from django.contrib.auth import logout
 from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
-from .utils import login_required 
+from .utils import login_required  # Assuming you have a custom login_required decorator
 
+logger = logging.getLogger(__name__)
 
-#todo create ini file for hostname
+def some_view(request):
+    logger.debug("Debug message")
+    logger.info("Info message")
+    logger.error("Error message")
+
+# Utility to fetch Authorization header
+def get_authorization_header(request):
+    token = request.session.get("access_token")
+    if not token:
+        return None
+    return {"Authorization": f"Bearer {token}"}
+
+# Utility to render consistent error pages
+def render_error_page(request, error_message, status_code=500):
+    return render(request, "error.html", {"error_message": error_message}, status=status_code)
 
 def homepage(request):
     return render(request, 'homepage.html')
 
 @login_required
 def suppliers(request):
-    token = request.session.get("access_token")
-    if not token:
+    headers = get_authorization_header(request)
+    if not headers:
         messages.error(request, "You need to log in to view this page.")
         return redirect("login")
 
-    headers = {"Authorization": f"Bearer {token}"}
     try:
-        response = requests.get('http://middleware-fastapi:8000/suppliers', headers=headers)
+        response = requests.get(f"{settings.API_HOST}/suppliers", headers=headers)
         suppliers = response.json()
-        print(suppliers)
         if response.status_code == 404:
-            # Order not found
-            return render(request, 'error.html', {'error_message': 'Supplier not found'})
-        else:
-            return render(request, 'suppliers.html', {'suppliers': suppliers})
-    except KeyError:
-        return render(request, 'error.html', {'message': suppliers['error']})
+            return render_error_page(request, "Supplier not found", 404)
+        return render(request, "suppliers.html", {"suppliers": suppliers})
+    except requests.RequestException as e:
+        logger.exception("Error fetching suppliers: %s", str(e))
+        return render_error_page(request, f"Error connecting to the server: {str(e)}")
 
 @login_required
 def supplierdetail(request, suppliercode):
-    token = request.session.get("access_token")
-    if not token:
+    headers = get_authorization_header(request)
+    if not headers:
         messages.error(request, "You need to log in to view this page.")
         return redirect("login")
 
-    headers = {"Authorization": f"Bearer {token}"}
     try:
-        # Fetch supplier details from FastAPI middleware
-        response1 = requests.get(f"http://middleware-fastapi:8000/suppliers/{suppliercode}", headers=headers)
-        response2 = requests.get(f"http://middleware-fastapi:8000/orders/{suppliercode}", headers=headers)
+        response1 = requests.get(f"{settings.API_HOST}/suppliers/{suppliercode}", headers=headers)
+        response2 = requests.get(f"{settings.API_HOST}/orders/{suppliercode}", headers=headers)
 
-        # Handle supplier not found
         if response1.status_code == 404:
-            return HttpResponseNotFound("Supplier not found.")  # Or render an error page
+            return HttpResponseNotFound("Supplier not found.")
         elif response2.status_code == 404:
-            return render(request, 'error.html', {'error_message': 'Orders for this supplier not found.'})
+            return render_error_page(request, "Orders for this supplier not found.", 404)
 
-        # Handle other errors
         if response1.status_code != 200 or response2.status_code != 200:
-            return render(request, 'error.html', {'error_message': 'Error retrieving supplier or order details.'})
+            return render_error_page(request, "Error retrieving supplier or order details.")
 
-        # Parse JSON responses
         convertData1 = response1.json()
-        convertData2 = response2.json()  # Expected to be a list of orders
+        convertData2 = response2.json()
 
-        # Merge data
         data_merge = {
-            "supplier_code": convertData1.get('supplier_code'),
-            "supplier_name": convertData1.get('supplier_name'),
-            "address": convertData1.get('address'),
-            "city": convertData1.get('city'),
-            "orders": convertData2  # List of orders
+            "supplier_code": convertData1.get("supplier_code"),
+            "supplier_name": convertData1.get("supplier_name"),
+            "address": convertData1.get("address"),
+            "city": convertData1.get("city"),
+            "orders": convertData2,
         }
 
-        # Render the template with merged data
-        return render(request, 'supplierdetail.html', {'data_merge': data_merge})
-
-    except requests.exceptions.RequestException as e:
-        # Handle connection errors or timeouts
-        return render(request, 'error.html', {'error_message': f'Error connecting to the server: {str(e)}'})
-
-    except KeyError as e:
-        # Handle unexpected JSON structure
-        return render(request, 'error.html', {'error_message': f'Missing expected data: {str(e)}'})
-
+        return render(request, "supplierdetail.html", {"data_merge": data_merge})
+    except requests.RequestException as e:
+        logger.exception("Error fetching supplier details: %s", str(e))
+        return render_error_page(request, f"Error connecting to the server: {str(e)}")
     except Exception as e:
-        # Generic error handling
-        return render(request, 'error.html', {'error_message': f'An unexpected error occurred: {str(e)}'})
-
-
-
-# def orders(request):
-#     response = requests.get('http://middleware-fastapi:8000/orders')
-#     order = response.json()
-#     print(order) 
-#     return render(request, 'orders.html', {'orders': order})
-
-# def orderdetails(request, ordernr):
-    
-#     response = requests.get(f'http://middleware-fastapi:8000/orderdetails/{ordernr}')
-#     orderdetails = response.json()
-#     print(orderdetails) 
-#     return render(request, 'orderdetails.html', {'orderdetails': orderdetails})
+        logger.exception("Unexpected error: %s", str(e))
+        return render_error_page(request, f"An unexpected error occurred: {str(e)}")
 
 @login_required
 def sportartikeldetails(request, artcode):
-    """
-    Fetch and display details of a specific sporting article based on its article code.
-    """
-    token = request.session.get("access_token")
-    if not token:
+    headers = get_authorization_header(request)
+    if not headers:
         messages.error(request, "You need to log in to view this page.")
         return redirect("login")
 
-    headers = {"Authorization": f"Bearer {token}"}
     try:
-        # Fetch article details from the middleware
-        response = requests.get(f'http://middleware-fastapi:8000/sports_articles/{artcode}', headers=headers,timeout=5)
-        
+        response = requests.get(f"{settings.API_HOST}/sports_articles/{artcode}", headers=headers, timeout=5)
         if response.status_code == 404:
             return HttpResponseNotFound("Sporting article not found.")
         elif response.status_code != 200:
-            return render(request, 'error.html', {'message': 'An error occurred while retrieving the article details.'})
-        
-        # Parse the response JSON
-        sportsarticle_list = response.json()
+            return render_error_page(request, "An error occurred while retrieving the article details.")
 
-        # Ensure the response is a list and extract the first item
-        if isinstance(sportsarticle_list, list) and len(sportsarticle_list) > 0:
+        sportsarticle_list = response.json()
+        if isinstance(sportsarticle_list, list) and sportsarticle_list:
             sportsarticle = sportsarticle_list[0]
         else:
-            return render(request, 'error.html', {'message': 'Invalid API response format.'})
-        
-        # Pass the article details to the template
-        return render(request, 'sportsarticlesdetails.html', {'sportsarticle': sportsarticle})
+            return render_error_page(request, "Invalid API response format.")
 
-    except requests.exceptions.RequestException as e:
-        return render(request, 'error.html', {'message': f"Error connecting to the server: {str(e)}"})
+        return render(request, "sportsarticlesdetails.html", {"sportsarticle": sportsarticle})
+    except requests.RequestException as e:
+        logger.exception("Error fetching sporting article details: %s", str(e))
+        return render_error_page(request, f"Error connecting to the server: {str(e)}")
     except Exception as e:
-        return render(request, 'error.html', {'message': f"An unexpected error occurred: {str(e)}"})
+        logger.exception("Unexpected error: %s", str(e))
+        return render_error_page(request, f"An unexpected error occurred: {str(e)}")
 
 @login_required
 def sportartikelen(request):
-    """
-    Fetch and display a list of all sporting articles.
-    """
-    token = request.session.get("access_token")
-    if not token:
+    headers = get_authorization_header(request)
+    if not headers:
         messages.error(request, "You need to log in to view this page.")
         return redirect("login")
 
-    headers = {"Authorization": f"Bearer {token}"}
     try:
-        # Fetch list of articles from the middleware
-        response = requests.get(f"http://middleware-fastapi:8000/sports_articles/", headers=headers,timeout=5)
+        response = requests.get(f"{settings.API_HOST}/sports_articles/", headers=headers, timeout=5)
         if response.status_code != 200:
-            return render(request, 'error.html', {'message': 'An error occurred while retrieving the articles list.'})
-        
-        # Parse the response JSON
-        sportArtikelen = response.json()
+            return render_error_page(request, "An error occurred while retrieving the articles list.")
 
-        # Ensure the structure is valid (expecting a list of articles)
+        sportArtikelen = response.json()
         if isinstance(sportArtikelen, list):
-            return render(request, 'sports_articles.html', {'sports_articles': sportArtikelen})
+            return render(request, "sports_articles.html", {"sports_articles": sportArtikelen})
         else:
             raise ValueError("Unexpected response structure.")
-
-    except requests.exceptions.RequestException as e:
-        # Handle network-related errors
-        return render(request, 'error.html', {'message': f"Error connecting to the server: {str(e)}"})
+    except requests.RequestException as e:
+        return render_error_page(request, f"Error connecting to the server: {str(e)}")
     except ValueError as e:
-        # Handle unexpected response structure
-        return render(request, 'error.html', {'message': str(e)})
+        return render_error_page(request, str(e))
     except Exception as e:
-        # Catch-all for other exceptions
-        return render(request, 'error.html', {'message': f"An unexpected error occurred: {str(e)}"})
+        return render_error_page(request, f"An unexpected error occurred: {str(e)}")
+
+def delete_sportartikel(request, article_code):
+    """
+    Receives DELETE (or POST) from the front end,
+    calls FastAPI to remove the article.
+    """
+    if request.method == "DELETE":
+        token = request.session.get("access_token")
+        if not token:
+            return JsonResponse({"error": "Not authenticated"}, status=401)
+
+        headers = {"Authorization": f"Bearer {token}"}
+        url = f"{settings.API_HOST}/sports_articles/{article_code}"
+        resp = requests.delete(url, headers=headers)
+
+        if resp.status_code in (200, 204):
+            return JsonResponse({"message": "Article deleted successfully!"})
+        else:
+            return JsonResponse({"error": resp.text}, status=resp.status_code)
+
+    return JsonResponse({"error": "Method not allowed"}, status=405)
 
 @login_required
 def add_sportartikel(request):
-    """
-    Handle adding a new sporting article.
-    """
-    token = request.session.get("access_token")
-    if not token:
-        messages.error(request, "You need to log in to perform this action.")
-        return redirect("login")
-
     if request.method == "POST":
-        # Gather data from the POST request
+        token = request.session.get("access_token")
+        if not token:
+            messages.error(request, "You need to log in to perform this action.")
+            return redirect("login")
+
         article_data = {
             "article_name": request.POST.get("article_name"),
             "category": request.POST.get("category"),
@@ -204,67 +185,83 @@ def add_sportartikel(request):
         }
 
         try:
-            # Send POST request to middleware to add the article
-            response = requests.post(
-                f"http://middleware-fastapi:8000/sports_articles/",
-                headers=headers,
-                json=article_data,
-                timeout=5
-            )
+            api_url = f"{settings.API_HOST}/sports_articles/"
+            response = requests.post(api_url, headers=headers, json=article_data, timeout=5)
 
-            if response.status_code == 201:
+            if response.status_code == 200:
                 messages.success(request, "Sport article added successfully.")
-                return redirect("sportartikelen")  # Redirect to the list of articles
+                return redirect("sportartikelen")
             elif response.status_code == 400:
-                error_message = response.json().get("detail", "Invalid data provided.")
-                messages.error(request, f"Failed to add article: {error_message}")
+                error_detail = response.json().get("detail", "Invalid data provided.")
+                messages.error(request, f"Failed to add article: {error_detail}")
             else:
                 messages.error(request, "An unexpected error occurred while adding the article.")
-        except requests.exceptions.RequestException as e:
-            # Handle network-related errors
+        except requests.RequestException as e:
             messages.error(request, f"Error connecting to the server: {str(e)}")
-        except Exception as e:
-            # Generic error handling
-            messages.error(request, f"An unexpected error occurred: {str(e)}")
 
-    # Render the form page
+        return redirect("add_sportartikel")
+
     return render(request, "add_sportsarticle.html")
 
-
 @login_required
-def orderdetailsArt(request, artcode):
+@require_http_methods(["PUT"])
+def update_sportartikel(request, article_code):
+    """
+    Django view to update a sport article's details via AJAX.
+    Expects JSON body with fields to update.
+    """
     token = request.session.get("access_token")
     if not token:
-        messages.error(request, "You need to log in to view this page.")
-        return redirect("login")
+        return JsonResponse({"detail": "You need to log in first!"}, status=401)
 
-    headers = {"Authorization": f"Bearer {token}"}
     try:
-        response = requests.get(f"http://middleware-fastapi:8000/orderdetailsArt/{artcode}", headers=headers)
-        orderdetails = response.json()
-        getOrderNr = orderdetails[0]['ordernr']
-        response = requests.get(f"http://middleware-fastapi:8000/orderdetails/{getOrderNr}", headers=headers)
-        orderdetails = response.json()
-   
-        return render(request, 'orderdetails.html', {'orderdetails': orderdetails})
-    except KeyError:
-        return render(request, 'error.html', {'message': orderdetails['error']})
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"detail": "Invalid JSON data"}, status=400)
+
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json"
+    }
+    api_url = f"{settings.API_HOST}/sports_articles/{article_code}"
+
+    try:
+        response = requests.put(api_url, headers=headers, json=data, timeout=5)
+    except requests.RequestException as e:
+        return JsonResponse({"detail": f"Error connecting to the server: {e}"}, status=500)
+
+    if response.status_code == 200:
+        return JsonResponse({"message": "Sport article updated successfully!"}, status=200)
+    else:
+        try:
+            error_detail = response.json().get("detail", "Failed to update sport article.")
+        except json.JSONDecodeError:
+            error_detail = "Failed to update sport article."
+        return JsonResponse({"detail": error_detail}, status=response.status_code)
 
 @login_required
 def inventory(request):
     token = request.session.get("access_token")
     if not token:
+        print("Access token not found in session.")
         messages.error(request, "You need to log in to view this page.")
         return redirect("login")
 
     headers = {"Authorization": f"Bearer {token}"}
-    print(request.session.get("access_token"))
+    
     try:
-        response = requests.get(f"http://middleware-fastapi:8000/inventory", headers=headers)
+        response = requests.get(f"{settings.API_HOST}/inventory", headers=headers)
+        print(f"inventory response = {response} | header = {headers}")
+        if response.status_code == 401:
+            print("Token is invalid or expired.")
+            messages.error(request, "Session expired. Please log in again.")
+            return redirect("login")
         inventoryDetails = response.json()
         return render(request, 'inventory.html', {'inventory': inventoryDetails})
-    except KeyError:
-        return render(request, 'error.html', {'message': inventoryDetails['error']})
+    except Exception as e:
+        print(f"Error fetching inventory: {e}")
+        messages.error(request, f"Error: {str(e)}")
+        return redirect("login")
 
 def login_under_construction(request):
     return render(request, 'under_construction.html')
@@ -273,77 +270,98 @@ def login_view(request):
     if request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("password")
-        response = requests.post(
-            f"http://middleware-fastapi:8000/users/login",
-            data={"username": username, "password": password},
-        )
 
-        if response.status_code == 200:
-            token_data = response.json()
-            access_token = token_data["access_token"]
-            print(f"Access Token Received: {access_token}")  # Debug
+        try:
+            response = requests.post(
+                f"{settings.API_HOST}/users/login",
+                data={"username": username, "password": password},
+                timeout=5
+            )
+            if response.status_code == 200:
+                data = response.json()
+                access_token = data.get("access_token")
+                if access_token:
+                    user_info = data.get("user", {})
+                    user_role = user_info.get("role", None)
+                    user_name = user_info.get("username", None)
+                    
+                    try:
+                        decoded = jwt.decode(access_token, settings.SECRET_KEY, algorithms=["HS256"])
+                        role = decoded.get("role")
+                        if role:
+                            request.session['role'] = role
+                        else:
+                            messages.error(request, "Invalid token: Missing role.")
+                            return redirect("login")
+                    except jwt.ExpiredSignatureError:
+                        messages.error(request, "Token has expired.")
+                        return redirect("login")
+                    except jwt.InvalidTokenError:
+                        messages.error(request, "Invalid token.")
+                        return redirect("login")
+                    except (ExpiredSignatureError, InvalidTokenError) as e:
+                        messages.error(request, "Invalid or expired token.")
+                        return redirect("login")
 
-            try:
-                decoded_token = jwt.decode(
-                    access_token,
-                    settings.SECRET_KEY,
-                    algorithms=["HS256"],
-                )
-                print(f"Decoded Token: {decoded_token}")  # Debug
-
-                request.session["access_token"] = access_token
-                request.session["username"] = decoded_token.get("sub")
-                request.session["role"] = decoded_token.get("role")
-                messages.success(request, "Login successful!")
-                return redirect("/")
-            except jwt.ExpiredSignatureError:
-                messages.error(request, "Token has expired. Please log in again.")
+                    # Store to session
+                    request.session["access_token"] = access_token
+                    request.session["role"] = user_role  
+                    request.session["username"] = user_name  
+                    
+                    return redirect("homePage")
+                else:
+                    messages.error(request, "No access token returned by server.")
+                    return redirect("login")
+            else:
+                messages.error(request, "Invalid credentials.")
                 return redirect("login")
-            except jwt.InvalidTokenError:
-                messages.error(request, "Invalid token. Please log in again.")
-                return redirect("login")
-        else:
-            messages.error(request, "Invalid username or password")
+        except requests.RequestException as e:
+            messages.error(request, f"Login error: {e}")
             return redirect("login")
-
-    return render(request, "login.html")
-
+    else:
+        return render(request, "login.html")
 
 @login_required
 def secure_view(request):
-    token = request.session.get("access_token")
-    print("Secure view token:", token)  # Debugging print statement
+    """
+    Secure view to fetch sensitive data from FastAPI.
+    """
+    headers = get_authorization_header(request)
+    if not headers:
+        messages.error(request, "You need to log in to access this page.")
+        return redirect("login")
 
-    if not token:
-        return redirect("login")  # This should not trigger if the token exists
-
-    headers = {"Authorization": f"Bearer {token}"}
     try:
-        response = requests.get(
-            "http://middleware-fastapi:8000/secure-data", headers=headers, timeout=10
-        )
+        response = requests.get(f"{settings.API_HOST}/secure-data", headers=headers, timeout=10)
+
         if response.status_code == 200:
             data = response.json()
             return render(request, "secure_view.html", {"data": data})
         elif response.status_code == 401:
             messages.error(request, "Session expired. Please log in again.")
-            del request.session["access_token"]
+            request.session.flush()  # Clear session
             return redirect("login")
         else:
-            messages.error(request, "An error occurred.")
+            logger.error(f"Unexpected status code {response.status_code} from secure-data endpoint.")
+            messages.error(request, "An error occurred while accessing secure data.")
             return redirect("login")
-    except requests.exceptions.RequestException as e:
+    except requests.RequestException as e:
+        logger.exception("Error fetching secure data: %s", str(e))
         messages.error(request, "Unable to connect to the server.")
         return redirect("login")
 
 def logout_view(request):
-    # Clear the session data
+    """
+    Logout view to clear session and redirect to login page.
+    """
     request.session.flush()
     messages.success(request, "You have been successfully logged out.")
-    return redirect("login")  # Redirect to the login page
-
+    return redirect("login")
 
 def register_view(request):
+    """
+    User registration view.
+    """
     if request.method == "POST":
         username = request.POST.get("username")
         email = request.POST.get("email")
@@ -351,24 +369,281 @@ def register_view(request):
         confirm_password = request.POST.get("confirm_password")
 
         if password != confirm_password:
-            messages.error(request, "Passwords do not match")
+            messages.error(request, "Passwords do not match.")
             return redirect("register")
 
-        response = requests.post(
-            "http://middleware-fastapi:8000/users/register",
-            json={"username": username, "email": email, "password": password},
-        )
+        try:
+            response = requests.post(
+                f"{settings.API_HOST}/users/register",
+                json={"username": username, "email": email, "password": password},
+                timeout=5
+            )
 
-        if response.status_code == 200:
-            messages.success(request, "Registration successful! Please login.")
-            return redirect("login")
-        else:
-            messages.error(request, response.json().get("detail", "Registration failed"))
+            if response.status_code == 200:
+                messages.success(request, "Registration successful! Please log in.")
+                return redirect("login")
+            else:
+                error_detail = response.json().get("detail", "Registration failed.")
+                logger.warning(f"Registration failed for user '{username}': {error_detail}")
+                messages.error(request, error_detail)
+                return redirect("register")
+        except requests.RequestException as e:
+            logger.exception("Error during registration: %s", str(e))
+            messages.error(request, f"Unable to connect to the server: {str(e)}")
             return redirect("register")
 
     return render(request, "register.html")
 
-# def home_page(request):
-#     if request.session.get("access_token"):
-#         return render(request, "homepage_logged_in.html")
-#     return render(request, "homepage.html")
+@login_required
+def orderdetailsArt(request, artcode):
+    """
+    Fetch and display order details for a given article code.
+    """
+    headers = get_authorization_header(request)
+    if not headers:
+        messages.error(request, "You need to log in to view this page.")
+        return redirect("login")
+
+    try:
+        response1 = requests.get(f"{settings.API_HOST}/orderdetailsArt/{artcode}", headers=headers)
+        if response1.status_code == 404:
+            return HttpResponseNotFound("Order details for this article not found.")
+        elif response1.status_code != 200:
+            return render_error_page(request, "Error fetching order details for the article.")
+
+        orderdetails_art = response1.json()
+
+        if not isinstance(orderdetails_art, list) or not orderdetails_art:
+            return render_error_page(request, "Invalid response structure for article order details.")
+
+        getOrderNr = orderdetails_art[0].get("ordernr")
+        if not getOrderNr:
+            return render_error_page(request, "Order number missing in the response.")
+
+        response2 = requests.get(f"{settings.API_HOST}/orderdetails/{getOrderNr}", headers=headers)
+        if response2.status_code == 404:
+            return HttpResponseNotFound("Order details not found.")
+        elif response2.status_code != 200:
+            return render_error_page(request, "Error fetching detailed order information.")
+
+        orderdetails = response2.json()
+        return render(request, "orderdetails.html", {"orderdetails": orderdetails})
+    except requests.RequestException as e:
+        logger.exception("Error fetching order details: %s", str(e))
+        return render_error_page(request, f"Error connecting to the server: {str(e)}")
+    except Exception as e:
+        logger.exception("Unexpected error: %s", str(e))
+        return render_error_page(request, f"An unexpected error occurred: {str(e)}")
+
+# ------------------------------
+# Cart Views
+# ------------------------------
+
+@login_required
+@require_POST
+def add_to_cart_view(request, article_code):
+    """
+    Django view to handle adding an article to the cart via AJAX or form submission.
+    """
+    token = request.session.get("access_token")
+    if not token:
+        return JsonResponse({"detail": "You need to log in first!"}, status=401)
+
+    # Determine if the request is AJAX or form submission based on content type
+    if request.headers.get('Content-Type') == 'application/json':
+        # AJAX request
+        try:
+            data = json.loads(request.body)
+            quantity = data.get("quantity", 1)
+        except json.JSONDecodeError:
+            quantity = 1
+    else:
+        # Form submission
+        quantity = request.POST.get("quantity", 1)
+
+    try:
+        quantity = int(quantity)
+        if quantity < 1:
+            raise ValueError
+    except ValueError:
+        return JsonResponse({"detail": "Invalid quantity specified."}, status=400)
+
+    try:
+        response = requests.post(
+            f"{settings.API_HOST}/cart/add/",
+            headers={
+                "Authorization": f"Bearer {token}",
+                "Content-Type": "application/json"
+            },
+            json={
+                "article_code": article_code,
+                "quantity": quantity
+            },
+            timeout=5
+        )
+    except requests.RequestException as e:
+        logger.exception("Error connecting to FastAPI: %s", str(e))
+        return JsonResponse({"detail": f"Error connecting to the server: {e}"}, status=500)
+
+    if response.status_code == 200:
+        if request.headers.get('Content-Type') == 'application/json':
+            return JsonResponse({"message": "Item added to cart successfully!"}, status=200)
+        else:
+            messages.success(request, "Item added to cart successfully!")
+            return redirect("sportartikelen")
+    else:
+        try:
+            error_detail = response.json().get("detail", "Failed to add to cart.")
+        except json.JSONDecodeError:
+            error_detail = "Failed to add to cart."
+        if request.headers.get('Content-Type') == 'application/json':
+            return JsonResponse({"detail": error_detail}, status=response.status_code)
+        else:
+            messages.error(request, f"Error: {error_detail}")
+            return redirect("sportartikelen")
+
+@require_http_methods(["PUT"])
+def update_cart_view(request):
+    """
+    Django view to update the quantity of a cart item via AJAX.
+    Expects JSON body with 'article_code' and 'quantity'.
+    """
+    try:
+        data = json.loads(request.body)
+        article_code = data.get("article_code")
+        quantity = data.get("quantity")
+
+        if not article_code or not isinstance(quantity, int) or quantity < 1:
+            return JsonResponse({"detail": "Invalid request data."}, status=400)
+    except json.JSONDecodeError:
+        return JsonResponse({"detail": "Invalid JSON."}, status=400)
+
+    token = request.session.get("access_token")
+    if not token:
+        return JsonResponse({"detail": "You need to log in first!"}, status=401)
+
+    try:
+        response = requests.put(
+            f"{settings.API_HOST}/cart/update/",
+            headers={
+                "Authorization": f"Bearer {token}",
+                "Content-Type": "application/json"
+            },
+            json={
+                "article_code": article_code,
+                "quantity": quantity
+            },
+            timeout=5
+        )
+    except requests.RequestException as e:
+        logger.exception("Error connecting to FastAPI: %s", str(e))
+        return JsonResponse({"detail": f"Error connecting to the server: {e}"}, status=500)
+
+    if response.status_code == 200:
+        data = response.json()
+        return JsonResponse({"message": "Cart item updated successfully!", "cart_count": data.get("cart_count", 0)}, status=200)
+    else:
+        try:
+            error_detail = response.json().get("detail", "Failed to update cart item.")
+        except json.JSONDecodeError:
+            error_detail = "Failed to update cart item."
+        return JsonResponse({"detail": error_detail}, status=response.status_code)
+
+@require_http_methods(["DELETE"])
+def remove_cart_view(request, article_code):
+    """
+    Django view to remove an article from the cart via AJAX.
+    """
+    token = request.session.get("access_token")
+    if not token:
+        return JsonResponse({"detail": "You need to log in first!"}, status=401)
+
+    try:
+        response = requests.delete(
+            f"{settings.API_HOST}/cart/delete/{article_code}",
+            headers={
+                "Authorization": f"Bearer {token}",
+                "Content-Type": "application/json"
+            },
+            timeout=5
+        )
+    except requests.RequestException as e:
+        logger.exception("Error connecting to FastAPI: %s", str(e))
+        return JsonResponse({"detail": f"Error connecting to the server: {e}"}, status=500)
+
+    if response.status_code == 200:
+        return JsonResponse({"message": "Cart item removed successfully!"}, status=200)
+    else:
+        try:
+            error_detail = response.json().get("detail", "Failed to remove cart item.")
+        except json.JSONDecodeError:
+            error_detail = "Failed to remove cart item."
+        return JsonResponse({"detail": error_detail}, status=response.status_code)
+
+@login_required
+def cart_view(request):
+    """
+    Django view to display the user's cart.
+    Fetches cart items from FastAPI.
+    """
+    token = request.session.get("access_token")
+    if not token:
+        messages.error(request, "You need to log in to view your cart.")
+        return redirect("login")
+
+    try:
+        response = requests.get(
+            f"{settings.API_HOST}/cart/",
+            headers={
+                "Authorization": f"Bearer {token}",
+                "Content-Type": "application/json"
+            },
+            timeout=5
+        )
+    except requests.RequestException as e:
+        logger.exception("Error connecting to FastAPI: %s", str(e))
+        messages.error(request, f"Error connecting to the server: {e}")
+        return redirect("homePage")
+
+    if response.status_code == 200:
+        data = response.json()
+        return render(request, "cart.html", {"cart": data})
+    else:
+        try:
+            error_detail = response.json().get("detail", "Failed to retrieve cart.")
+        except json.JSONDecodeError:
+            error_detail = "Failed to retrieve cart."
+        messages.error(request, f"Error: {error_detail}")
+        return redirect("homePage")
+
+@login_required
+@require_http_methods(["GET"])
+def cart_count_view(request):
+    """
+    Django view to retrieve the current number of items in the user's cart.
+    Returns a JSON response with the cart count.
+    """
+    token = request.session.get("access_token")
+    if not token:
+        return JsonResponse({"detail": "You need to log in first!"}, status=401)
+
+    try:
+        response = requests.get(
+            f"{settings.API_HOST}/cart/count/",
+            headers={
+                "Authorization": f"Bearer {token}",
+                "Content-Type": "application/json"
+            },
+            timeout=5
+        )
+    except requests.RequestException as e:
+        logger.exception("Error connecting to FastAPI: %s", str(e))
+        return JsonResponse({"detail": f"Error connecting to the server: {e}"}, status=500)
+
+    if response.status_code == 200:
+        data = response.json()
+        cart_count = data.get("cart_count", 0)
+        return JsonResponse({"cart_count": cart_count}, status=200)
+    else:
+        logger.error("Failed to retrieve cart count. Status code: %s", response.status_code)
+        return JsonResponse({"cart_count": 0}, status=200)

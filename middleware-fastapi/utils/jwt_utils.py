@@ -1,40 +1,59 @@
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
-from fastapi import HTTPException, Depends
-from fastapi.security import OAuth2PasswordBearer
+from fastapi import HTTPException
+import logging
 
 # Configuration for JWT
-SECRET_KEY = "django-insecure-x3my1lu5-hcc@uf8w&9-le8q=v(da!2peq^u3za%i1(szdf%kx"  # Change this to a secure, random value
+SECRET_KEY = "django-insecure-x3my1lu5-hcc@uf8w&9-le8q=v(da!2peq^u3za%i1(szdf%kx"  # Ensure this is securely stored
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-# OAuth2PasswordBearer is used to extract the token from requests
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="users/login")
+# Logger setup
+logger = logging.getLogger("jwt_utils")
+logger.setLevel(logging.INFO)
 
-# Function to create a JWT token
-# def create_access_token(data: dict):
-#     to_encode = data.copy()
-#     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-#     to_encode.update({"exp": expire})
-#     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-#     return encoded_jwt
+def create_access_token(data: dict, expires_delta: timedelta = None) -> str:
+    """
+    Create a JWT token with additional payload fields like user_id and role.
+    Args:
+        data (dict): Payload data to include in the JWT token.
+        expires_delta (timedelta, optional): Custom expiration time. Defaults to ACCESS_TOKEN_EXPIRE_MINUTES.
 
-def create_access_token(data: dict, expires_delta: timedelta = None):
+    Returns:
+        str: Encoded JWT token.
+    """
     to_encode = data.copy()
     expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    print(f"Generated Token: {encoded_jwt}")  # Debugging token
+    logger.info(f"Generated JWT token for user: {data.get('sub')}")
     return encoded_jwt
 
+def verify_access_token(token: str) -> dict:
+    """
+    Verify and decode a JWT token.
+    Args:
+        token (str): The JWT token to validate.
 
-# Function to verify a JWT token
-def verify_access_token(token: str):
+    Returns:
+        dict: Decoded payload if token is valid.
+
+    Raises:
+        HTTPException: If the token is invalid or missing required fields.
+    """
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")  # Het 'sub'-veld bevat vaak de gebruikersnaam
-        if username is None:
-            raise HTTPException(status_code=401, detail="Invalid token")
-        return {"username": username, "exp": payload.get("exp")}  # Je kunt meer velden teruggeven indien nodig
+        logger.info(f"Decoded token payload: {payload}")
+        print(payload)
+
+        user_id: str = payload.get("user_id")
+        username: str = payload.get("sub")  # The 'sub' field should represent the subject (e.g., username)
+        role: str = payload.get("role")    # The 'role' field represents the user's role
+
+        if not username or not role:
+            raise HTTPException(status_code=401, detail="Invalid token: Missing essential fields")
+
+        return {"user_id": user_id, "username": username, "role": role, "exp": payload.get("exp")}
     except JWTError as e:
-        raise HTTPException(status_code=401, detail="Invalid token") from e
+        logger.error(f"JWT verification failed: {str(e)}")
+        raise HTTPException(status_code=401, detail="Invalid token: JWT verification failed") from e

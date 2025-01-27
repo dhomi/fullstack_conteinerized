@@ -4,7 +4,7 @@ class Delivery:
     
     def get_delivery(self):
         cursor = self.db.get_cursor()
-        zoek_string = "SELECT ordernr, artcode, delivery_date, amount_received, status, external_invoice_nr, serial_number FROM QAsportartikelen.successful_delivery"
+        zoek_string = "SELECT receipt_id, ordernr, artcode, receipt_date, receipt_quantity, status, booking_number, sequence_number FROM QAsportartikelen.goods_receipt"
         cursor.execute(zoek_string)
         result = cursor.fetchall()
         return result

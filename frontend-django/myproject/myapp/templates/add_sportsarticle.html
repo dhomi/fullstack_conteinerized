@@ -3,14 +3,17 @@
 {% block title %}Add New Sporting Article{% endblock %}
 
 {% block content %}
-<meta name="description" content="Add a new sporting article using the form below.">
 <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 
-<div class="container" style="display: flex; justify-content: center; align-items: center; height: 85vh; margin-top: 0px;">
+<div class="container" style="display: flex; justify-content: center; align-items: center; height: 85vh;">
     <div class="card" style="width: 400px; border-radius: 10px; box-shadow: 0px 4px 8px rgba(0,0,0,0.1); padding: 20px; background-color: #ffffff;">
         <h4 style="text-align: center; margin-bottom: 15px;">Add New Sporting Article</h4>
-        <form id="addArticleForm">
+        
+        <!-- IMPORTANT: The action points to Django, not FastAPI -->
+        <form method="POST" action="{% url 'add_sportartikel' %}">
+            {% csrf_token %}
+
             <div class="form-group" style="margin-bottom: 2px;">
                 <label for="article_name">Article Name:</label>
                 <input type="text" class="form-control" id="article_name" name="article_name" required>
@@ -46,37 +49,10 @@
                     <option value="L">Low</option>
                 </select>
             </div>
-            <button type="button" class="btn btn-primary btn-block" onclick="submitArticle()" style="margin-top: 2px;">Submit Article</button>
+
+            <!-- Submit button posts to Django -->
+            <button type="submit" class="btn btn-primary btn-block" style="margin-top: 2px;">Submit Article</button>
         </form>
     </div>
 </div>
-
-<script>
-    function submitArticle() {
-        const articleData = {
-            article_name: document.getElementById('article_name').value,
-            category: document.getElementById('category').value,
-            size: document.getElementById('size').value,
-            color: document.getElementById('color').value,
-            price: parseFloat(document.getElementById('price').value),
-            stock_quantity: parseInt(document.getElementById('stock_quantity').value),
-            stock_min: parseInt(document.getElementById('stock_min').value),
-            vat_type: document.getElementById('vat_type').value,
-        };
-
-        $.ajax({
-            url: 'http://localhost:8000/sports_articles/',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(articleData),
-            success: function(response) {
-                alert('Sport article added successfully!');
-                window.location.href = '/sports_articles/';
-            },
-            error: function(err) {
-                alert('Failed to add article: ' + err.responseText);
-            }
-        });
-    }
-</script>
 {% endblock %}
