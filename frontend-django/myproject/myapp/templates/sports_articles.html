@@ -125,9 +125,12 @@
       updatedData[fieldName] = fieldValue;
     });
 
+    const csrfToken = "{{ csrf_token }}"; // Ensure CSRF token is available
+
     $.ajax({
       url: `/sports_articles/update/${articleCode}/`,
       type: 'PUT',
+      headers: { 'X-CSRFToken': csrfToken },
       contentType: 'application/json',
       data: JSON.stringify(updatedData),
       success: function(response) {
@@ -146,9 +149,12 @@
   function deleteSportArticle(articleCode) {
     if (!confirm("Are you sure you want to delete this article?")) return;
 
+    const csrfToken = "{{ csrf_token }}"; // Ensure CSRF token is available
+
     $.ajax({
       url: `/sports_articles/delete/${articleCode}/`,
       type: 'DELETE',
+      headers: { 'X-CSRFToken': csrfToken }, // Add CSRF token to headers
       success: function(response) {
         alert('Sport article deleted successfully!');
         location.reload();
@@ -175,16 +181,11 @@
         csrfmiddlewaretoken: "{{ csrf_token }}"
       },
       success: function(response) {
-        // This might be JSON if your view returns JsonResponse
-        // or it might just redirect. If it's JSON, we can do:
         if (response.message) {
           alert(response.message);
         } else {
           alert("Item added to cart successfully!");
         }
-
-        // Now update the cart count at the top
-        // (Assumes you have a JS function in homepage.html called updateCartCount)
         updateCartCount();
       },
       error: function(err) {
@@ -195,10 +196,9 @@
       }
     });
   }
-  $("#myAddToCartForm").on("submit", function(e) {
-  e.preventDefault();  // Stop normal redirect
-  // then do your AJAX call
-});
 
+  $("#myAddToCartForm").on("submit", function(e) {
+    e.preventDefault();  // Stop normal redirect
+  });
 </script>
 {% endblock %}

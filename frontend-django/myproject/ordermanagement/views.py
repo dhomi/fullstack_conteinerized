@@ -1,10 +1,12 @@
 import requests
 import json
+from django.contrib import messages
 from django.conf import settings
 from django.http import JsonResponse 
 from django.shortcuts import render, redirect, get_object_or_404
 from requests.exceptions import RequestException
-from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.csrf import csrf_protect, csrf_exempt
+
 from .models import Order
 
 #todo create ini file for hostname
@@ -130,6 +132,67 @@ def update_order_view(request, orderNumber):
 
 def create_order(request):
     return render(request, 'create_order.html')
+
+@csrf_protect
+def create_order_view(request):
+    """
+    Receives POST JSON from the client, then forwards it to FastAPI
+    to create a new order.
+    """
+    if request.method == "POST":
+        # 1) Check if user is logged in (has token in session)
+        token = request.session.get("access_token")
+        if not token:
+            return JsonResponse({"error": "You must be logged in."}, status=401)
+
+        # 2) Parse JSON body from the request
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON."}, status=400)
+
+        # 3) Prepare the headers with Bearer token
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json"
+        }
+
+        # 4) Decide on the FastAPI endpoint for creating orders
+        # For example: POST /orders/
+        url = f"{settings.API_HOST}/orders/"
+
+        # 5) Forward the data to FastAPI
+        # Example: your FastAPI might expect:
+        # {
+        #   "order_number": ...,
+        #   "supplier_code": ...,
+        #   "amount": ...,
+        #   "order_date": ...,
+        #   "delivery_date": ...,
+        #   "status": ...
+        # }
+        # Adjust keys as needed to match your FastAPI "create order" schema
+        fastapi_payload = {
+            "order_number": data["order_number"],
+            "supplier_code": data["supplier_code"],
+            "amount": data["amount"],
+            "order_date": data["order_date"],
+            "delivery_date": data["delivery_date"],
+            "status": data["status"]
+        }
+
+        resp = requests.post(url, headers=headers, json=fastapi_payload)
+
+        if resp.status_code == 201 or resp.status_code == 200:
+            # Order created successfully
+            return JsonResponse({"message": "Order created successfully in FastAPI."}, status=200)
+        else:
+            return JsonResponse({
+                "error": "Failed to create order in FastAPI.",
+                "details": resp.text
+            }, status=resp.status_code)
+
+    return JsonResponse({"error": "Method not allowed."}, status=405)
 
 def track_orders(request):
     return render(request, 'track_orders.html')

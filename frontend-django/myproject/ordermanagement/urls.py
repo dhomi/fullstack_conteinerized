@@ -8,5 +8,6 @@ urlpatterns = [
     path('create/', views.create_order, name='create_order'),
     path('track/', views.track_orders, name='track_orders'),
     path('update_order/<int:order_number>/', views.update_order_view, name="update_order_view"),
+    path("create/", views.create_order_view, name="create_order_view"),
     # Add more order management-related URLs here
 ]

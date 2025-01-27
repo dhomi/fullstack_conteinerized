@@ -1332,7 +1332,7 @@ spec:
     spec:
       containers:
       - name: frontend-django
-        image: daafinho/fullstack_conteinerized-frontend-django:latest
+        image: daafinho/fullstack_conteinerized-frontend-django:3.0
         ports:
         - containerPort: 8001
         env:
@@ -1435,7 +1435,7 @@ spec:
           value: QApassword
         - name: MYSQL_USER
           value: QAuser
-        image: daafinho/fullstack_conteinerized-middleware-fastapi:latest
+        image: daafinho/fullstack_conteinerized-middleware-fastapi:3.0
         name: middleware-fastapi
         ports:
         - containerPort: 8000

@@ -1,10 +1,15 @@
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
+
+# working on implementation with .env but need to find a good solution for kubernetes
+# from decouple import Config, RepositoryEnv
 from fastapi import HTTPException
 import logging
 
+
+# config = Config(RepositoryEnv('/app/.env'))
 # Configuration for JWT
-SECRET_KEY = "django-insecure-x3my1lu5-hcc@uf8w&9-le8q=v(da!2peq^u3za%i1(szdf%kx"  # Ensure this is securely stored
+SECRET_KEY = 'django-insecure-x3my1lu5-hcc@uf8w&9-le8q=v(da!2peq^u3za%i1(szdf%kx' #config('SECRET_KEY')
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 

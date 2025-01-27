@@ -1,14 +1,16 @@
 from pathlib import Path
+# from decouple import Config, RepositoryEnv
 import os
 
+# config = Config(RepositoryEnv('/app/.env'))
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = "django-insecure-x3my1lu5-hcc@uf8w&9-le8q=v(da!2peq^u3za%i1(szdf%kx" #os.getenv('DJANGO_SECRET_KEY', 'unsafe-development-key')
+SECRET_KEY = 'django-insecure-x3my1lu5-hcc@uf8w&9-le8q=v(da!2peq^u3za%i1(szdf%kx' #config('SECRET_KEY')
 DEBUG = os.getenv('DJANGO_DEBUG', 'True') == 'True'
 ALLOWED_HOSTS = ['*']
 
 
-API_HOST = os.getenv('API_HOST', 'http://localhost:8000')
+API_HOST = os.getenv('API_HOST', 'http://middleware-fastapi:8000')
 
 INSTALLED_APPS = [
     'django.contrib.admin',

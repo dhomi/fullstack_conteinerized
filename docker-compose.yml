@@ -48,31 +48,33 @@ services:
       - MYSQL_USER=QAuser
       - MYSQL_PASSWORD=QApassword
       - MYSQL_DATABASE=QAsportarticles
+      - SECRET_KEY=${SECRET_KEY}  # Load shared secret key
+    volumes:
+      - .env:/app/.env  # Mount the .env file
     networks:
       - backend
-    # Expose the hostname
-    extra_hosts:
-      - "middleware-fastapi:127.0.0.1"
 
-  # frontend-django:
-  #   build:
-  #     context: ./frontend-django
-  #     dockerfile: Dockerfile
-  #   command: python ./frontend-django/myproject/manage.py runserver 0.0.0.0:8001
-  #   ports:
-  #     - "8001:8001"
-  #   depends_on:
-  #     - db
-  #     - middleware-fastapi
-  #   environment:
-  #     - MYSQL_HOST=db
-  #     - MYSQL_USER=QAuser
-  #     - MYSQL_PASSWORD=QApassword
-  #     - MYSQL_DATABASE=QAsportarticles
-  #   volumes:
-  #     - .:/frontend-django
-  #   networks:
-  #     - backend
+  frontend-django:
+    build:
+      context: ./frontend-django
+      dockerfile: Dockerfile
+    command: python ./frontend-django/myproject/manage.py runserver 0.0.0.0:8001
+    ports:
+      - "8001:8001"
+    depends_on:
+      - db
+      - middleware-fastapi
+    environment:
+      - MYSQL_HOST=db
+      - MYSQL_USER=QAuser
+      - MYSQL_PASSWORD=QApassword
+      - MYSQL_DATABASE=QAsportarticles
+      - SECRET_KEY=${SECRET_KEY}  # Load shared secret key
+    volumes:
+      - .:/frontend-django
+      - .env:/app/.env  # Mount the .env file
+    networks:
+      - backend
 
   # grafana:
   #   build:
