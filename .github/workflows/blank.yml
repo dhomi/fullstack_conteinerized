@@ -1,0 +1,29 @@
+name: Sync to Azure sandbox Beni
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Greet TechLab
+        run: echo Hello, QA TechLab!
+
+      - name: Sync to Azure techlab benis sandbox
+        run: |
+          with:
+            azurePatSecret: ${{ secrets.AZUREPATSANDBOXBENISYNC }}
+          - bash: |
+              git push --prune https://$(azurePatSecret)@dev.azure.com/TechlabQA/Techlab/_git/Techlab \
+                  +refs/remotes/origin/*:refs/heads/* +refs/tags/*:refs/tags/*
+            displayName: 'Copy to Azure sanbox van Beni'
+            # condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
