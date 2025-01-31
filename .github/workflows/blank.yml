@@ -1,4 +1,4 @@
-name: Sync to Azure sandbox Beni
+name: Github2Azure Sync by Beni@qualityaccelerators.nl
 
 on:
   push:
@@ -7,24 +7,43 @@ on:
     branches: [ "main" ]
 
 jobs:
-  push-to-azure:
+  sync_from_git_to_azure:
     runs-on: ubuntu-latest
-  
-    steps:
-      - uses: actions/checkout@v4
 
-      - name: Checkout repository
-        uses: actions/checkout@v2
-  
-      - name: Set up Git
-        run: |
-          git config --global user.name 'github-actions'
-          git config --global user.email 'github-actions@github.com'
-  
-      - name: Add Azure DevOps remote
-        run: git remote add azure https://TechlabQA:${{ secrets.AZUREPATSANDBOXBENISYNC }}@dev.azure.com/TechlabQA/ZandbakBeni/_git/ZandbakBeni
-  
-      - name: Push to Azure DevOps
-        run: git push azure main
-        env:
-          AZURE_PAT: ${{ secrets.AZUREPATSANDBOXBENISYNC }}
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Setup omgevingsvariabelen
+      run: |
+        echo ::set-env name=AZUREPAT::${{ secrets.AZUREPAT }}
+        echo ::set-env name=AZUSERNAME::${{ secrets.AZUSERNAME }}
+        echo ::set-env name=AZUSER_EMAIL::${{ secrets.AZUSER_EMAIL }}
+        echo ::set-env name=AZORG::${{ secrets.AZORG }}
+    
+    - name: Git clone repo
+      run: |
+        git clone https://github.com/dhomi/fullstack_conteinerized.git
+        cd reponame
+        rm -rf .git
+    
+    - name: Clonen naar Azure DevOps Repo
+      run: |
+        cd ..
+        GIT_CMD_REPOSITORY="https://dev.azure.com/TechlabQA/ZandbakBeni/_git/ZandbakBeni" 
+        git clone $GIT_CMD_REPOSITORY
+    
+    - name: Kopieer bestanden van git naar azure repo
+      run: |
+        cp -r testAzureDevops/* TestGitSync/
+
+    - name: Configureer gebruiker in de azure repro
+      run: |
+        cd TestGitSync
+        git config --global user.email "$AZUSER_EMAIL"
+        git config --global user.name "$AZUSERNAME"
+    
+    - name: Commit en Push naar azure
+      run: |
+        git add .
+        git commit -m "sync from git to azure"
+        git push
