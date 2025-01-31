@@ -9,11 +9,11 @@ on:
 jobs:
   sync_from_git_to_azure:
     runs-on: ubuntu-latest
+    env:
+      ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
 
     steps:
     - uses: actions/checkout@v2
-      env:
-        ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
     
     - name: Setup omgevingsvariabelen
       run: |
