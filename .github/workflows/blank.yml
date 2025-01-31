@@ -22,11 +22,11 @@ jobs:
         echo ::set-env name=AZUSER_EMAIL::${{ secrets.AZUSER_EMAIL }}
         echo ::set-env name=AZORG::${{ secrets.AZORG }}
     
-    - name: Git clone repo
-      run: |
-        git clone https://github.com/dhomi/fullstack_conteinerized.git
-        cd reponame
-        rm -rf .git
+    # - name: Git clone repo
+    #   run: |
+    #     git clone https://github.com/dhomi/fullstack_conteinerized.git
+    #     cd reponame
+    #     rm -rf .git
     
     - name: Clonen naar Azure DevOps Repo
       run: |
