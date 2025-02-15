@@ -32,6 +32,15 @@ if %errorlevel% neq 0 (
     echo Kubernetes CLI is already installed.
 )
 
+REM Check if K9s is installed
+k9s version --client > nul 2>&1
+if %errorlevel% neq 0 (
+    echo K9s is not installed. Installing...
+    choco install k9s
+) else (
+    echo Kubernetes CLI is already installed.
+)
+
 REM Check if Act CLI is installed
 act --version > nul 2>&1
 if %errorlevel% neq 0 (
