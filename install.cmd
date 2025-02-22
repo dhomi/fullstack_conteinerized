@@ -36,7 +36,7 @@ REM Check if K9s is installed
 k9s version --client > nul 2>&1
 if %errorlevel% neq 0 (
     echo K9s is not installed. Installing...
-    choco install k9s
+    choco install k9s -y
 ) else (
     echo Kubernetes CLI is already installed.
 )
