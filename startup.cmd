@@ -23,17 +23,7 @@ if %errorlevel% neq 0 (
 REM Add Helm repo and install/upgrade Chaos Mesh
 helm repo add chaos-mesh https://charts.chaos-mesh.org
 helm install chaos-mesh chaos-mesh/chaos-mesh -n=chaos-mesh --version 2.7.0
-helm upgrade chaos-mesh chaos-mesh/chaos-mesh -n=chaos-mesh --version 2.7.0 --set dashboard.securityMode=false
-
-REM Wait for 1 minute to ensure services are up
-timeout /t 60
-
-REM Port forwarding
-start /b kubectl port-forward -n chaos-mesh svc/chaos-dashboard 2333:2333
-start /b kubectl port-forward -n techlab svc/middleware-fastapi 8000:8000
-start /b kubectl port-forward -n techlab svc/grafana 4000:4000
-start /b kubectl port-forward -n techlab svc/frontend-django 8001:8001
-start /b kubectl port-forward -n techlab svc/db 3306:3306
+helm upgrade chaos-mesh chaos-mesh/chaos-mesh -n=chaos-mesh --version 2.7.0 --set dashboard.service.type=LoadBalancer --set dashboard.securityMode=false --set dashboard.service.port=80 --set dashboard.service.targetPort=2333
 
 REM Houd de terminal open
 pause

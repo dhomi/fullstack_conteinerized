@@ -1183,6 +1183,7 @@ spec:
     targetPort: 3306
   selector:
     io.kompose.service: db
+  type: LoadBalancer  
 ---
 apiVersion: v1
 kind: Service
@@ -1200,6 +1201,7 @@ spec:
     targetPort: 8001
   selector:
     app: frontend-django
+  type: LoadBalancer  
 ---
 apiVersion: v1
 kind: Service
@@ -1217,6 +1219,7 @@ spec:
     targetPort: 3000
   selector:
     io.kompose.service: grafana
+  type: LoadBalancer  
 ---
 apiVersion: v1
 kind: Service
@@ -1234,6 +1237,7 @@ spec:
     targetPort: 8000
   selector:
     io.kompose.service: middleware-fastapi
+  type: LoadBalancer  
 ---
 apiVersion: v1
 kind: Service
@@ -1251,6 +1255,7 @@ spec:
     targetPort: 80
   selector:
     io.kompose.service: phpmyadmin
+  type: LoadBalancer  
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
