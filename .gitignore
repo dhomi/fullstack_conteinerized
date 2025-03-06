@@ -83,3 +83,6 @@ __pycache__/
 # IDE specific folders
 .vscode/
 .idea/
+
+# Load test
+auth_reponse.json
