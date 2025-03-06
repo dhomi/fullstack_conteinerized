@@ -85,4 +85,4 @@ __pycache__/
 .idea/
 
 # Load test
-auth_reponse.json
+auth_response.json
