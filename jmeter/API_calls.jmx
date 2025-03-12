@@ -5,11 +5,9 @@
       <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
         <collectionProp name="Arguments.arguments"/>
       </elementProp>
-      <boolProp name="TestPlan.functional_mode">false</boolProp>
-      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
     </TestPlan>
     <hashTree>
-      <UserParameters guiclass="UserParametersGui" testclass="UserParameters" testname="User Parameters - lokaal" enabled="false">
+      <UserParameters guiclass="UserParametersGui" testclass="UserParameters" testname="User Parameters - lokaal">
         <collectionProp name="UserParameters.names">
           <stringProp name="-1326197564">domain</stringProp>
           <stringProp name="3446913">port</stringProp>
@@ -23,7 +21,7 @@
         <boolProp name="UserParameters.per_iteration">false</boolProp>
       </UserParameters>
       <hashTree/>
-      <UserParameters guiclass="UserParametersGui" testclass="UserParameters" testname="User Parameters - kubernetes">
+      <UserParameters guiclass="UserParametersGui" testclass="UserParameters" testname="User Parameters - kubernetes" enabled="false">
         <collectionProp name="UserParameters.names">
           <stringProp name="-1326197564">domain</stringProp>
           <stringProp name="3446913">port</stringProp>
@@ -40,16 +38,25 @@
       <UserParameters guiclass="UserParametersGui" testclass="UserParameters" testname="response code checks">
         <collectionProp name="UserParameters.names">
           <stringProp name="398856699">check_200</stringProp>
-          <stringProp name="0"></stringProp>
+          <stringProp name="398859582">check_500</stringProp>
         </collectionProp>
         <collectionProp name="UserParameters.thread_values">
-          <collectionProp name="184982985">
+          <collectionProp name="1639167571">
             <stringProp name="1477249802">200 OK</stringProp>
-            <stringProp name="0"></stringProp>
+            <stringProp name="1454209635">500 Internal Server Error</stringProp>
           </collectionProp>
         </collectionProp>
         <boolProp name="UserParameters.per_iteration">false</boolProp>
       </UserParameters>
+      <hashTree/>
+      <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager">
+        <collectionProp name="HeaderManager.headers">
+          <elementProp name="" elementType="Header">
+            <stringProp name="Header.name">User-Agent</stringProp>
+            <stringProp name="Header.value">PerfomanceTest_${__machineIP}</stringProp>
+          </elementProp>
+        </collectionProp>
+      </HeaderManager>
       <hashTree/>
       <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="JSR223 PreProcessor" enabled="false">
         <stringProp name="cacheKey">true</stringProp>
@@ -58,15 +65,6 @@
         <stringProp name="script">vars.getIteration()</stringProp>
         <stringProp name="scriptLanguage">groovy</stringProp>
       </JSR223PreProcessor>
-      <hashTree/>
-      <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
-        <collectionProp name="HeaderManager.headers">
-          <elementProp name="" elementType="Header">
-            <stringProp name="Header.name">User-Agent</stringProp>
-            <stringProp name="Header.value">PerfomanceTest_</stringProp>
-          </elementProp>
-        </collectionProp>
-      </HeaderManager>
       <hashTree/>
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Suppliers">
         <intProp name="ThreadGroup.num_threads">10</intProp>
@@ -79,11 +77,11 @@
         </elementProp>
       </ThreadGroup>
       <hashTree>
-        <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="01 Get list of Suppliers" enabled="true">
+        <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="01 Get list of Suppliers">
           <boolProp name="TransactionController.includeTimers">false</boolProp>
         </TransactionController>
         <hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Get all Suppliers" enabled="true">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Get all Suppliers">
             <stringProp name="HTTPSampler.domain">${domain}</stringProp>
             <stringProp name="HTTPSampler.port">${port}</stringProp>
             <stringProp name="HTTPSampler.protocol">http</stringProp>
@@ -135,7 +133,7 @@
             <hashTree/>
           </hashTree>
         </hashTree>
-        <PreciseThroughputTimer guiclass="TestBeanGUI" testclass="PreciseThroughputTimer" testname="Precise Throughput Timer" enabled="false">
+        <PreciseThroughputTimer guiclass="TestBeanGUI" testclass="PreciseThroughputTimer" testname="Precise Throughput Timer" enabled="true">
           <doubleProp>
             <name>allowedThroughputSurplus</name>
             <value>1.0</value>
@@ -159,7 +157,7 @@
           <stringProp name="RandomTimer.range">3000.0</stringProp>
         </UniformRandomTimer>
         <hashTree/>
-        <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="02 Get details of one Supplier" enabled="true">
+        <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="02 Get details of one Supplier">
           <boolProp name="TransactionController.includeTimers">false</boolProp>
         </TransactionController>
         <hashTree>
@@ -193,16 +191,6 @@
               </collectionProp>
             </HeaderManager>
             <hashTree/>
-            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion ${check_200}" enabled="true">
-              <collectionProp name="Asserion.test_strings">
-                <stringProp name="2144948729">${check_200}</stringProp>
-              </collectionProp>
-              <stringProp name="Assertion.custom_message">Response bevat NIET ${check_200}</stringProp>
-              <stringProp name="Assertion.test_field">Assertion.response_headers</stringProp>
-              <boolProp name="Assertion.assume_success">false</boolProp>
-              <intProp name="Assertion.test_type">16</intProp>
-            </ResponseAssertion>
-            <hashTree/>
             <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion field supplier code, name and address" enabled="true">
               <collectionProp name="Asserion.test_strings">
                 <stringProp name="-2049497720">&quot;supplier_code&quot;:${Suppliers_nr_random},</stringProp>
@@ -217,38 +205,170 @@
               <stringProp name="TestPlan.comments">&quot;supplier_code&quot;: 34,</stringProp>
             </ResponseAssertion>
             <hashTree/>
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion ${check_200}" enabled="true">
+              <collectionProp name="Asserion.test_strings">
+                <stringProp name="2144948729">${check_200}</stringProp>
+              </collectionProp>
+              <stringProp name="Assertion.custom_message">Response bevat NIET ${check_200}</stringProp>
+              <stringProp name="Assertion.test_field">Assertion.response_headers</stringProp>
+              <boolProp name="Assertion.assume_success">false</boolProp>
+              <intProp name="Assertion.test_type">16</intProp>
+            </ResponseAssertion>
+            <hashTree/>
           </hashTree>
         </hashTree>
-        <IfController guiclass="IfControllerPanel" testclass="IfController" testname="If Controller" enabled="false">
-          <stringProp name="IfController.condition"></stringProp>
-          <boolProp name="IfController.evaluateAll">false</boolProp>
-          <boolProp name="IfController.useExpression">true</boolProp>
-        </IfController>
+        <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="Create new supplier">
+          <boolProp name="TransactionController.includeTimers">false</boolProp>
+        </TransactionController>
         <hashTree>
-          <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="Create new supplier" enabled="true">
-            <boolProp name="TransactionController.includeTimers">false</boolProp>
-          </TransactionController>
+          <LoopController guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Add new supplier">
+            <stringProp name="LoopController.loops">5</stringProp>
+          </LoopController>
           <hashTree>
-            <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="01 Get list of Suppliers" enabled="true">
+            <CounterConfig guiclass="CounterConfigGui" testclass="CounterConfig" testname="Counter">
+              <stringProp name="CounterConfig.start">1</stringProp>
+              <stringProp name="CounterConfig.end">99</stringProp>
+              <stringProp name="CounterConfig.incr">1</stringProp>
+              <stringProp name="CounterConfig.name">Counter</stringProp>
+              <stringProp name="CounterConfig.format">00</stringProp>
+              <boolProp name="CounterConfig.per_user">true</boolProp>
+              <stringProp name="TestPlan.comments">Counter for adding supplier, to increase +1 every time</stringProp>
+            </CounterConfig>
+            <hashTree/>
+            <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Check if the Supplier is already used">
+              <stringProp name="HTTPSampler.domain">${domain}</stringProp>
+              <stringProp name="HTTPSampler.port">${port}</stringProp>
+              <stringProp name="HTTPSampler.protocol">http</stringProp>
+              <stringProp name="HTTPSampler.path">/suppliers/${__threadNum}${Counter}</stringProp>
+              <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+              <stringProp name="HTTPSampler.method">GET</stringProp>
+              <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+              <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+              <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+                <collectionProp name="Arguments.arguments">
+                  <elementProp name="" elementType="HTTPArgument">
+                    <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                    <stringProp name="Argument.value"></stringProp>
+                    <stringProp name="Argument.metadata">=</stringProp>
+                    <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                  </elementProp>
+                </collectionProp>
+              </elementProp>
+            </HTTPSamplerProxy>
+            <hashTree>
+              <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+                <collectionProp name="HeaderManager.headers">
+                  <elementProp name="" elementType="Header">
+                    <stringProp name="Header.name">Content-Type</stringProp>
+                    <stringProp name="Header.value">application/json</stringProp>
+                  </elementProp>
+                </collectionProp>
+              </HeaderManager>
+              <hashTree/>
+              <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion ${check_200}">
+                <collectionProp name="Asserion.test_strings">
+                  <stringProp name="2145038102">${check_500}</stringProp>
+                  <stringProp name="2144948729">${check_200}</stringProp>
+                </collectionProp>
+                <stringProp name="Assertion.custom_message">Response bevat NIET ${check_500} of ${check_200}</stringProp>
+                <stringProp name="Assertion.test_field">Assertion.response_headers</stringProp>
+                <boolProp name="Assertion.assume_success">false</boolProp>
+                <intProp name="Assertion.test_type">48</intProp>
+              </ResponseAssertion>
+              <hashTree/>
+              <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="SupplierExist">
+                <stringProp name="RegexExtractor.useHeaders">true</stringProp>
+                <stringProp name="RegexExtractor.refname">SupplierExist</stringProp>
+                <stringProp name="RegexExtractor.regex">HTTP/[0-9]+.*? ([2][0-9]+).*</stringProp>
+                <stringProp name="RegexExtractor.template">$1$</stringProp>
+                <stringProp name="RegexExtractor.default">500</stringProp>
+                <boolProp name="RegexExtractor.default_empty_value">false</boolProp>
+                <stringProp name="RegexExtractor.match_number">1</stringProp>
+                <stringProp name="TestPlan.comments">HTTP/1.1 500 Internal Server Error</stringProp>
+              </RegexExtractor>
+              <hashTree/>
+            </hashTree>
+            <IfController guiclass="IfControllerPanel" testclass="IfController" testname="If Controller">
+              <stringProp name="IfController.condition">${__groovy(&quot;${SupplierExist}&quot; == &quot;200&quot;)}</stringProp>
+              <boolProp name="IfController.evaluateAll">false</boolProp>
+              <boolProp name="IfController.useExpression">true</boolProp>
+              <stringProp name="TestPlan.comments">to delete the supplier if the supplier exist</stringProp>
+            </IfController>
+            <hashTree>
+              <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="04 Delete new supplier">
+                <boolProp name="TransactionController.includeTimers">false</boolProp>
+              </TransactionController>
+              <hashTree>
+                <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Delete Supplier ">
+                  <stringProp name="HTTPSampler.domain">${domain}</stringProp>
+                  <stringProp name="HTTPSampler.port">${port}</stringProp>
+                  <stringProp name="HTTPSampler.protocol">http</stringProp>
+                  <stringProp name="HTTPSampler.path">/suppliers/${__threadNum}${Counter}</stringProp>
+                  <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+                  <stringProp name="HTTPSampler.method">DELETE</stringProp>
+                  <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+                  <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+                  <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+                    <collectionProp name="Arguments.arguments"/>
+                  </elementProp>
+                </HTTPSamplerProxy>
+                <hashTree>
+                  <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+                    <collectionProp name="HeaderManager.headers">
+                      <elementProp name="" elementType="Header">
+                        <stringProp name="Header.name">Content-Type</stringProp>
+                        <stringProp name="Header.value">application/json</stringProp>
+                      </elementProp>
+                    </collectionProp>
+                  </HeaderManager>
+                  <hashTree/>
+                  <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion ${check_200}" enabled="true">
+                    <collectionProp name="Asserion.test_strings">
+                      <stringProp name="2144948729">${check_200}</stringProp>
+                    </collectionProp>
+                    <stringProp name="Assertion.custom_message">Response bevat NIET ${check_200}</stringProp>
+                    <stringProp name="Assertion.test_field">Assertion.response_headers</stringProp>
+                    <boolProp name="Assertion.assume_success">false</boolProp>
+                    <intProp name="Assertion.test_type">16</intProp>
+                  </ResponseAssertion>
+                  <hashTree/>
+                  <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Suppliers_nr_random" enabled="false">
+                    <stringProp name="RegexExtractor.useHeaders">false</stringProp>
+                    <stringProp name="RegexExtractor.refname">Suppliers_nr_random</stringProp>
+                    <stringProp name="RegexExtractor.regex">&quot;suppliercode&quot;.*?([0-9]+),</stringProp>
+                    <stringProp name="RegexExtractor.template">$1$</stringProp>
+                    <stringProp name="RegexExtractor.default">Suppliers_nr_random NIET gevonden</stringProp>
+                    <boolProp name="RegexExtractor.default_empty_value">false</boolProp>
+                    <stringProp name="RegexExtractor.match_number">0</stringProp>
+                  </RegexExtractor>
+                  <hashTree/>
+                </hashTree>
+              </hashTree>
+            </hashTree>
+            <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="03 Add new supplier">
               <boolProp name="TransactionController.includeTimers">false</boolProp>
             </TransactionController>
             <hashTree>
-              <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Get all Suppliers" enabled="true">
+              <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Add Supplier " enabled="true">
                 <stringProp name="HTTPSampler.domain">${domain}</stringProp>
                 <stringProp name="HTTPSampler.port">${port}</stringProp>
                 <stringProp name="HTTPSampler.protocol">http</stringProp>
-                <stringProp name="HTTPSampler.path">/suppliers</stringProp>
+                <stringProp name="HTTPSampler.path">/suppliers/</stringProp>
                 <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-                <stringProp name="HTTPSampler.method">GET</stringProp>
+                <stringProp name="HTTPSampler.method">POST</stringProp>
                 <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-                <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
-                <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+                <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+                <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
                   <collectionProp name="Arguments.arguments">
                     <elementProp name="" elementType="HTTPArgument">
                       <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                      <stringProp name="Argument.value"></stringProp>
+                      <stringProp name="Argument.value">{&#xd;
+  &quot;supplier_code&quot;: ${__threadNum}${Counter},&#xd;
+  &quot;supplier_name&quot;: &quot;Test_${__threadNum}${Counter}&quot;,&#xd;
+  &quot;address&quot;: &quot;Adress_${__threadNum}${Counter}&quot;,&#xd;
+  &quot;city&quot;: &quot;City_${__threadNum}${Counter}&quot;&#xd;
+}</stringProp>
                       <stringProp name="Argument.metadata">=</stringProp>
-                      <boolProp name="HTTPArgument.use_equals">true</boolProp>
                     </elementProp>
                   </collectionProp>
                 </elementProp>
@@ -273,7 +393,173 @@
                   <intProp name="Assertion.test_type">16</intProp>
                 </ResponseAssertion>
                 <hashTree/>
-                <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Suppliers_nr_random" enabled="true">
+                <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Suppliers_nr_random" enabled="false">
+                  <stringProp name="RegexExtractor.useHeaders">false</stringProp>
+                  <stringProp name="RegexExtractor.refname">Suppliers_nr_random</stringProp>
+                  <stringProp name="RegexExtractor.regex">&quot;suppliercode&quot;.*?([0-9]+),</stringProp>
+                  <stringProp name="RegexExtractor.template">$1$</stringProp>
+                  <stringProp name="RegexExtractor.default">Suppliers_nr_random NIET gevonden</stringProp>
+                  <boolProp name="RegexExtractor.default_empty_value">false</boolProp>
+                  <stringProp name="RegexExtractor.match_number">0</stringProp>
+                </RegexExtractor>
+                <hashTree/>
+              </hashTree>
+              <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Add Supplier " enabled="false">
+                <stringProp name="HTTPSampler.domain">${domain}</stringProp>
+                <stringProp name="HTTPSampler.port">${port}</stringProp>
+                <stringProp name="HTTPSampler.protocol">http</stringProp>
+                <stringProp name="HTTPSampler.path">/suppliers/</stringProp>
+                <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+                <stringProp name="HTTPSampler.method">POST</stringProp>
+                <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+                <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+                <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+                  <collectionProp name="Arguments.arguments">
+                    <elementProp name="" elementType="HTTPArgument">
+                      <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                      <stringProp name="Argument.value">{&#xd;
+  &quot;supplier_code&quot;: 1${Counter},&#xd;
+  &quot;supplier_name&quot;: &quot;Test_1${Counter}&quot;,&#xd;
+  &quot;address&quot;: &quot;Adress_1${Counter}&quot;,&#xd;
+  &quot;city&quot;: &quot;City_1${Counter}&quot;&#xd;
+}</stringProp>
+                      <stringProp name="Argument.metadata">=</stringProp>
+                    </elementProp>
+                  </collectionProp>
+                </elementProp>
+              </HTTPSamplerProxy>
+              <hashTree>
+                <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+                  <collectionProp name="HeaderManager.headers">
+                    <elementProp name="" elementType="Header">
+                      <stringProp name="Header.name">Content-Type</stringProp>
+                      <stringProp name="Header.value">application/json</stringProp>
+                    </elementProp>
+                  </collectionProp>
+                </HeaderManager>
+                <hashTree/>
+                <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion ${check_200}" enabled="true">
+                  <collectionProp name="Asserion.test_strings">
+                    <stringProp name="2144948729">${check_200}</stringProp>
+                  </collectionProp>
+                  <stringProp name="Assertion.custom_message">Response bevat NIET ${check_200}</stringProp>
+                  <stringProp name="Assertion.test_field">Assertion.response_headers</stringProp>
+                  <boolProp name="Assertion.assume_success">false</boolProp>
+                  <intProp name="Assertion.test_type">16</intProp>
+                </ResponseAssertion>
+                <hashTree/>
+                <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Suppliers_nr_random" enabled="false">
+                  <stringProp name="RegexExtractor.useHeaders">false</stringProp>
+                  <stringProp name="RegexExtractor.refname">Suppliers_nr_random</stringProp>
+                  <stringProp name="RegexExtractor.regex">&quot;suppliercode&quot;.*?([0-9]+),</stringProp>
+                  <stringProp name="RegexExtractor.template">$1$</stringProp>
+                  <stringProp name="RegexExtractor.default">Suppliers_nr_random NIET gevonden</stringProp>
+                  <boolProp name="RegexExtractor.default_empty_value">false</boolProp>
+                  <stringProp name="RegexExtractor.match_number">0</stringProp>
+                </RegexExtractor>
+                <hashTree/>
+              </hashTree>
+            </hashTree>
+          </hashTree>
+          <LoopController guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Delete supplier">
+            <stringProp name="LoopController.loops">5</stringProp>
+          </LoopController>
+          <hashTree>
+            <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="01 Get list of Suppliers">
+              <boolProp name="TransactionController.includeTimers">false</boolProp>
+            </TransactionController>
+            <hashTree>
+              <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Get all Suppliers">
+                <stringProp name="HTTPSampler.domain">${domain}</stringProp>
+                <stringProp name="HTTPSampler.port">${port}</stringProp>
+                <stringProp name="HTTPSampler.protocol">http</stringProp>
+                <stringProp name="HTTPSampler.path">/suppliers</stringProp>
+                <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+                <stringProp name="HTTPSampler.method">GET</stringProp>
+                <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+                <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+                <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+                  <collectionProp name="Arguments.arguments">
+                    <elementProp name="" elementType="HTTPArgument">
+                      <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                      <stringProp name="Argument.value"></stringProp>
+                      <stringProp name="Argument.metadata">=</stringProp>
+                      <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                    </elementProp>
+                  </collectionProp>
+                </elementProp>
+              </HTTPSamplerProxy>
+              <hashTree>
+                <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager">
+                  <collectionProp name="HeaderManager.headers">
+                    <elementProp name="" elementType="Header">
+                      <stringProp name="Header.name">Content-Type</stringProp>
+                      <stringProp name="Header.value">application/json</stringProp>
+                    </elementProp>
+                  </collectionProp>
+                </HeaderManager>
+                <hashTree/>
+                <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Suppliers_nr_list">
+                  <stringProp name="RegexExtractor.useHeaders">false</stringProp>
+                  <stringProp name="RegexExtractor.refname">Suppliers_nr_list</stringProp>
+                  <stringProp name="RegexExtractor.regex">suppliercode&quot;:(${__threadNum}[0-9][0-9]),&quot;</stringProp>
+                  <stringProp name="RegexExtractor.template">$1$</stringProp>
+                  <stringProp name="RegexExtractor.default">Suppliers_nr_list NIET gevonden</stringProp>
+                  <boolProp name="RegexExtractor.default_empty_value">false</boolProp>
+                  <stringProp name="RegexExtractor.match_number">0</stringProp>
+                  <stringProp name="TestPlan.comments">suppliercode&quot;:(1[0-9][0-9]),&quot;</stringProp>
+                </RegexExtractor>
+                <hashTree/>
+                <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion ${check_200}">
+                  <collectionProp name="Asserion.test_strings">
+                    <stringProp name="2144948729">${check_200}</stringProp>
+                  </collectionProp>
+                  <stringProp name="Assertion.custom_message">Response bevat NIET ${check_200}</stringProp>
+                  <stringProp name="Assertion.test_field">Assertion.response_headers</stringProp>
+                  <boolProp name="Assertion.assume_success">false</boolProp>
+                  <intProp name="Assertion.test_type">16</intProp>
+                </ResponseAssertion>
+                <hashTree/>
+              </hashTree>
+            </hashTree>
+            <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="04 Delete new supplier">
+              <boolProp name="TransactionController.includeTimers">false</boolProp>
+            </TransactionController>
+            <hashTree>
+              <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Delete Supplier ">
+                <stringProp name="HTTPSampler.domain">${domain}</stringProp>
+                <stringProp name="HTTPSampler.port">${port}</stringProp>
+                <stringProp name="HTTPSampler.protocol">http</stringProp>
+                <stringProp name="HTTPSampler.path">/suppliers/${Suppliers_nr_list}</stringProp>
+                <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+                <stringProp name="HTTPSampler.method">DELETE</stringProp>
+                <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+                <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+                <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+                  <collectionProp name="Arguments.arguments"/>
+                </elementProp>
+              </HTTPSamplerProxy>
+              <hashTree>
+                <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager">
+                  <collectionProp name="HeaderManager.headers">
+                    <elementProp name="" elementType="Header">
+                      <stringProp name="Header.name">Content-Type</stringProp>
+                      <stringProp name="Header.value">application/json</stringProp>
+                    </elementProp>
+                  </collectionProp>
+                </HeaderManager>
+                <hashTree/>
+                <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion ${check_200}" enabled="true">
+                  <collectionProp name="Asserion.test_strings">
+                    <stringProp name="2144948729">${check_200}</stringProp>
+                  </collectionProp>
+                  <stringProp name="Assertion.custom_message">Response bevat NIET ${check_200}</stringProp>
+                  <stringProp name="Assertion.test_field">Assertion.response_headers</stringProp>
+                  <boolProp name="Assertion.assume_success">false</boolProp>
+                  <intProp name="Assertion.test_type">16</intProp>
+                </ResponseAssertion>
+                <hashTree/>
+                <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Suppliers_nr_random" enabled="false">
                   <stringProp name="RegexExtractor.useHeaders">false</stringProp>
                   <stringProp name="RegexExtractor.refname">Suppliers_nr_random</stringProp>
                   <stringProp name="RegexExtractor.regex">&quot;suppliercode&quot;.*?([0-9]+),</stringProp>
@@ -309,7 +595,14 @@
           </elementProp>
         </HTTPSamplerProxy>
         <hashTree/>
-        <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="false">
+        <DebugPostProcessor guiclass="TestBeanGUI" testclass="DebugPostProcessor" testname="Debug PostProcessor" enabled="false">
+          <boolProp name="displayJMeterProperties">false</boolProp>
+          <boolProp name="displayJMeterVariables">true</boolProp>
+          <boolProp name="displaySamplerProperties">true</boolProp>
+          <boolProp name="displaySystemProperties">false</boolProp>
+        </DebugPostProcessor>
+        <hashTree/>
+        <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree">
           <boolProp name="ResultCollector.error_logging">false</boolProp>
           <objProp>
             <name>saveConfig</name>
@@ -531,13 +824,6 @@
         </HTTPSamplerProxy>
         <hashTree/>
       </hashTree>
-      <DebugPostProcessor guiclass="TestBeanGUI" testclass="DebugPostProcessor" testname="Debug PostProcessor" enabled="false">
-        <boolProp name="displayJMeterProperties">false</boolProp>
-        <boolProp name="displayJMeterVariables">true</boolProp>
-        <boolProp name="displaySamplerProperties">true</boolProp>
-        <boolProp name="displaySystemProperties">false</boolProp>
-      </DebugPostProcessor>
-      <hashTree/>
     </hashTree>
   </hashTree>
 </jmeterTestPlan>
