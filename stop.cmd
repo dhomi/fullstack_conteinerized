@@ -5,7 +5,8 @@ taskkill /F /IM "kubectl.exe" >nul 2>&1
 
 REM Delete both namespaces
 kubectl delete namespace techlab
-kubectl delete namespace chaos-mesh
+helm uninstall chaos-mesh -n=chaos-mesh
+REM kubectl delete namespace chaos-mesh
 
 REM Remove Helm repo
 helm repo remove chaos-mesh
