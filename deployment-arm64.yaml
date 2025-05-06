@@ -1,0 +1,213 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: techlab
+
+---
+
+# Database Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db
+  namespace: techlab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db
+  template:
+    metadata:
+      labels:
+        app: db
+    spec:
+      containers:
+      - name: db
+        image: steavy/db:arm64
+        env:
+        - name: MYSQL_DATABASE
+          value: QAsportarticles
+        - name: MYSQL_PASSWORD
+          value: QApassword
+        - name: MYSQL_ROOT_PASSWORD
+          value: password
+        - name: MYSQL_USER
+          value: QAuser
+        ports:
+        - containerPort: 3306
+
+---
+
+# Database Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+  namespace: techlab
+spec:
+  selector:
+    app: db
+  ports:
+  - protocol: TCP
+    port: 3306
+    targetPort: 3306
+  type: ClusterIP
+
+---
+
+# phpMyAdmin Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: phpmyadmin
+  namespace: techlab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: phpmyadmin
+  template:
+    metadata:
+      labels:
+        app: phpmyadmin
+    spec:
+      containers:
+      - name: phpmyadmin
+        image: phpmyadmin/phpmyadmin:latest
+        env:
+        - name: MYSQL_PASSWORD
+          value: QApassword
+        - name: MYSQL_ROOT_PASSWORD
+          value: password
+        - name: MYSQL_USER
+          value: QAuser
+        - name: PMA_HOST
+          value: db
+        ports:
+        - containerPort: 80
+          protocol: TCP
+      restartPolicy: Always
+
+---
+
+# phpMyAdmin Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: phpmyadmin
+  namespace: techlab
+spec:
+  type: LoadBalancer
+  ports:
+  - name: "8090"
+    port: 8090
+    targetPort: 80
+  selector:
+    app: phpmyadmin
+
+---
+
+# Frontend Django Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-django
+  namespace: techlab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend-django
+  template:
+    metadata:
+      labels:
+        app: frontend-django
+    spec:
+      containers:
+      - name: frontend-django
+        image: steavy/frontend-django:latest
+        ports:
+        - containerPort: 8001
+        env:
+        - name: MYSQL_DATABASE
+          value: QAsportarticles
+        - name: MYSQL_HOST
+          value: db
+        - name: MYSQL_PASSWORD
+          value: QApassword
+        - name: MYSQL_USER
+          value: QAuser
+        command:
+        - python
+        - /frontend-django/myproject/manage.py
+        - runserver
+        - 0.0.0.0:8001
+
+---
+
+# Frontend Django Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-django
+  namespace: techlab
+spec:
+  selector:
+    app: frontend-django
+  ports:
+  - protocol: TCP
+    port: 8001
+    targetPort: 8001
+  type: LoadBalancer
+
+---
+
+# Middleware FastAPI Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: middleware-fastapi
+  namespace: techlab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: middleware-fastapi
+  template:
+    metadata:
+      labels:
+        app: middleware-fastapi
+    spec:
+      containers:
+      - name: middleware-fastapi
+        image: steavy/middleware-fastapi:latest
+        command: ["uvicorn"]
+        args: ["main:app", "--host", "0.0.0.0", "--port", "8000"]
+        env:
+        - name: MYSQL_DATABASE
+          value: QAsportarticles
+        - name: MYSQL_HOST
+          value: db
+        - name: MYSQL_PASSWORD
+          value: QApassword
+        - name: MYSQL_USER
+          value: QAuser
+        ports:
+        - containerPort: 8000
+
+---
+
+# Middleware FastAPI Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: middleware-fastapi
+  namespace: techlab
+spec:
+  selector:
+    app: middleware-fastapi
+  ports:
+  - protocol: TCP
+    port: 8000
+    targetPort: 8000
+  type: LoadBalancer

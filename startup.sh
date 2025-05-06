@@ -5,7 +5,7 @@ kubectl create namespace techlab --dry-run=client -o yaml | kubectl apply -f -
 kubectl create namespace chaos-mesh --dry-run=client -o yaml | kubectl apply -f -
 
 # Deploy all
-kubectl apply -f deployment.yaml -n techlab
+kubectl apply -f deployment-arm64.yaml -n techlab
 
 kubectl -n techlab get pods
 

@@ -3,8 +3,7 @@ FROM mariadb:latest
 
 # Set environment variables for MariaDB
 ENV MYSQL_ROOT_PASSWORD=rootpassword
-ENV MYSQL_DATABASE: 'QAsportartikelen'
-# ENV MYSQL_DATABASE=sampledb
+ENV MYSQL_DATABASE=QAsportartikelen
 ENV MYSQL_USER=user
 ENV MYSQL_PASSWORD=userpassword
 
