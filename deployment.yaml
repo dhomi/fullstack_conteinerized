@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
       - name: db
-        image: daafinho/db:latest
+        image: steavy/db:latest
         env:
         - name: MYSQL_DATABASE
           value: QAsportarticles
